@@ -33,6 +33,10 @@ public class SparePart {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "sparePart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FailurePart> failureParts;
+    @Size(max = 150, message = "Producer name cannot be longer than 150 characters.")
+    @Column(name = "producer")
+    private String producer;
+
+    @OneToMany(mappedBy = "sparePart")
+    private List<BreakdownUsedParts> breakdownUsedPartsList;
 }

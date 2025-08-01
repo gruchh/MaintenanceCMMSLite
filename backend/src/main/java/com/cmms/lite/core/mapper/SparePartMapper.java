@@ -1,0 +1,21 @@
+package com.cmms.lite.core.mapper;
+
+import com.cmms.lite.api.dto.SparePartDTOs;
+import com.cmms.lite.core.entity.SparePart;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
+
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
+public interface SparePartMapper {
+
+    SparePart toEntity(SparePartDTOs.CreateRequest request);
+    SparePartDTOs.Response toResponse(SparePart sparePart);
+    List<SparePartDTOs.Response> toResponseList(List<SparePart> spareParts);
+    void updateEntityFromRequest(SparePartDTOs.UpdateRequest request, @MappingTarget SparePart sparePart);
+}

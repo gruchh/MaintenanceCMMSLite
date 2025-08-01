@@ -45,7 +45,7 @@ public class UserService {
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
-                .roles(Set.of(Role.USER))
+                .roles(Set.of(Role.SUBCONTRACTOR))
                 .build();
 
         userRepository.save(user);

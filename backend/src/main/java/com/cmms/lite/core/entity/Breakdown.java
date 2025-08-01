@@ -33,29 +33,33 @@ public class Breakdown {
     @Column(name = "reported_at", nullable = false)
     private LocalDateTime reportedAt;
 
-    @Column(name = "repaired_at")
-    private LocalDateTime repairedAt;
+    @PastOrPresent(message = "The start date cannot be in the future.")
+    @Column(name = "started_at")
+    private LocalDateTime startedAt;
+
+    @PastOrPresent(message = "The finish date cannot be in the future.")
+    @Column(name = "finished_at")
+    private LocalDateTime finishedAt;
 
     @NotNull(message = "A machine must be assigned to the failure.")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "machine_id", nullable = false)
     private Machine machine;
 
-    @OneToMany(mappedBy = "failure", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FailurePart> usedParts = new ArrayList<>();
+    @OneToMany(mappedBy = "breakdown")
+    private List<BreakdownUsedParts> usedPartsList = new ArrayList<>();
 
     @Column(name = "total_cost", precision = 19, scale = 4)
     private BigDecimal totalCost;
 
-    @PrePersist
-    @PreUpdate
-    public void calculateTotalCost() {
-        if (this.usedParts == null) {
-            this.totalCost = BigDecimal.ZERO;
-            return;
-        }
-        this.totalCost = usedParts.stream()
-                .map(FailurePart::getCost)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    @Column(nullable = false)
+    private Boolean opened;
+
+    @Column(name = "specialist_comment", length = 2000)
+    private String specialistComment;
+
+    @NotNull(message = "Breakdown type cannot be null.")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "breakdown_type", nullable = false)
+    private BreakdownType type;
 }

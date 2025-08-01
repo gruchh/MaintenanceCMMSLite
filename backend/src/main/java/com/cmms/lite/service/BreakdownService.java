@@ -1,0 +1,124 @@
+package com.cmms.lite.service;
+
+import com.cmms.lite.api.dto.BreakdownDTOs;
+import com.cmms.lite.core.entity.Breakdown;
+import com.cmms.lite.core.entity.BreakdownUsedParts;
+import com.cmms.lite.core.entity.Machine;
+import com.cmms.lite.core.entity.SparePart;
+import com.cmms.lite.core.mapper.BreakdownMapper;
+import com.cmms.lite.core.repository.BreakdownRepository;
+import com.cmms.lite.core.repository.MachineRepository;
+import com.cmms.lite.core.repository.SparePartRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class BreakdownService {
+
+    private final BreakdownRepository breakdownRepository;
+    private final SparePartRepository sparePartRepository;
+    private final MachineRepository machineRepository;
+    private final BreakdownMapper breakdownMapper;
+
+    private static final String BREAKDOWN_NOT_FOUND = "Breakdown not found with id: ";
+    private static final String MACHINE_NOT_FOUND = "Machine not found with id: ";
+    private static final String PART_NOT_FOUND = "SparePart not found with id: ";
+
+    @Transactional
+    public BreakdownDTOs.Response createBreakdown(BreakdownDTOs.CreateRequest request) {
+        Machine machine = machineRepository.findById(request.machineId())
+                .orElseThrow(() -> new EntityNotFoundException(MACHINE_NOT_FOUND + request.machineId()));
+
+        Breakdown breakdown = new Breakdown();
+        breakdown.setDescription(request.description());
+        breakdown.setType(request.type());
+        breakdown.setMachine(machine);
+
+        breakdown.setReportedAt(LocalDateTime.now());
+        breakdown.setOpened(true);
+        breakdown.setTotalCost(BigDecimal.ZERO);
+
+        Breakdown savedBreakdown = breakdownRepository.save(breakdown);
+        return breakdownMapper.toResponse(savedBreakdown);
+    }
+
+    @Transactional(readOnly = true)
+    public BreakdownDTOs.Response findById(Long id) {
+        return breakdownRepository.findById(id)
+                .map(breakdownMapper::toResponse)
+                .orElseThrow(() -> new EntityNotFoundException(BREAKDOWN_NOT_FOUND + id));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BreakdownDTOs.Response> findAll(Pageable pageable) {
+        return breakdownRepository.findAll(pageable).map(breakdownMapper::toResponse);
+    }
+
+    @Transactional
+    public BreakdownDTOs.Response addPartToBreakdown(Long breakdownId, BreakdownDTOs.AddPartRequest request) {
+        Breakdown breakdown = findBreakdownEntityById(breakdownId);
+        SparePart sparePart = sparePartRepository.findById(request.sparePartId())
+                .orElseThrow(() -> new EntityNotFoundException(PART_NOT_FOUND + request.sparePartId()));
+
+        BreakdownUsedParts usedPart = new BreakdownUsedParts();
+        usedPart.setBreakdown(breakdown);
+        usedPart.setSparePart(sparePart);
+        usedPart.setQuantity(request.quantity());
+        breakdown.getUsedPartsList().add(usedPart);
+
+        recalculateTotalCost(breakdown);
+        return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
+    }
+
+    @Transactional
+    public BreakdownDTOs.Response removePartFromBreakdown(Long breakdownId, Long usedPartId) {
+        Breakdown breakdown = findBreakdownEntityById(breakdownId);
+        boolean removed = breakdown.getUsedPartsList()
+                .removeIf(part -> part.getId().equals(usedPartId));
+
+        if (!removed) {
+            throw new EntityNotFoundException("Used part with id " + usedPartId + " not found in breakdown " + breakdownId);
+        }
+
+        recalculateTotalCost(breakdown);
+        return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
+    }
+
+    @Transactional
+    public BreakdownDTOs.Response closeBreakdown(Long breakdownId, BreakdownDTOs.CloseRequest request) {
+        Breakdown breakdown = findBreakdownEntityById(breakdownId);
+        if (!breakdown.getOpened()) {
+            throw new IllegalStateException("Breakdown is already closed.");
+        }
+        breakdown.setOpened(false);
+        breakdown.setFinishedAt(LocalDateTime.now());
+        breakdown.setSpecialistComment(request.specialistComment());
+
+        return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
+    }
+
+    private Breakdown findBreakdownEntityById(Long id) {
+        return breakdownRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(BREAKDOWN_NOT_FOUND + id));
+    }
+
+    private void recalculateTotalCost(Breakdown breakdown) {
+        BigDecimal totalCost = breakdown.getUsedPartsList().stream()
+                .map(usedPart -> {
+                    BigDecimal price = usedPart.getSparePart().getPrice();
+                    if (price == null) return BigDecimal.ZERO;
+                    return price.multiply(new BigDecimal(usedPart.getQuantity()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        breakdown.setTotalCost(totalCost);
+    }
+}
