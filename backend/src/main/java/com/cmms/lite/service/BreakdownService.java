@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +104,29 @@ public class BreakdownService {
         breakdown.setSpecialistComment(request.specialistComment());
 
         return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
+    }
+
+    @Transactional(readOnly = true)
+    public BreakdownDTOs.BreakdownStatsDTO getBreakdownStats() {
+        LocalDateTime now = LocalDateTime.now();
+
+        Long daysSinceLast = breakdownRepository.findTopByOrderByFinishedAtDesc()
+                .map(b -> ChronoUnit.DAYS.between(b.getFinishedAt(), now))
+                .orElse(null);
+
+        Long lastWeekCount = breakdownRepository.countByFinishedAtBetween(now.minusWeeks(1), now);
+        Long lastMonthCount = breakdownRepository.countByFinishedAtBetween(now.minusMonths(1), now);
+        Long currentYearCount = breakdownRepository.countByFinishedAtBetween(now.withDayOfYear(1), now);
+
+        Double avgDurationMinutes = breakdownRepository.getAverageBreakdownDurationInMinutes();
+
+        return new BreakdownDTOs.BreakdownStatsDTO(
+                daysSinceLast,
+                lastWeekCount,
+                lastMonthCount,
+                currentYearCount,
+                avgDurationMinutes
+        );
     }
 
     private Breakdown findBreakdownEntityById(Long id) {

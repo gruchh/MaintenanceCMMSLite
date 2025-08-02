@@ -39,7 +39,7 @@ public final class BreakdownDTOs {
             String specialistComment,
             BreakdownType type,
             BigDecimal totalCost,
-            MachineDTOs.SummaryResponse machine, // Użycie DTO z innej klasy-kontenera
+            MachineDTOs.SummaryResponse machine,
             List<UsedPartResponse> usedParts
     ) {}
 
@@ -49,5 +49,13 @@ public final class BreakdownDTOs {
             String sparePartName,
             Integer quantity,
             BigDecimal pricePerUnit
+    ) {}
+
+    public record BreakdownStatsDTO(
+            Long daysSinceLastBreakdown,
+            Long breakdownsLastWeek,
+            Long breakdownsLastMonth,
+            Long breakdownsCurrentYear,
+            Double averageBreakdownDurationMinutes
     ) {}
 }
