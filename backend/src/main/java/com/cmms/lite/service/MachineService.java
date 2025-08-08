@@ -6,13 +6,17 @@ import com.cmms.lite.core.mapper.MachineMapper;
 import com.cmms.lite.core.repository.MachineRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MachineService {
 
     private final MachineRepository machineRepository;
@@ -21,39 +25,48 @@ public class MachineService {
     private static final String NOT_FOUND_MESSAGE = "Machine not found with id: ";
 
     @Transactional(readOnly = true)
-    public Page<MachineDTOs.Response> findAll(Pageable pageable) {
-        Page<Machine> machinePage = machineRepository.findAll(pageable);
-        return machinePage.map(machineMapper::toResponse);
+    public Page<MachineDTOs.Response> getAllMachines(Pageable pageable) {
+        return machineRepository.findAll(pageable)
+                .map(machineMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public MachineDTOs.Response findById(Long id) {
-        return machineRepository.findById(id)
+    public List<MachineDTOs.Response> getAllMachinesAsList() {
+        return machineRepository.findAll()
+                .stream()
                 .map(machineMapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE + id));
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MachineDTOs.Response getMachineById(Long id) {
+        Machine machine = getMachineByIdOrThrow(id);
+        return machineMapper.toResponse(machine);
     }
 
     @Transactional
-    public MachineDTOs.Response save(MachineDTOs.CreateRequest createRequest) {
-        Machine machine = machineMapper.toEntity(createRequest);
-        Machine savedMachine = machineRepository.save(machine);
-        return machineMapper.toResponse(savedMachine);
+    public MachineDTOs.Response createMachine(MachineDTOs.CreateRequest request) {
+        Machine machine = machineMapper.toEntity(request);
+        return machineMapper.toResponse(machineRepository.save(machine));
     }
 
     @Transactional
-    public MachineDTOs.Response update(Long id, MachineDTOs.UpdateRequest updateRequest) {
-        Machine existingMachine = machineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE + id));
-        machineMapper.updateEntityFromRequest(updateRequest, existingMachine);
-        Machine updatedMachine = machineRepository.save(existingMachine);
-        return machineMapper.toResponse(updatedMachine);
+    public MachineDTOs.Response updateMachine(Long id, MachineDTOs.UpdateRequest request) {
+        Machine machine = getMachineByIdOrThrow(id);
+        machineMapper.updateEntityFromRequest(request, machine);
+        return machineMapper.toResponse(machineRepository.save(machine));
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void deleteMachine(Long id) {
         if (!machineRepository.existsById(id)) {
             throw new EntityNotFoundException(NOT_FOUND_MESSAGE + id);
         }
         machineRepository.deleteById(id);
+    }
+
+    private Machine getMachineByIdOrThrow(Long id) {
+        return machineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE + id));
     }
 }

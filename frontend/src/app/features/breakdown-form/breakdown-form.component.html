@@ -1,0 +1,70 @@
+  <div class="w-full max-w-2xl mx-auto bg-slate-800 rounded-xl shadow-lg p-6 md:p-8">
+    <div class="mb-8 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-white">Zgłoś nową awarię</h2>
+      <p class="text-slate-400 mt-2">Wypełnij formularz, aby zarejestrować nowe zdarzenie w systemie.</p>
+    </div>
+    <form [formGroup]="breakdownForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="space-y-6">
+        <div>
+          <label for="machineId" class="block mb-2 text-sm font-medium text-slate-300">Maszyna, której dotyczy awaria</label>
+          <select
+            id="machineId"
+            formControlName="machineId"
+            class="w-full p-3 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            [ngClass]="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': f['machineId'].invalid && f['machineId'].touched }">
+            <option [ngValue]="null" disabled>Wybierz maszynę...</option>
+            <option *ngFor="let machine of machines$ | async" [value]="machine.id">
+              {{ machine.fullName }}
+            </option>
+          </select>
+          <div *ngIf="f['machineId'].invalid && f['machineId'].touched" class="mt-2 text-xs text-red-400">
+            Wybór maszyny jest wymagany.
+          </div>
+        </div>
+        <div>
+          <label for="type" class="block mb-2 text-sm font-medium text-slate-300">Typ awarii</label>
+          <select
+            id="type"
+            formControlName="type"
+            class="w-full p-3 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            [ngClass]="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': f['type'].invalid && f['type'].touched }">
+            <option [ngValue]="null" disabled>Wybierz typ...</option>
+            <option *ngFor="let type of breakdownTypes$ | async" [value]="type.value">
+              {{ type.displayName }}
+            </option>
+          </select>
+          <div *ngIf="f['type'].invalid && f['type'].touched" class="mt-2 text-xs text-red-400">
+            Wybór typu awarii jest wymagany.
+          </div>
+        </div>
+        <div>
+          <label for="description" class="block mb-2 text-sm font-medium text-slate-300">Szczegółowy opis</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="5"
+            class="w-full p-3 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y"
+            [ngClass]="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': f['description'].invalid && f['description'].touched }"
+            placeholder="Opisz dokładnie, co się stało, jakie są objawy, czy słychać nietypowe dźwięki itp."></textarea>
+          <div *ngIf="f['description'].invalid && f['description'].touched" class="mt-2 text-xs text-red-400">
+            <span *ngIf="f['description'].errors?.['required']">Opis jest wymagany.</span>
+            <span *ngIf="f['description'].errors?.['minlength']">Opis musi mieć co najmniej 10 znaków.</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-4">
+        <button
+          type="button"
+          routerLink="/dashboard"
+          class="w-full sm:w-auto mt-2 sm:mt-0 px-6 py-3 text-center font-semibold text-slate-300 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors duration-200">
+          Anuluj
+        </button>
+        <button
+          type="submit"
+          [disabled]="breakdownForm.invalid || isSubmitting"
+          class="w-full sm:w-auto px-6 py-3 font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isSubmitting ? 'Wysyłanie...' : 'Zgłoś Awarię' }}
+        </button>
+      </div>
+    </form>
+  </div>

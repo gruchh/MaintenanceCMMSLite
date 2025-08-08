@@ -1,12 +1,13 @@
 package com.cmms.lite.security.controller;
 
-
 import com.cmms.lite.security.dto.JwtAuthRequest;
 import com.cmms.lite.security.dto.JwtAuthResponse;
 import com.cmms.lite.security.dto.RegisterRequest;
 import com.cmms.lite.security.dto.UserProfileResponse;
-import com.cmms.lite.security.filter.JwtTokenValidator;
 import com.cmms.lite.security.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,13 @@ import javax.validation.Valid;
 @Slf4j
 @RestController()
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "API for user registration and login")
 public class SecurityController {
 
     private final UserService userService;
-    private final JwtTokenValidator jwtTokenValidator;
+
+    @Operation(summary = "Register a new user",
+            description = "Creates a new user account and returns a JWT token upon successful registration.")
 
     @PostMapping("/register")
     public ResponseEntity<JwtAuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -34,10 +38,12 @@ public class SecurityController {
         } catch (Exception e) {
             log.error("Registration failed for user: {}", request.getUsername(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new JwtAuthResponse(null));
+                    .body(new JwtAuthResponse("Registration failed: " + e.getMessage()));
         }
     }
 
+    @Operation(summary = "Authenticate a user (login)",
+            description = "Verifies user credentials and returns a JWT token if they are valid.")
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody JwtAuthRequest request) {
         log.info("Processing login request for user: {}", request.getUsername());
@@ -48,23 +54,26 @@ public class SecurityController {
         } catch (Exception e) {
             log.error("Login failed for user: {}", request.getUsername(), e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new JwtAuthResponse(null));
+                    .body(new JwtAuthResponse("Authentication failed: " + e.getMessage()));
         }
     }
 
+    @Operation(summary = "Get current user profile",
+            description = "Retrieves profile information for the currently authenticated user. Requires a valid JWT Bearer token.",
+            security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/getCurrentUser")
     public ResponseEntity<UserProfileResponse> getCurrentUser() {
-        log.info("Przetwarzanie żądania getCurrentUser");
+        log.info("Processing getCurrentUser request");
         try {
             UserProfileResponse response = userService.getCurrentUserInfo();
             response.setStatus("success");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Błąd podczas pobierania danych użytkownika", e);
+            log.error("Error while fetching user data", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(UserProfileResponse.builder()
                             .status("error")
-                            .message("Wewnętrzny błąd serwera: " + e.getMessage())
+                            .message("Internal server error: " + e.getMessage())
                             .build());
         }
     }

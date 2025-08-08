@@ -18,44 +18,45 @@ public class SparePartService {
     private final SparePartRepository sparePartRepository;
     private final SparePartMapper sparePartMapper;
 
-    private static final String NOT_FOUND_MESSAGE = "SparePart not found with id: ";
+    private static final String NOT_FOUND = "SparePart not found with id: ";
 
     @Transactional(readOnly = true)
-    public Page<SparePartDTOs.Response> findAll(Pageable pageable) {
-        Page<SparePart> sparePartsPage = sparePartRepository.findAll(pageable);
-        return sparePartsPage.map(sparePartMapper::toResponse);
+    public Page<SparePartDTOs.Response> getAllSpareParts(Pageable pageable) {
+        return sparePartRepository.findAll(pageable)
+                .map(sparePartMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public SparePartDTOs.Response findById(Long id) {
-        return sparePartRepository.findById(id)
-                .map(sparePartMapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE + id));
+    public SparePartDTOs.Response getSparePartById(Long id) {
+        SparePart sparePart = getSparePartByIdOrThrow(id);
+        return sparePartMapper.toResponse(sparePart);
     }
 
     @Transactional
-    public SparePartDTOs.Response save(SparePartDTOs.CreateRequest createRequest) {
-        SparePart sparePart = sparePartMapper.toEntity(createRequest);
-        SparePart savedPart = sparePartRepository.save(sparePart);
-        return sparePartMapper.toResponse(savedPart);
+    public SparePartDTOs.Response createSparePart(SparePartDTOs.CreateRequest request) {
+        SparePart sparePart = sparePartMapper.toEntity(request);
+        SparePart saved = sparePartRepository.save(sparePart);
+        return sparePartMapper.toResponse(saved);
     }
 
     @Transactional
-    public SparePartDTOs.Response update(Long id, SparePartDTOs.UpdateRequest updateRequest) {
-        SparePart existingPart = sparePartRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE + id));
-
-        sparePartMapper.updateEntityFromRequest(updateRequest, existingPart);
-        SparePart updatedPart = sparePartRepository.save(existingPart);
-
-        return sparePartMapper.toResponse(updatedPart);
+    public SparePartDTOs.Response updateSparePart(Long id, SparePartDTOs.UpdateRequest request) {
+        SparePart existing = getSparePartByIdOrThrow(id);
+        sparePartMapper.updateEntityFromRequest(request, existing);
+        SparePart updated = sparePartRepository.save(existing);
+        return sparePartMapper.toResponse(updated);
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void deleteSparePart(Long id) {
         if (!sparePartRepository.existsById(id)) {
-            throw new EntityNotFoundException(NOT_FOUND_MESSAGE + id);
+            throw new EntityNotFoundException(NOT_FOUND + id);
         }
         sparePartRepository.deleteById(id);
+    }
+
+    private SparePart getSparePartByIdOrThrow(Long id) {
+        return sparePartRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND + id));
     }
 }

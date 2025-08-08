@@ -15,7 +15,7 @@ export class NavbarComponent implements OnInit {
   passwordVisible = false;
 
   navLinks = [
-    { path: '#', label: 'Zgłoś awarię' },
+    { path: '/report-breakdown', label: 'Zgłoś awarię' },
     { path: '#', label: 'Dashboard' }
   ];
 

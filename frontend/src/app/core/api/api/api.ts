@@ -1,0 +1,11 @@
+export * from './authentication.service';
+import { AuthenticationService } from './authentication.service';
+export * from './breakdown.service';
+import { BreakdownService } from './breakdown.service';
+export * from './breakdownTypes.service';
+import { BreakdownTypesService } from './breakdownTypes.service';
+export * from './machine.service';
+import { MachineService } from './machine.service';
+export * from './sparePart.service';
+import { SparePartService } from './sparePart.service';
+export const APIS = [AuthenticationService, BreakdownService, BreakdownTypesService, MachineService, SparePartService];

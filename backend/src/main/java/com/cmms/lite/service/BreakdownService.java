@@ -42,30 +42,27 @@ public class BreakdownService {
         breakdown.setDescription(request.description());
         breakdown.setType(request.type());
         breakdown.setMachine(machine);
-
         breakdown.setReportedAt(LocalDateTime.now());
         breakdown.setOpened(true);
         breakdown.setTotalCost(BigDecimal.ZERO);
 
-        Breakdown savedBreakdown = breakdownRepository.save(breakdown);
-        return breakdownMapper.toResponse(savedBreakdown);
+        return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
     }
 
     @Transactional(readOnly = true)
-    public BreakdownDTOs.Response findById(Long id) {
-        return breakdownRepository.findById(id)
-                .map(breakdownMapper::toResponse)
-                .orElseThrow(() -> new EntityNotFoundException(BREAKDOWN_NOT_FOUND + id));
+    public BreakdownDTOs.Response getBreakdownById(Long id) {
+        Breakdown breakdown = getBreakdownByIdOrThrow(id);
+        return breakdownMapper.toResponse(breakdown);
     }
 
     @Transactional(readOnly = true)
-    public Page<BreakdownDTOs.Response> findAll(Pageable pageable) {
+    public Page<BreakdownDTOs.Response> getAllBreakdowns(Pageable pageable) {
         return breakdownRepository.findAll(pageable).map(breakdownMapper::toResponse);
     }
 
     @Transactional
     public BreakdownDTOs.Response addPartToBreakdown(Long breakdownId, BreakdownDTOs.AddPartRequest request) {
-        Breakdown breakdown = findBreakdownEntityById(breakdownId);
+        Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
         SparePart sparePart = sparePartRepository.findById(request.sparePartId())
                 .orElseThrow(() -> new EntityNotFoundException(PART_NOT_FOUND + request.sparePartId()));
 
@@ -73,17 +70,17 @@ public class BreakdownService {
         usedPart.setBreakdown(breakdown);
         usedPart.setSparePart(sparePart);
         usedPart.setQuantity(request.quantity());
-        breakdown.getUsedPartsList().add(usedPart);
 
+        breakdown.getUsedPartsList().add(usedPart);
         recalculateTotalCost(breakdown);
+
         return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
     }
 
     @Transactional
     public BreakdownDTOs.Response removePartFromBreakdown(Long breakdownId, Long usedPartId) {
-        Breakdown breakdown = findBreakdownEntityById(breakdownId);
-        boolean removed = breakdown.getUsedPartsList()
-                .removeIf(part -> part.getId().equals(usedPartId));
+        Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
+        boolean removed = breakdown.getUsedPartsList().removeIf(part -> part.getId().equals(usedPartId));
 
         if (!removed) {
             throw new EntityNotFoundException("Used part with id " + usedPartId + " not found in breakdown " + breakdownId);
@@ -95,10 +92,12 @@ public class BreakdownService {
 
     @Transactional
     public BreakdownDTOs.Response closeBreakdown(Long breakdownId, BreakdownDTOs.CloseRequest request) {
-        Breakdown breakdown = findBreakdownEntityById(breakdownId);
+        Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
+
         if (!breakdown.getOpened()) {
             throw new IllegalStateException("Breakdown is already closed.");
         }
+
         breakdown.setOpened(false);
         breakdown.setFinishedAt(LocalDateTime.now());
         breakdown.setSpecialistComment(request.specialistComment());
@@ -114,32 +113,25 @@ public class BreakdownService {
                 .map(b -> ChronoUnit.DAYS.between(b.getFinishedAt(), now))
                 .orElse(null);
 
-        Long lastWeekCount = breakdownRepository.countByFinishedAtBetween(now.minusWeeks(1), now);
-        Long lastMonthCount = breakdownRepository.countByFinishedAtBetween(now.minusMonths(1), now);
-        Long currentYearCount = breakdownRepository.countByFinishedAtBetween(now.withDayOfYear(1), now);
-
-        Double avgDurationMinutes = breakdownRepository.getAverageBreakdownDurationInMinutes();
-
         return new BreakdownDTOs.BreakdownStatsDTO(
                 daysSinceLast,
-                lastWeekCount,
-                lastMonthCount,
-                currentYearCount,
-                avgDurationMinutes
+                breakdownRepository.countByFinishedAtBetween(now.minusWeeks(1), now),
+                breakdownRepository.countByFinishedAtBetween(now.minusMonths(1), now),
+                breakdownRepository.countByFinishedAtBetween(now.withDayOfYear(1), now),
+                breakdownRepository.getAverageBreakdownDurationInMinutes()
         );
     }
 
-    private Breakdown findBreakdownEntityById(Long id) {
+    private Breakdown getBreakdownByIdOrThrow(Long id) {
         return breakdownRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(BREAKDOWN_NOT_FOUND + id));
     }
 
     private void recalculateTotalCost(Breakdown breakdown) {
         BigDecimal totalCost = breakdown.getUsedPartsList().stream()
-                .map(usedPart -> {
-                    BigDecimal price = usedPart.getSparePart().getPrice();
-                    if (price == null) return BigDecimal.ZERO;
-                    return price.multiply(new BigDecimal(usedPart.getQuantity()));
+                .map(part -> {
+                    BigDecimal price = part.getSparePart().getPrice();
+                    return price == null ? BigDecimal.ZERO : price.multiply(new BigDecimal(part.getQuantity()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
