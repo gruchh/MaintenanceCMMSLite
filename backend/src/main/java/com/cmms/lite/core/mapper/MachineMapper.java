@@ -4,7 +4,6 @@ import com.cmms.lite.api.dto.MachineDTOs;
 import com.cmms.lite.core.entity.Machine;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 

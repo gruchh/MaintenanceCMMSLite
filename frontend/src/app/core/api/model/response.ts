@@ -26,9 +26,9 @@ export interface Response {
 }
 export namespace Response {
     export const TypeEnum = {
-        Mechanical: 'MECHANICAL',
-        Automatical: 'AUTOMATICAL',
-        Parameters: 'PARAMETERS'
+        MECHANICAL: 'MECHANICAL',
+        AUTOMATICAL: 'AUTOMATICAL',
+        PARAMETERS: 'PARAMETERS'
     } as const;
     export type TypeEnum = typeof TypeEnum[keyof typeof TypeEnum];
 }

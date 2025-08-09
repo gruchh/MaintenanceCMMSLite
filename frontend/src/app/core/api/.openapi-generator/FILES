@@ -5,10 +5,15 @@ api.base.service.ts
 api.module.ts
 api/api.ts
 api/authentication.service.ts
+api/authentication.serviceInterface.ts
 api/breakdown.service.ts
+api/breakdown.serviceInterface.ts
 api/breakdownTypes.service.ts
+api/breakdownTypes.serviceInterface.ts
 api/machine.service.ts
+api/machine.serviceInterface.ts
 api/sparePart.service.ts
+api/sparePart.serviceInterface.ts
 configuration.ts
 encoder.ts
 git_push.sh

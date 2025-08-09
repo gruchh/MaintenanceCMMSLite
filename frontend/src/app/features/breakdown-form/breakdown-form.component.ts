@@ -1,17 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { BreakdownCreateRequest, BreakdownService, BreakdownTypeResponse, BreakdownTypesService, MachineDetailsResponse, MachineService } from '../../core/api';
+import {
+  BreakdownCreateRequest,
+  BreakdownService,
+  BreakdownTypeResponse,
+  BreakdownTypesService,
+  MachineDetailsResponse,
+  MachineService,
+} from '../../core/api';
 
 @Component({
   selector: 'app-breakdown-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './breakdown-form.component.html',
-  styleUrls: ['./breakdown-form.component.css']
+  styleUrls: ['./breakdown-form.component.css'],
 })
 export class BreakdownFormComponent implements OnInit {
   breakdownForm!: FormGroup;
@@ -25,13 +37,20 @@ export class BreakdownFormComponent implements OnInit {
     private machineService: MachineService,
     private breakdownTypesService: BreakdownTypesService,
     private breakdownService: BreakdownService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.breakdownForm = this.fb.group({
       machineId: [null, [Validators.required]],
       type: [null, [Validators.required]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]]
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(1000),
+        ],
+      ],
     });
 
     this.loadDropdownData();
@@ -56,16 +75,39 @@ export class BreakdownFormComponent implements OnInit {
 
     const request: BreakdownCreateRequest = this.breakdownForm.value;
 
-    this.breakdownService.createBreakdown(request).pipe(
-      finalize(() => this.isSubmitting = false)
-    ).subscribe({
-      next: () => {
-       console.log('Awaria zgłoszona pomyślnie!');
-       this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        console.error('Wystąpił błąd podczas zgłaszania awarii', err);
-      }
-    });
+    this.breakdownService
+      .reportBreakdown(request)
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => {
+          console.log('Awaria zgłoszona pomyślnie!');
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          console.error('Wystąpił błąd podczas zgłaszania awarii', err);
+        },
+      });
+  }
+  getSliderStyle(
+    types: BreakdownTypeResponse[],
+    selectedValue: string
+  ): { [key: string]: string } {
+    if (!types || types.length === 0 || !selectedValue) {
+      return { opacity: '0' };
+    }
+
+    const selectedIndex = types.findIndex((t) => t.value === selectedValue);
+    if (selectedIndex === -1) {
+      return { opacity: '0' };
+    }
+
+    const percentPerItem = 100 / types.length;
+    const leftPosition = selectedIndex * percentPerItem;
+
+    return {
+      opacity: '1',
+      width: `${percentPerItem}%`,
+      left: `${leftPosition}%`,
+    };
   }
 }

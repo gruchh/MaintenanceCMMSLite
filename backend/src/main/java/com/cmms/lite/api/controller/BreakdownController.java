@@ -8,12 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/breakdowns")
+@RequestMapping(value = "/api/breakdowns", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Tag(name = "Breakdown", description = "API for managing breakdowns")
 public class BreakdownController {
@@ -32,9 +33,8 @@ public class BreakdownController {
         return ResponseEntity.ok(breakdownService.getBreakdownById(id));
     }
 
-    @PostMapping
-    @PreAuthorize("hasRole('SUBCONTRACTOR')")
-    public ResponseEntity<BreakdownDTOs.Response> createBreakdown(@Valid @RequestBody BreakdownDTOs.CreateRequest request) {
+    @PostMapping("/report")
+    public ResponseEntity<BreakdownDTOs.Response> reportBreakdown(@Valid @RequestBody BreakdownDTOs.CreateRequest request) {
         BreakdownDTOs.Response response = breakdownService.createBreakdown(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

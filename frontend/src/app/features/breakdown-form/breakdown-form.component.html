@@ -1,70 +1,96 @@
-  <div class="w-full max-w-2xl mx-auto bg-slate-800 rounded-xl shadow-lg p-6 md:p-8">
-    <div class="mb-8 text-center">
-      <h2 class="text-2xl md:text-3xl font-bold text-white">Zgłoś nową awarię</h2>
-      <p class="text-slate-400 mt-2">Wypełnij formularz, aby zarejestrować nowe zdarzenie w systemie.</p>
-    </div>
+<div class="bg-slate-900 min-h-screen px-6 md:px-8 py-6 md:py-8">
+  <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+    <h2 class="text-2xl font-bold text-slate-800 mb-2">Zgłoś nową awarię</h2>
+    <p class="text-slate-500 mb-6">Wypełnij formularz, aby zarejestrować nowe zdarzenie w systemie.</p>
+
     <form [formGroup]="breakdownForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="space-y-6">
+
+        <!-- Maszyna -->
         <div>
-          <label for="machineId" class="block mb-2 text-sm font-medium text-slate-300">Maszyna, której dotyczy awaria</label>
+          <label for="machineId" class="block mb-2 text-sm font-medium text-slate-700">Maszyna</label>
           <select
             id="machineId"
             formControlName="machineId"
-            class="w-full p-3 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-            [ngClass]="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': f['machineId'].invalid && f['machineId'].touched }">
+            class="w-full p-3 bg-slate-100 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
+            [ngClass]="{ 'border-red-500': f['machineId'].invalid && f['machineId'].touched }">
             <option [ngValue]="null" disabled>Wybierz maszynę...</option>
             <option *ngFor="let machine of machines$ | async" [value]="machine.id">
               {{ machine.fullName }}
             </option>
           </select>
-          <div *ngIf="f['machineId'].invalid && f['machineId'].touched" class="mt-2 text-xs text-red-400">
+          <p *ngIf="f['machineId'].invalid && f['machineId'].touched" class="mt-1 text-xs text-red-500">
             Wybór maszyny jest wymagany.
-          </div>
+          </p>
         </div>
+
+        <!-- Typ awarii -->
         <div>
-          <label for="type" class="block mb-2 text-sm font-medium text-slate-300">Typ awarii</label>
-          <select
-            id="type"
-            formControlName="type"
-            class="w-full p-3 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-            [ngClass]="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': f['type'].invalid && f['type'].touched }">
-            <option [ngValue]="null" disabled>Wybierz typ...</option>
-            <option *ngFor="let type of breakdownTypes$ | async" [value]="type.value">
-              {{ type.displayName }}
-            </option>
-          </select>
-          <div *ngIf="f['type'].invalid && f['type'].touched" class="mt-2 text-xs text-red-400">
+          <label class="block mb-2 text-sm font-medium text-slate-700">Typ awarii</label>
+          <ng-container *ngIf="breakdownTypes$ | async as types">
+            <div *ngIf="types.length > 0"
+              class="relative flex w-full p-1 bg-slate-100 rounded-full border border-slate-300"
+              [ngClass]="{ 'border-red-500': f['type'].invalid && f['type'].touched }">
+
+              <div
+                class="absolute top-1 bottom-1 bg-yellow-400 rounded-full transition-all duration-300 ease-in-out"
+                [ngStyle]="getSliderStyle(types, f['type'].value)">
+              </div>
+
+              <div *ngFor="let type of types" class="flex-1 z-10">
+                <input
+                  type="radio"
+                  [id]="'type-' + type.value"
+                  [value]="type.value"
+                  formControlName="type"
+                  class="sr-only peer"
+                />
+                <label
+                  [for]="'type-' + type.value"
+                  class="block w-full text-center py-2 text-sm font-semibold cursor-pointer rounded-full transition-colors duration-300
+                         text-slate-600 peer-checked:text-black">
+                  {{ type.displayName }}
+                </label>
+              </div>
+            </div>
+          </ng-container>
+          <p *ngIf="f['type'].invalid && f['type'].touched" class="mt-1 text-xs text-red-500">
             Wybór typu awarii jest wymagany.
-          </div>
+          </p>
         </div>
+
+        <!-- Opis -->
         <div>
-          <label for="description" class="block mb-2 text-sm font-medium text-slate-300">Szczegółowy opis</label>
+          <label for="description" class="block mb-2 text-sm font-medium text-slate-700">Szczegółowy opis</label>
           <textarea
             id="description"
             formControlName="description"
             rows="5"
-            class="w-full p-3 bg-slate-700 border border-slate-600 text-white text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y"
-            [ngClass]="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': f['description'].invalid && f['description'].touched }"
-            placeholder="Opisz dokładnie, co się stało, jakie są objawy, czy słychać nietypowe dźwięki itp."></textarea>
-          <div *ngIf="f['description'].invalid && f['description'].touched" class="mt-2 text-xs text-red-400">
+            class="w-full p-3 bg-slate-100 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 resize-y"
+            placeholder="Np. Wyciek oleju z lewej strony, dziwne stukanie przy 3 biegu, zapach spalenizny..."
+            [ngClass]="{ 'border-red-500': f['description'].invalid && f['description'].touched }"></textarea>
+          <p *ngIf="f['description'].invalid && f['description'].touched" class="mt-1 text-xs text-red-500">
             <span *ngIf="f['description'].errors?.['required']">Opis jest wymagany.</span>
             <span *ngIf="f['description'].errors?.['minlength']">Opis musi mieć co najmniej 10 znaków.</span>
-          </div>
+          </p>
         </div>
       </div>
-      <div class="mt-8 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-4">
+
+      <!-- Przyciski -->
+      <div class="mt-8 flex flex-col sm:flex-row sm:justify-end gap-4">
         <button
           type="button"
           routerLink="/dashboard"
-          class="w-full sm:w-auto mt-2 sm:mt-0 px-6 py-3 text-center font-semibold text-slate-300 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors duration-200">
+          class="w-full sm:w-auto px-6 py-3 text-slate-600 bg-slate-200 rounded-lg hover:bg-slate-300 transition">
           Anuluj
         </button>
         <button
           type="submit"
           [disabled]="breakdownForm.invalid || isSubmitting"
-          class="w-full sm:w-auto px-6 py-3 font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          class="w-full sm:w-auto px-6 py-3 text-white bg-yellow-400 rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 disabled:opacity-50">
           {{ isSubmitting ? 'Wysyłanie...' : 'Zgłoś Awarię' }}
         </button>
       </div>
     </form>
   </div>
+</div>

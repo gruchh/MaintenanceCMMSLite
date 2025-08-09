@@ -6,8 +6,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
   selector: 'app-navbar',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  templateUrl: './navbar.component.html'
 })
 export class NavbarComponent implements OnInit {
   isMobileMenuOpen = false;
@@ -16,7 +15,7 @@ export class NavbarComponent implements OnInit {
 
   navLinks = [
     { path: '/report-breakdown', label: 'Zgłoś awarię' },
-    { path: '#', label: 'Dashboard' }
+    { path: '/dashboard', label: 'Dashboard' }
   ];
 
   loginForm!: FormGroup;

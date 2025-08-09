@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/h2-console/**",
                                 "/api/breakdowns/stats",
+                                "/api/breakdowns/report",
                                 "/api/breakdown-types",
                                 "/api/machines/list"
                         ).permitAll()
