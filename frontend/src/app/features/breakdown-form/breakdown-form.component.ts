@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,7 +7,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, tap } from 'rxjs/operators';
 import {
   BreakdownCreateRequest,
   BreakdownService,
@@ -17,29 +16,27 @@ import {
   MachineDetailsResponse,
   MachineService,
 } from '../../core/api';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-breakdown-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, CommonModule],
   templateUrl: './breakdown-form.component.html',
-  styleUrls: ['./breakdown-form.component.css'],
 })
-export class BreakdownFormComponent implements OnInit {
-  breakdownForm!: FormGroup;
-  machines$!: Observable<MachineDetailsResponse[]>;
-  breakdownTypes$!: Observable<BreakdownTypeResponse[]>;
+export class BreakdownFormComponent {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private machineService = inject(MachineService);
+  private breakdownTypesService = inject(BreakdownTypesService);
+  private breakdownService = inject(BreakdownService);
+
+  breakdownForm: FormGroup;
+  machines$: Observable<MachineDetailsResponse[]>;
+  breakdownTypes$: Observable<BreakdownTypeResponse[]>;
   isSubmitting = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private machineService: MachineService,
-    private breakdownTypesService: BreakdownTypesService,
-    private breakdownService: BreakdownService
-  ) {}
-
-  ngOnInit(): void {
+  constructor() {
     this.breakdownForm = this.fb.group({
       machineId: [null, [Validators.required]],
       type: [null, [Validators.required]],
@@ -53,16 +50,18 @@ export class BreakdownFormComponent implements OnInit {
       ],
     });
 
-    this.loadDropdownData();
+    this.machines$ = this.machineService.getAllMachinesAsList();
+    this.breakdownTypes$ = this.breakdownTypesService.getBreakdownTypes().pipe(
+      tap(types => {
+        if (types && types.length > 0) {
+          this.breakdownForm.patchValue({ type: types[0].value });
+        }
+      })
+    );
   }
 
   get f() {
     return this.breakdownForm.controls;
-  }
-
-  private loadDropdownData(): void {
-    this.machines$ = this.machineService.getAllMachinesAsList();
-    this.breakdownTypes$ = this.breakdownTypesService.getBreakdownTypes();
   }
 
   onSubmit(): void {
@@ -72,7 +71,6 @@ export class BreakdownFormComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-
     const request: BreakdownCreateRequest = this.breakdownForm.value;
 
     this.breakdownService
@@ -88,6 +86,7 @@ export class BreakdownFormComponent implements OnInit {
         },
       });
   }
+
   getSliderStyle(
     types: BreakdownTypeResponse[],
     selectedValue: string

@@ -6,7 +6,6 @@
     <form [formGroup]="breakdownForm" (ngSubmit)="onSubmit()" novalidate>
       <div class="space-y-6">
 
-        <!-- Maszyna -->
         <div>
           <label for="machineId" class="block mb-2 text-sm font-medium text-slate-700">Maszyna</label>
           <select
@@ -15,51 +14,50 @@
             class="w-full p-3 bg-slate-100 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
             [ngClass]="{ 'border-red-500': f['machineId'].invalid && f['machineId'].touched }">
             <option [ngValue]="null" disabled>Wybierz maszynę...</option>
-            <option *ngFor="let machine of machines$ | async" [value]="machine.id">
-              {{ machine.fullName }}
-            </option>
+            @for (machine of machines$ | async; track machine.id) {
+              <option [value]="machine.id">{{ machine.fullName }}</option>
+            }
           </select>
-          <p *ngIf="f['machineId'].invalid && f['machineId'].touched" class="mt-1 text-xs text-red-500">
-            Wybór maszyny jest wymagany.
-          </p>
+          @if (f['machineId'].invalid && f['machineId'].touched) {
+            <p class="mt-1 text-xs text-red-500">Wybór maszyny jest wymagany.</p>
+          }
         </div>
 
-        <!-- Typ awarii -->
         <div>
           <label class="block mb-2 text-sm font-medium text-slate-700">Typ awarii</label>
-          <ng-container *ngIf="breakdownTypes$ | async as types">
-            <div *ngIf="types.length > 0"
-              class="relative flex w-full p-1 bg-slate-100 rounded-full border border-slate-300"
-              [ngClass]="{ 'border-red-500': f['type'].invalid && f['type'].touched }">
-
+          @if (breakdownTypes$ | async; as types) {
+            @if (types.length > 0) {
               <div
-                class="absolute top-1 bottom-1 bg-yellow-400 rounded-full transition-all duration-300 ease-in-out"
-                [ngStyle]="getSliderStyle(types, f['type'].value)">
+                class="relative flex w-full p-1 bg-slate-100 rounded-full border border-slate-300"
+                [ngClass]="{ 'border-red-500': f['type'].invalid && f['type'].touched }">
+                <div
+                  class="absolute top-1 bottom-1 bg-yellow-400 rounded-full transition-all duration-300 ease-in-out"
+                  [ngStyle]="getSliderStyle(types, f['type'].value)">
+                </div>
+                @for (type of types; track type.value) {
+                  <div class="flex-1 z-10">
+                    <input
+                      type="radio"
+                      [id]="'type-' + type.value"
+                      [value]="type.value"
+                      formControlName="type"
+                      class="sr-only peer"
+                    />
+                    <label
+                      [for]="'type-' + type.value"
+                      class="block w-full text-center py-2 text-sm font-semibold cursor-pointer rounded-full transition-colors duration-300 text-slate-600 peer-checked:text-black">
+                      {{ type.displayName }}
+                    </label>
+                  </div>
+                }
               </div>
-
-              <div *ngFor="let type of types" class="flex-1 z-10">
-                <input
-                  type="radio"
-                  [id]="'type-' + type.value"
-                  [value]="type.value"
-                  formControlName="type"
-                  class="sr-only peer"
-                />
-                <label
-                  [for]="'type-' + type.value"
-                  class="block w-full text-center py-2 text-sm font-semibold cursor-pointer rounded-full transition-colors duration-300
-                         text-slate-600 peer-checked:text-black">
-                  {{ type.displayName }}
-                </label>
-              </div>
-            </div>
-          </ng-container>
-          <p *ngIf="f['type'].invalid && f['type'].touched" class="mt-1 text-xs text-red-500">
-            Wybór typu awarii jest wymagany.
-          </p>
+            }
+          }
+          @if (f['type'].invalid && f['type'].touched) {
+            <p class="mt-1 text-xs text-red-500">Wybór typu awarii jest wymagany.</p>
+          }
         </div>
 
-        <!-- Opis -->
         <div>
           <label for="description" class="block mb-2 text-sm font-medium text-slate-700">Szczegółowy opis</label>
           <textarea
@@ -69,14 +67,19 @@
             class="w-full p-3 bg-slate-100 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 resize-y"
             placeholder="Np. Wyciek oleju z lewej strony, dziwne stukanie przy 3 biegu, zapach spalenizny..."
             [ngClass]="{ 'border-red-500': f['description'].invalid && f['description'].touched }"></textarea>
-          <p *ngIf="f['description'].invalid && f['description'].touched" class="mt-1 text-xs text-red-500">
-            <span *ngIf="f['description'].errors?.['required']">Opis jest wymagany.</span>
-            <span *ngIf="f['description'].errors?.['minlength']">Opis musi mieć co najmniej 10 znaków.</span>
-          </p>
+          @if (f['description'].invalid && f['description'].touched) {
+            <p class="mt-1 text-xs text-red-500">
+              @if (f['description'].errors?.['required']) {
+                <span>Opis jest wymagany.</span>
+              }
+              @if (f['description'].errors?.['minlength']) {
+                <span>Opis musi mieć co najmniej 10 znaków.</span>
+              }
+            </p>
+          }
         </div>
       </div>
 
-      <!-- Przyciski -->
       <div class="mt-8 flex flex-col sm:flex-row sm:justify-end gap-4">
         <button
           type="button"
