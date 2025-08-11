@@ -1,0 +1,70 @@
+@if (isOpen) {
+  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div (click)="closeModal()" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full relative z-10">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                <svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                  Logowanie do systemu
+                </h3>
+                <div class="mt-4 space-y-4">
+                  <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Login</label>
+                    <input type="text" id="username" formControlName="username" class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{ 'border-red-500': f['username'].invalid && (f['username'].dirty || f['username'].touched) }" placeholder="np. jankowalski" autocomplete="username" />
+                    @if (f['username'].invalid && (f['username'].dirty || f['username'].touched)) {
+                      <div class="mt-1 text-xs text-red-600">
+                        @if (f['username'].errors?.['required']) { <div>Login jest wymagany.</div> }
+                        @if (f['username'].errors?.['minlength']) { <div>Login musi mieć co najmniej 3 znaki.</div> }
+                      </div>
+                    }
+                  </div>
+                  <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Hasło</label>
+                    <div class="mt-1 relative">
+                      <input [type]="passwordVisible() ? 'text' : 'password'" id="password" formControlName="password" class="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md" [ngClass]="{ 'border-red-500': f['password'].invalid && (f['password'].dirty || f['password'].touched) }" autocomplete="current-password" />
+                      <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                        @if (!passwordVisible()) {
+                          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        } @else {
+                          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064 7 9.542 7 .847 0 1.67.127 2.457.361M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 2l20 20" /></svg>
+                        }
+                      </button>
+                    </div>
+                    @if (f['password'].invalid && (f['password'].dirty || f['password'].touched)) {
+                      <div class="mt-1 text-xs text-red-600">
+                        @if (f['password'].errors?.['required']) { <div>Hasło jest wymagane.</div> }
+                        @if (f['password'].errors?.['minlength']) { <div>Hasło musi mieć co najmniej 8 znaków.</div> }
+                      </div>
+                    }
+                  </div>
+                  @if(errorMessage()) {
+                    <div class="mt-2 text-sm text-red-600 p-3 bg-red-50 rounded-md">
+                      {{ errorMessage() }}
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="submit" [disabled]="loginForm.invalid || isSubmitting()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:bg-indigo-400 disabled:cursor-not-allowed">
+              {{ isSubmitting() ? 'Logowanie...' : 'Zaloguj się' }}
+            </button>
+            <button (click)="closeModal()" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+              Anuluj
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

@@ -21,13 +21,9 @@ import javax.validation.Valid;
 @Slf4j
 @RestController()
 @RequestMapping(name = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Authentication", description = "API for user registration and login")
 public class SecurityController {
 
     private final UserService userService;
-
-    @Operation(summary = "Register a new user",
-            description = "Creates a new user account and returns a JWT token upon successful registration.")
 
     @PostMapping("/register")
     public ResponseEntity<JwtAuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -43,8 +39,6 @@ public class SecurityController {
         }
     }
 
-    @Operation(summary = "Authenticate a user (login)",
-            description = "Verifies user credentials and returns a JWT token if they are valid.")
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(@Valid @RequestBody JwtAuthRequest request) {
         log.info("Processing login request for user: {}", request.getUsername());
@@ -59,9 +53,6 @@ public class SecurityController {
         }
     }
 
-    @Operation(summary = "Get current user profile",
-            description = "Retrieves profile information for the currently authenticated user. Requires a valid JWT Bearer token.",
-            security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/getCurrentUser")
     public ResponseEntity<UserProfileResponse> getCurrentUser() {
         log.info("Processing getCurrentUser request");

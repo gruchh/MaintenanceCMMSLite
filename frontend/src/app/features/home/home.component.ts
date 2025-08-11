@@ -78,36 +78,41 @@ export class HomeComponent {
   }
 
   private mapStatsToCardData(apiStats: BreakdownStats): StatCardData[] {
+    const roundIfNumber = (value: number | null | undefined): number | 'B/D' => {
+      return typeof value === 'number' ? Math.round(value) : 'B/D';
+    };
+
     return [
       {
         icon: 'heroCalendar',
-        value: apiStats.daysSinceLastBreakdown ?? 'B/D',
+        value: roundIfNumber(apiStats.daysSinceLastBreakdown),
         label: 'Dni od ostatniej awarii',
         color: 'text-cyan-400',
       },
       {
         icon: 'heroExclamationTriangle',
-        value: apiStats.breakdownsLastWeek ?? 'B/D',
+        value: roundIfNumber(apiStats.breakdownsLastWeek),
         label: 'Awarie w ostatnim tygodniu',
         color: 'text-amber-400',
       },
       {
         icon: 'heroExclamationTriangle',
-        value: apiStats.breakdownsLastMonth ?? 'B/D',
+        value: roundIfNumber(apiStats.breakdownsLastMonth),
         label: 'Awarie w ostatnim miesiącu',
         color: 'text-orange-400',
       },
       {
         icon: 'heroExclamationTriangle',
-        value: apiStats.breakdownsCurrentYear ?? 'B/D',
+        value: roundIfNumber(apiStats.breakdownsCurrentYear),
         label: 'Awarie w tym roku',
         color: 'text-red-400',
       },
       {
         icon: 'heroClock',
-        value: apiStats.averageBreakdownDurationMinutes
-          ? `${apiStats.averageBreakdownDurationMinutes} min`
-          : 'B/D',
+        value:
+          typeof apiStats.averageBreakdownDurationMinutes === 'number'
+            ? `${Math.round(apiStats.averageBreakdownDurationMinutes)} min`
+            : 'B/D',
         label: 'Średni czas awarii',
         color: 'text-teal-400',
       },

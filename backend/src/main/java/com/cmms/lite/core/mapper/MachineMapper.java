@@ -13,9 +13,10 @@ public interface MachineMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "breakdownsList", ignore = true)
-
     Machine toEntity(MachineDTOs.CreateRequest request);
+
     MachineDTOs.Response toResponse(Machine machine);
+
     List<MachineDTOs.Response> toResponseList(List<Machine> machines);
 
     @Mapping(target = "id", ignore = true)

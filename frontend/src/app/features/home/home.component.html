@@ -14,7 +14,6 @@
       }
       @case ('success') {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <!-- Statystyki -->
           <div class="lg:col-span-1 grid grid-cols-1 md:grid-cols-2 gap-8">
             @for (stat of stats(); track stat.label; let i = $index) {
               <div
@@ -29,8 +28,6 @@
               </div>
             }
           </div>
-
-          <!-- Ostatnia awaria -->
           @if (lastFailure(); as failure) {
             <div
               [style.transition-delay]="'400ms'"
