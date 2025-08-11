@@ -8,21 +8,21 @@
  * Do not edit the class manually.
  */
 import { PageableObject } from './pageableObject';
+import { MachineDetailsResponse } from './machineDetailsResponse';
 import { SortObject } from './sortObject';
-import { SparePartResponse } from './sparePartResponse';
 
 
-export interface PageSparePartResponse { 
-    totalPages?: number;
+export interface PageMachineDetailsResponse { 
     totalElements?: number;
+    totalPages?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
-    content?: Array<SparePartResponse>;
+    content?: Array<MachineDetailsResponse>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 }
 

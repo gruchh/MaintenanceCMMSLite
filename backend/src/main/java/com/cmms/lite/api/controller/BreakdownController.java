@@ -57,6 +57,11 @@ public class BreakdownController {
         return ResponseEntity.ok(breakdownService.closeBreakdown(breakdownId, request));
     }
 
+    @GetMapping("/latest")
+    public ResponseEntity<BreakdownDTOs.Response> getLatestBreakdown() {
+        return ResponseEntity.ok(breakdownService.getLatestBreakdown());
+    }
+
     @GetMapping("/stats")
     public ResponseEntity<BreakdownDTOs.BreakdownStatsDTO> getBreakdownStats() {
         return ResponseEntity.ok(breakdownService.getBreakdownStats());

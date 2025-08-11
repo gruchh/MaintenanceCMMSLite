@@ -30,6 +30,7 @@ public class BreakdownService {
     private final BreakdownMapper breakdownMapper;
 
     private static final String BREAKDOWN_NOT_FOUND = "Breakdown not found with id: ";
+    private static final String LATEST_BREAKDOWN_NOT_FOUND = "No breakdowns found.";
     private static final String MACHINE_NOT_FOUND = "Machine not found with id: ";
     private static final String PART_NOT_FOUND = "SparePart not found with id: ";
 
@@ -103,6 +104,13 @@ public class BreakdownService {
         breakdown.setSpecialistComment(request.specialistComment());
 
         return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
+    }
+
+    @Transactional(readOnly = true)
+    public BreakdownDTOs.Response getLatestBreakdown() {
+        Breakdown latestBreakdown = breakdownRepository.findTopByOrderByReportedAtDesc()
+                .orElseThrow(() -> new EntityNotFoundException(LATEST_BREAKDOWN_NOT_FOUND));
+        return breakdownMapper.toResponse(latestBreakdown);
     }
 
     @Transactional(readOnly = true)

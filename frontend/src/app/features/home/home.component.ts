@@ -1,6 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
+
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
+import {
+  BreakdownService,
+  BreakdownStats,
+  Response,
+} from '../../core/api/generated';
+
+type StatCardData = {
+  icon: 'heroCalendar' | 'heroExclamationTriangle' | 'heroClock';
+  value: string | number;
+  label: string;
+  color: string;
+};
+
+type LastFailureData = {
+  title: string;
+  imageUrl: string;
+  description: string;
+};
+
+type HomeData = {
+  stats: StatCardData[];
+  lastFailure: LastFailureData;
+};
+
+type ComponentState = {
+  data: HomeData | null;
+  status: 'loading' | 'success' | 'error';
+  error?: unknown;
+};
 
 @Component({
   selector: 'app-home',
@@ -9,17 +40,97 @@ import { StatCardComponent } from '../../shared/components/stat-card/stat-card.c
   templateUrl: './home.component.html',
 })
 export class HomeComponent {
+  private breakdownService = inject(BreakdownService);
 
-  stats = [
-    { icon: 'heroCalendar', value: 7, label: 'Awarie w tym tyg.', color: 'text-cyan-400' },
-    { icon: 'heroCalendar', value: 31, label: 'Awarie w tym msc.', color: 'text-cyan-400' },
-    { icon: 'heroExclamationTriangle', value: 198, label: 'Awarie w tym roku', color: 'text-amber-400' },
-    { icon: 'heroClock', value: '48 min', label: 'Średni czas naprawy', color: 'text-teal-400' }
-  ] as const;
+  private state = signal<ComponentState>({
+    data: null,
+    status: 'loading',
+  });
 
-  lastFailure = {
-    title: 'Awaria układu hydraulicznego w naczepie',
-    imageUrl: 'https://cdn.pixabay.com/photo/2016/02/02/07/24/towing-service-1174901_1280.jpg',
-    description: 'W dniu wczorajszym o godzinie 14:32 odnotowano krytyczny błąd systemu hydraulicznego w pojeździe o numerze WZ 12345. Zdiagnozowano wyciek płynu z głównego przewodu ciśnieniowego. Pojazd został unieruchomiony na autostradzie A2. Serwis jest w drodze na miejsce zdarzenia.'
-  };
+  public stats = computed(() => this.state().data?.stats);
+  public lastFailure = computed(() => this.state().data?.lastFailure);
+  public status = computed(() => this.state().status);
+
+  constructor() {
+    this.loadData();
+  }
+
+  private loadData(): void {
+    forkJoin({
+      stats: this.breakdownService.getBreakdownStats(),
+      latestFailure: this.breakdownService.getLatestBreakdown(),
+    }).subscribe({
+      next: ({ stats, latestFailure }) => {
+        const mappedData: HomeData = {
+          stats: this.mapStatsToCardData(stats),
+          lastFailure: this.mapLatestBreakdownToData(latestFailure),
+        };
+        this.state.set({ data: mappedData, status: 'success' });
+      },
+      error: (err) => {
+        console.error(
+          'Błąd podczas pobierania danych dla strony głównej:',
+          err
+        );
+        this.state.set({ data: null, status: 'error', error: err });
+      },
+    });
+  }
+
+  private mapStatsToCardData(apiStats: BreakdownStats): StatCardData[] {
+    return [
+      {
+        icon: 'heroCalendar',
+        value: apiStats.daysSinceLastBreakdown ?? 'B/D',
+        label: 'Dni od ostatniej awarii',
+        color: 'text-cyan-400',
+      },
+      {
+        icon: 'heroExclamationTriangle',
+        value: apiStats.breakdownsLastWeek ?? 'B/D',
+        label: 'Awarie w ostatnim tygodniu',
+        color: 'text-amber-400',
+      },
+      {
+        icon: 'heroExclamationTriangle',
+        value: apiStats.breakdownsLastMonth ?? 'B/D',
+        label: 'Awarie w ostatnim miesiącu',
+        color: 'text-orange-400',
+      },
+      {
+        icon: 'heroExclamationTriangle',
+        value: apiStats.breakdownsCurrentYear ?? 'B/D',
+        label: 'Awarie w tym roku',
+        color: 'text-red-400',
+      },
+      {
+        icon: 'heroClock',
+        value: apiStats.averageBreakdownDurationMinutes
+          ? `${apiStats.averageBreakdownDurationMinutes} min`
+          : 'B/D',
+        label: 'Średni czas awarii',
+        color: 'text-teal-400',
+      },
+    ];
+  }
+
+  private mapLatestBreakdownToData(
+    latest: Response | null | undefined
+  ): LastFailureData {
+    if (!latest) {
+      return {
+        title: 'Brak zarejestrowanych awarii',
+        description: 'System nie odnotował jeszcze żadnych awarii.',
+        imageUrl:
+          'https://cdn.pixabay.com/photo/2017/02/19/15/28/checklist-2080034_1280.jpg',
+      };
+    }
+
+    return {
+      title: `Awaria: ${latest.machine?.fullName ?? 'Nieznana maszyna'}`,
+      description: latest.description ?? 'Brak szczegółowego opisu.',
+      imageUrl:
+        'https://cdn.pixabay.com/photo/2016/02/02/07/24/towing-service-1174901_1280.jpg',
+    };
+  }
 }

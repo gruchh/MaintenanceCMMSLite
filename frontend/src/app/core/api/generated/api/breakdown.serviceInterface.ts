@@ -67,6 +67,12 @@ export interface BreakdownServiceInterface {
     /**
      * 
      * 
+     */
+    getLatestBreakdown(extraHttpRequestParams?: any): Observable<Response>;
+
+    /**
+     * 
+     * 
      * @param breakdownId 
      * @param usedPartId 
      */

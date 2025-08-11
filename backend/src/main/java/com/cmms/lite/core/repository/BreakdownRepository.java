@@ -17,4 +17,5 @@ public interface BreakdownRepository extends JpaRepository<Breakdown, Long> {
 
     Long countByFinishedAtBetween(LocalDateTime localDateTime, LocalDateTime now);
     Optional<Breakdown> findTopByOrderByFinishedAtDesc();
+    Optional<Breakdown> findTopByOrderByReportedAtDesc();
 }

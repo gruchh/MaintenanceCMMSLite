@@ -15,7 +15,7 @@ import {
   BreakdownTypesService,
   MachineDetailsResponse,
   MachineService,
-} from '../../core/api';
+} from '../../core/api/generated';
 import { CommonModule } from '@angular/common';
 
 @Component({

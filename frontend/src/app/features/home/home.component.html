@@ -1,29 +1,52 @@
 <section id="stats-section" class="bg-slate-900 py-12 lg:py-20">
-  <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <div class="lg:col-span-1 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div *ngFor="let stat of stats; let i = index"
-           [style.transition-delay]="i * 100 + 'ms'"
-           class="data-[state=closed]:opacity-0 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-bottom-5 duration-500">
-        <app-stat-card
-          [icon]="stat.icon"
-          [value]="stat.value"
-          [label]="stat.label"
-          [colorClass]="stat.color">
-        </app-stat-card>
-      </div>
-    </div>
-    <div [style.transition-delay]="'400ms'"
-         class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-8 flex flex-col data-[state=closed]:opacity-0 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-bottom-5 duration-500">
+  <div class="container mx-auto px-6">
+    @switch (status()) {
+      @case ('loading') {
+        <div class="text-center text-slate-400">
+          <p>Ładowanie danych...</p>
+        </div>
+      }
+      @case ('error') {
+        <div class="bg-red-900 border border-red-600 text-white rounded-lg p-6 text-center">
+          <h3 class="text-xl font-bold mb-2">Wystąpił błąd</h3>
+          <p class="text-red-300">Nie udało się nawiązać połączenia z serwerem. Proszę spróbować ponownie później.</p>
+        </div>
+      }
+      @case ('success') {
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Statystyki -->
+          <div class="lg:col-span-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+            @for (stat of stats(); track stat.label; let i = $index) {
+              <div
+                [style.transition-delay]="i * 100 + 'ms'"
+                class="data-[state=closed]:opacity-0 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-bottom-5 duration-500">
+                <app-stat-card
+                  [icon]="stat.icon"
+                  [value]="stat.value"
+                  [label]="stat.label"
+                  [colorClass]="stat.color">
+                </app-stat-card>
+              </div>
+            }
+          </div>
 
-      <h2 class="text-2xl font-bold text-slate-800 mb-4">Ostatnia awaria</h2>
-      <div class="w-full h-64 lg:h-80 rounded-xl overflow-hidden mb-6">
-        <img [src]="lastFailure.imageUrl" alt="Zdjęcie ostatniej awarii" class="w-full h-full object-cover">
-      </div>
-      <div>
-        <h3 class="text-xl font-semibold text-slate-700 mb-2">{{ lastFailure.title }}</h3>
-        <p class="text-slate-600">{{ lastFailure.description }}</p>
-      </div>
-    </div>
-
+          <!-- Ostatnia awaria -->
+          @if (lastFailure(); as failure) {
+            <div
+              [style.transition-delay]="'400ms'"
+              class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-8 flex flex-col data-[state=closed]:opacity-0 data-[state=open]:animate-in data-[state=open]:fade-in data-[state=open]:slide-in-from-bottom-5 duration-500">
+              <h2 class="text-2xl font-bold text-slate-800 mb-4">Ostatnia awaria</h2>
+              <div class="w-full h-64 lg:h-80 rounded-xl overflow-hidden mb-6">
+                <img [src]="failure.imageUrl" alt="Zdjęcie ostatniej awarii" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-slate-700 mb-2">{{ failure.title }}</h3>
+                <p class="text-slate-600">{{ failure.description }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
   </div>
 </section>

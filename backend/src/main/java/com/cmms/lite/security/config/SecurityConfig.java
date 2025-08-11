@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 "/h2-console/**",
                                 "/api/breakdowns/stats",
                                 "/api/breakdowns/report",
+                                "/api/breakdowns/latest",
                                 "/api/breakdown-types",
                                 "/api/machines/list"
                         ).permitAll()
