@@ -55,7 +55,6 @@ export class LoginModalComponent {
 
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
-
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         console.log('Logowanie udane!');
@@ -63,10 +62,10 @@ export class LoginModalComponent {
         this.router.navigate(['/dashboard']);
       },
       error: (err: HttpErrorResponse) => {
-        if (err.error && typeof err.error.token === 'string') {
-          this.errorMessage.set(err.error.token);
+        if (err.error && typeof err.error.accessToken === 'string') {
+          this.errorMessage.set(err.error.accessToken);
         } else {
-          this.errorMessage.set('Wystąpił nieoczekiwany błąd serwera.');
+          this.errorMessage.set('Wystąpił nieoczekiwany błąd. Spróbuj ponownie.');
         }
         this.isSubmitting.set(false);
       }

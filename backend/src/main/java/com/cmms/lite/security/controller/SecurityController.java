@@ -5,9 +5,6 @@ import com.cmms.lite.security.dto.JwtAuthResponse;
 import com.cmms.lite.security.dto.RegisterRequest;
 import com.cmms.lite.security.dto.UserProfileResponse;
 import com.cmms.lite.security.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +17,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @Slf4j
 @RestController()
-@RequestMapping(name = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SecurityController {
 
     private final UserService userService;
