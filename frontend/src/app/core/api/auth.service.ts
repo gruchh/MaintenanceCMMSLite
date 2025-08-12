@@ -21,7 +21,7 @@ export class AuthService {
   }
 
   private fetchAndStoreUser(): Observable<UserProfileDto | null> {
-    return this.http.get<UserProfileResponse>(`${this.apiUrl}/getCurrentUser`).pipe(
+    return this.http.get<UserProfileResponse>(`${this.apiUrl}/auth/getCurrentUser`).pipe(
       map(response => {
         if (response && response.status === 'success' && response.data) {
           this.currentUserSource.next(response.data);
