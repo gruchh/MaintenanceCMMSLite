@@ -4,6 +4,9 @@ import { BreakdownFormComponent } from './features/breakdown-form/breakdown-form
 import { DefaultLayoutComponent } from './layout/default-layout/default-layout.component';
 import { DashboardLayoutComponent } from './layout/dasboard-layout/dashboard-layout.component';
 import { OverviewComponent } from './features/dashboard/overview/overview.component';
+import { EmpolyeesComponent } from './features/dashboard/employees/employee.component';
+import { SparePartsComponent } from './features/dashboard/spare-parts/spare-parts.component';
+import { BreakdownsComponent } from './features/dashboard/breakdowns/breakdowns.component';
 
 export const routes: Routes = [
   {
@@ -28,7 +31,18 @@ export const routes: Routes = [
         path: '',
         component: OverviewComponent,
       },
-    ],
-  },
-
+      {
+        path: 'breakdowns',
+        component: BreakdownsComponent,
+      },
+      {
+        path: 'employees',
+        component: EmpolyeesComponent,
+      },
+      {
+        path: 'spare-parts',
+        component: SparePartsComponent,
+      }
+    ]
+  }
 ];

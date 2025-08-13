@@ -41,9 +41,9 @@ export class SidebarComponent {
 
   readonly menuItems: MenuItem[] = [
     { path: '/', iconName: 'heroHome', label: 'Strona Główna' },
-    { path: '/breakdowns', iconName: 'heroCog6Tooth', label: 'Awarie' },
-    { path: '/spare-parts', iconName: 'heroCubeTransparent', label: 'Części zamienne' },
-    { path: '/employees', iconName: 'heroUsers', label: 'Pracownicy' }, // Dodano nową pozycję
+    { path: '/dashboard/breakdowns', iconName: 'heroCog6Tooth', label: 'Awarie' },
+    { path: '/dashboard/spare-parts', iconName: 'heroCubeTransparent', label: 'Części zamienne' },
+    { path: '/dashboard/employees', iconName: 'heroUsers', label: 'Pracownicy' },
   ];
 
   readonly bottomItems: ActionItem[] = [
