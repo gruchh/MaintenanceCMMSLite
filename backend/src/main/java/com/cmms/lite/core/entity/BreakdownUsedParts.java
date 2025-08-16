@@ -1,16 +1,16 @@
 package com.cmms.lite.core.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "breakdown_used_parts")
 public class BreakdownUsedParts {

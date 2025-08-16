@@ -1,10 +1,7 @@
 package com.cmms.lite.config;
 
 import com.cmms.lite.core.entity.*;
-import com.cmms.lite.core.repository.BreakdownRepository;
-import com.cmms.lite.core.repository.BreakdownUsedPartsRepository;
-import com.cmms.lite.core.repository.MachineRepository;
-import com.cmms.lite.core.repository.SparePartRepository;
+import com.cmms.lite.core.repository.*;
 import com.cmms.lite.security.entity.Role;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
@@ -15,14 +12,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 @Profile("dev")
@@ -35,9 +34,20 @@ public class DataInitializer {
     private final BreakdownRepository breakdownRepository;
     private final BreakdownUsedPartsRepository breakdownUsedPartsRepository;
     private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeRoleRepository employeeRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private static final Random RANDOM = new Random();
+    private static final List<String> ROLE_NAMES = List.of("Automatyk", "Mechanik", "Ślusarz", "Spawacz", "Elektronik", "Kierownik", "Manager");
+    private static final List<String> PROBLEM_TYPES = List.of("Nagły zanik", "Problem z", "Błąd", "Głośna praca", "Wyciek", "Niska wydajność", "Przegrzewanie się", "Brak komunikacji z");
+    private static final List<String> COMPONENTS = List.of("napędem osi Z", "systemem smarowania", "układem chłodzenia", "panelem sterowania HMI", "głównym wrzecionem", "magazynem narzędzi", "pompy hydraulicznej", "falownikiem");
+    private static final List<String> SPECIALIST_ACTIONS = List.of("Wymieniono", "Naprawiono", "Wyczyszczono i skalibrowano", "Dokręcono połączenia i sprawdzono", "Zaktualizowano oprogramowanie", "Uzupełniono stan");
+    private static final List<String> REPAIRED_COMPONENTS = List.of("uszkodzony przekaźnik", "zapchany filtr", "przewód sygnałowy", "czujnik ciśnienia", "oprogramowanie sterownika", "oleju hydraulicznego");
+
+
     @EventListener(ApplicationReadyEvent.class)
+    @Transactional
     public void initializeData() {
         if (userRepository.count() > 0) {
             log.info("Dane już istnieją w bazie. Inicjalizacja pominięta.");
@@ -46,157 +56,223 @@ public class DataInitializer {
 
         log.info("Rozpoczynanie inicjalizacji bazy danych przykładowymi danymi...");
 
-        createUsers();
+        Map<String, EmployeeRole> employeeRoles = createEmployeeRoles();
+        List<Employee> employees = createUsersAndEmployees(employeeRoles);
         List<Machine> machines = createMachines();
-        machineRepository.saveAll(machines);
         List<SparePart> spareParts = createSpareParts();
-        sparePartRepository.saveAll(spareParts);
-        createBreakdowns(machines, spareParts);
+        createBreakdowns(machines, spareParts, employees);
 
         log.info("Inicjalizacja bazy danych przykładowymi danymi została zakończona pomyślnie.");
     }
 
-    private void createUsers() {
-        log.info("Tworzenie użytkowników z hierarchią ról...");
-        User admin = User.builder()
-                .username("admin")
-                .email("admin@cmms.com")
-                .password(passwordEncoder.encode("admin12345"))
-                .roles(Set.of(Role.ADMIN))
-                .build();
+    private Map<String, EmployeeRole> createEmployeeRoles() {
+        log.info("Tworzenie ról pracowników...");
+        List<EmployeeRole> roles = ROLE_NAMES.stream()
+                .map(name -> EmployeeRole.builder().name(name).build())
+                .collect(Collectors.toList());
+        employeeRoleRepository.saveAll(roles);
+        log.info("Utworzono {} ról pracowników.", roles.size());
+        return roles.stream().collect(Collectors.toMap(EmployeeRole::getName, Function.identity()));
+    }
 
-        User technician = User.builder()
-                .username("technik")
-                .email("technik@cmms.com")
-                .password(passwordEncoder.encode("technik123"))
-                .roles(Set.of(Role.TECHNICAN))
-                .build();
+    private record UserData(String username, String email, String password, Role role, String employeeRoleName) {
+    }
 
-        User subcontractor = User.builder()
-                .username("podwykonawca")
-                .email("podwykonawca@cmms.com")
-                .password(passwordEncoder.encode("podwykonawca123"))
-                .roles(Set.of(Role.SUBCONTRACTOR))
-                .build();
+    private List<Employee> createUsersAndEmployees(Map<String, EmployeeRole> roles) {
+        log.info("Tworzenie użytkowników i pracowników...");
 
-        userRepository.saveAll(List.of(admin, technician, subcontractor));
-        log.info("Utworzono {} użytkowników.", userRepository.count());
+        List<UserData> usersData = List.of(
+                new UserData("admin", "admin@cmms.com", "admin12345", Role.ADMIN, "Manager"),
+                new UserData("kierownik", "kierownik@cmms.com", "kierownik123", Role.TECHNICAN, "Kierownik"),
+                new UserData("automatyk", "automatyk@cmms.com", "technik123", Role.TECHNICAN, "Automatyk"),
+                new UserData("mechanik", "mechanik@cmms.com", "technik123", Role.TECHNICAN, "Mechanik"),
+                new UserData("elektronik", "elektronik@cmms.com", "technik123", Role.TECHNICAN, "Elektronik"),
+                new UserData("slusarz", "slusarz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Ślusarz"),
+                new UserData("spawacz", "spawacz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Spawacz")
+        );
+
+        List<User> savedUsers = new ArrayList<>();
+        List<Employee> employeesToSave = new ArrayList<>();
+
+        for (UserData data : usersData) {
+            User user = User.builder()
+                    .username(data.username())
+                    .email(data.email())
+                    .password(passwordEncoder.encode(data.password()))
+                    .roles(Set.of(data.role()))
+                    .build();
+
+            User savedUser = userRepository.save(user);
+            savedUsers.add(savedUser);
+
+            employeesToSave.add(Employee.builder()
+                    .user(savedUser)
+                    .employeeRole(roles.get(data.employeeRoleName()))
+                    .build());
+        }
+
+        List<Employee> savedEmployees = employeeRepository.saveAll(employeesToSave);
+        log.info("Utworzono {} użytkowników i przypisano im role pracownicze.", savedUsers.size());
+        return savedEmployees;
+    }
+
+    private record MachineData(String code, String fullName, String manufacturer, String description, int yearsOld) {
     }
 
     private List<Machine> createMachines() {
-        List<Machine> machines = new ArrayList<>();
+        log.info("Tworzenie maszyn...");
+        List<MachineData> machinesData = List.of(
+                new MachineData("TKR", "Tokarka CNC T-500", "DMG Mori", "Precyzyjna tokarka do produkcji seryjnej.", 10),
+                new MachineData("VOO", "Frezarka 5-osiowa V-90", "Haas", "Centrum obróbcze do skomplikowanych detali.", 9),
+                new MachineData("LCC", "Maszyna do cięcia laserowego L-3030", "Trumpf", "Wysokowydajny laser do cięcia blach stalowych.", 8),
+                new MachineData("RER", "Robot spawalniczy Fanuc R-2000iC", "Fanuc", "Zrobotyzowane stanowisko do spawania MIG/MAG.", 7),
+                new MachineData("PPP", "Piec hartowniczy P-1200", "Seco/Warwick", "Piec z kontrolowaną atmosferą do obróbki cieplnej.", 6),
+                new MachineData("UEW", "Zgrzewarka ultradźwiękowa U-50", "Branson", "Urządzenie do precyzyjnego łączenia tworzyw sztucznych.", 5),
+                new MachineData("CSD", "Maszyna inspekcyjna 3D Zeiss Contura", "Zeiss", "Współrzędnościowa maszyna pomiarowa o wysokiej dokładności.", 4),
+                new MachineData("PKK", "Prasa krawędziowa Amada HFE", "Amada", "Hydrauliczna prasa do gięcia blach o nacisku 150 ton.", 3),
+                new MachineData("SWA", "Szlifierka do wałków Jotes SWA-10", "Jotes", "Szlifierka do precyzyjnego wykańczania powierzchni zewnętrznych.", 2),
+                new MachineData("WMN", "Wiertarka wielowrzecionowa Wotan B-75", "Wotan", "Maszyna do wykonywania otworów w produkcji wielkoseryjnej.", 1)
+        );
 
-        Object[][] machineData = {
-                {"TKR", "Tokarka CNC T-500", "DMG Mori", "Precyzyjna tokarka do produkcji seryjnej."},
-                {"VOO", "Frezarka 5-osiowa V-90", "Haas", "Centrum obróbcze do skomplikowanych detali."},
-                {"LCC", "Maszyna do cięcia laserowego L-3030", "Trumpf", "Wysokowydajny laser do cięcia blach stalowych."},
-                {"RER", "Robot spawalniczy Fanuc R-2000iC", "Fanuc", "Zrobotyzowane stanowisko do spawania MIG/MAG."},
-                {"PPP", "Piec hartowniczy P-1200", "Seco/Warwick", "Piec z kontrolowaną atmosferą do obróbki cieplnej."},
-                {"UEW", "Zgrzewarka ultradźwiękowa U-50", "Branson", "Urządzenie do precyzyjnego łączenia tworzyw sztucznych."},
-                {"CSD", "Maszyna inspekcyjna 3D Zeiss Contura", "Zeiss", "Współrzędnościowa maszyna pomiarowa o wysokiej dokładności."},
-                {"PKK", "Prasa krawędziowa Amada HFE", "Amada", "Hydrauliczna prasa do gięcia blach o nacisku 150 ton."},
-                {"SWA", "Szlifierka do wałków Jotes SWA-10", "Jotes", "Szlifierka do precyzyjnego wykańczania powierzchni zewnętrznych."},
-                {"WMN", "Wiertarka wielowrzecionowa Wotan B-75", "Wotan", "Maszyna do wykonywania otworów w produkcji wielkoseryjnej."}
-        };
+        List<Machine> machines = machinesData.stream()
+                .map(data -> Machine.builder()
+                        .code(data.code())
+                        .fullName(data.fullName())
+                        .serialNumber("SN-" + data.code() + "-" + (LocalDate.now().getYear() - data.yearsOld()))
+                        .manufacturer(data.manufacturer())
+                        .productionDate(LocalDate.now().minusYears(data.yearsOld()))
+                        .description(data.description())
+                        .build())
+                .collect(Collectors.toList());
 
-        for (int i = 0; i < machineData.length; i++) {
-            Machine machine = new Machine();
-            machine.setCode((String) machineData[i][0]);
-            machine.setFullName((String) machineData[i][1]);
-            machine.setSerialNumber("SN-" + (String) machineData[i][0] + "-" + (2020 + i));
-            machine.setManufacturer((String) machineData[i][2]);
-            machine.setProductionDate(LocalDate.now().minusYears(machineData.length - i));
-            machine.setDescription((String) machineData[i][3]);
-            machines.add(machine);
-        }
-
-        log.info("Przygotowano {} maszyn do zapisu.", machines.size());
+        machineRepository.saveAll(machines);
+        log.info("Utworzono {} maszyn.", machines.size());
         return machines;
     }
 
     private List<SparePart> createSpareParts() {
-        List<SparePart> spareParts = new ArrayList<>();
+        log.info("Tworzenie części zamiennych...");
         String[] partNames = {"Bezpiecznik 2A", "Czujnik indukcyjny", "Filtr oleju hydraulicznego", "Przekaźnik bezpieczeństwa", "Stycznik mocy", "Zawór pneumatyczny", "Wężyk chłodziwa", "Uszczelka siłownika"};
-        for (int i = 1; i <= 15; i++) {
-            SparePart part = new SparePart();
-            part.setName(partNames[i % partNames.length] + " typ " + i);
-            part.setPrice(new BigDecimal(15 + i * 12).setScale(2));
-            part.setProducer(i % 2 == 0 ? "Siemens" : "Festo");
-            spareParts.add(part);
-        }
-        log.info("Przygotowano {} części zamiennych do zapisu.", spareParts.size());
+
+        List<SparePart> spareParts = IntStream.rangeClosed(1, 15)
+                .mapToObj(i -> SparePart.builder()
+                        .name(partNames[i % partNames.length] + " typ " + i)
+                        .price(new BigDecimal(15 + i * 12).setScale(2, RoundingMode.HALF_UP))
+                        .producer(i % 2 == 0 ? "Siemens" : "Festo")
+                        .build())
+                .collect(Collectors.toList());
+
+        sparePartRepository.saveAll(spareParts);
+        log.info("Utworzono {} części zamiennych.", spareParts.size());
         return spareParts;
     }
 
-    private void createBreakdowns(List<Machine> machines, List<SparePart> spareParts) {
-        List<Breakdown> breakdowns = new ArrayList<>();
-        Random random = new Random();
-        LocalDateTime now = LocalDateTime.now();
 
-        String[] problemTypes = {"Nagły zanik", "Problem z", "Błąd", "Głośna praca", "Wyciek", "Niska wydajność", "Przegrzewanie się", "Brak komunikacji z"};
-        String[] components = {"napędu osi Z", "systemu smarowania", "układu chłodzenia", "panelu sterowania HMI", "głównego wrzeciona", "magazynu narzędzi", "pompy hydraulicznej", "falownika"};
-        String[] specialistActions = {"Wymieniono", "Naprawiono", "Wyczyszczono i skalibrowano", "Dokręcono połączenia i sprawdzono", "Zaktualizowano oprogramowanie", "Uzupełniono stan"};
-        String[] repairedComponents = {"uszkodzony przekaźnik", "zapchany filtr", "przewód sygnałowy", "czujnik ciśnienia", "oprogramowanie sterownika", "oleju hydraulicznego"};
+    private void createBreakdowns(List<Machine> machines, List<SparePart> spareParts, List<Employee> employees) {
+        log.info("Tworzenie awarii...");
+        List<Breakdown> breakdownsToSave = new ArrayList<>();
+        List<BreakdownUsedParts> allUsedPartsToSave = new ArrayList<>();
+
+        List<Employee> technicians = employees.stream()
+                .filter(e -> !List.of("Manager", "Kierownik").contains(e.getEmployeeRole().getName()))
+                .collect(Collectors.toList());
+
+        if (technicians.isEmpty()) {
+            log.warn("Brak dostępnych techników do przypisania do awarii. Awariom nie zostaną przypisani pracownicy.");
+        }
 
         for (int i = 0; i < 25; i++) {
-            Breakdown breakdown = new Breakdown();
-            String description = problemTypes[random.nextInt(problemTypes.length)] + " " + components[random.nextInt(components.length)] + ".";
-            breakdown.setDescription(description);
+            boolean isOldAndClosed = i < 20 && RANDOM.nextInt(10) != 0;
+            boolean isOldAndOpen = i < 20 && !isOldAndClosed;
+            boolean isNewAndClosed = i >= 20 && RANDOM.nextInt(4) == 0;
+            boolean isOpen = !isOldAndClosed && !isNewAndClosed;
 
-            boolean isOldBreakdown = i < 20;
-            if (isOldBreakdown) {
-                LocalDateTime reported = now.minusDays(random.nextInt(30) + 2).withHour(random.nextInt(12) + 8);
-                breakdown.setReportedAt(reported);
-                breakdown.setStartedAt(reported.minusMinutes(random.nextInt(120)));
-                if (random.nextInt(10) != 0) {
-                    breakdown.setOpened(false);
-                    breakdown.setFinishedAt(reported.plusHours(random.nextInt(10) + 1));
-                    String comment = specialistActions[random.nextInt(specialistActions.length)] + " " + repairedComponents[random.nextInt(repairedComponents.length)] + ". Maszyna przetestowana, działa poprawnie.";
-                    breakdown.setSpecialistComment(comment);
-                } else {
-                    breakdown.setOpened(true);
-                    breakdown.setSpecialistComment("Oczekuje na dostawę części specjalistycznej.");
-                }
+            LocalDateTime reportedAt = generateRandomPastDateTime(isOldAndClosed || isOldAndOpen);
+            LocalDateTime startedAt = reportedAt.minusMinutes(RANDOM.nextInt(120));
+            LocalDateTime finishedAt = isOpen ? null : startedAt.plusHours(RANDOM.nextInt(10) + 1);
+
+            int teamSize = technicians.size() > 1 ? RANDOM.nextInt(2) + 1 : (technicians.isEmpty() ? 0 : 1);
+            Set<Employee> assignedTeam = selectRandomTechnicians(technicians, teamSize);
+
+            Breakdown breakdown = Breakdown.builder()
+                    .description(generateRandomDescription())
+                    .reportedAt(reportedAt)
+                    .startedAt(startedAt)
+                    .finishedAt(finishedAt)
+                    .opened(isOpen)
+                    .specialistComment(generateSpecialistComment(isOpen, isOldAndOpen))
+                    .type(BreakdownType.values()[RANDOM.nextInt(BreakdownType.values().length)])
+                    .machine(getRandomElement(machines))
+                    .assignedEmployees(assignedTeam)
+                    .build();
+
+            if (!isOpen) {
+                List<BreakdownUsedParts> usedPartsForThisBreakdown = createUsedPartsForBreakdown(breakdown, spareParts);
+                allUsedPartsToSave.addAll(usedPartsForThisBreakdown);
+                BigDecimal totalCost = usedPartsForThisBreakdown.stream()
+                        .map(part -> part.getSparePart().getPrice().multiply(new BigDecimal(part.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                breakdown.setTotalCost(totalCost);
             } else {
-                LocalDateTime reported = now.minusHours(random.nextInt(48)).minusMinutes(random.nextInt(60));
-                breakdown.setReportedAt(reported);
-                breakdown.setStartedAt(reported.minusMinutes(random.nextInt(30)));
-                if (random.nextInt(4) == 0) {
-                    breakdown.setOpened(false);
-                    breakdown.setFinishedAt(reported.plusMinutes(random.nextInt(120) + 30));
-                    breakdown.setSpecialistComment("Reset sterownika rozwiązał problem. Obserwować.");
-                } else {
-                    breakdown.setOpened(true);
-                }
+                breakdown.setTotalCost(BigDecimal.ZERO);
             }
-            breakdown.setMachine(machines.get(random.nextInt(machines.size())));
-            breakdown.setTotalCost(BigDecimal.ZERO);
-            breakdown.setType(BreakdownType.values()[random.nextInt(BreakdownType.values().length)]);
-            breakdowns.add(breakdown);
+            breakdownsToSave.add(breakdown);
         }
-        breakdownRepository.saveAll(breakdowns);
 
-        List<BreakdownUsedParts> usedPartsList = new ArrayList<>();
-        for (Breakdown breakdown : breakdownRepository.findAll()) {
-            if (!breakdown.getOpened() && breakdown.getFinishedAt() != null) {
-                int numberOfParts = random.nextInt(4);
-                BigDecimal totalCost = BigDecimal.ZERO;
-                for (int j = 0; j < numberOfParts; j++) {
-                    BreakdownUsedParts usedPart = new BreakdownUsedParts();
-                    usedPart.setBreakdown(breakdown);
-                    SparePart randomPart = spareParts.get(random.nextInt(spareParts.size()));
-                    usedPart.setSparePart(randomPart);
-                    usedPart.setQuantity(random.nextInt(2) + 1);
-                    usedPartsList.add(usedPart);
-                    totalCost = totalCost.add(randomPart.getPrice().multiply(new BigDecimal(usedPart.getQuantity())));
-                }
-                if (totalCost.compareTo(BigDecimal.ZERO) > 0) {
-                    breakdown.setTotalCost(totalCost);
-                    breakdownRepository.save(breakdown);
-                }
-            }
+        breakdownRepository.saveAll(breakdownsToSave);
+        breakdownUsedPartsRepository.saveAll(allUsedPartsToSave);
+        log.info("Utworzono {} awarii i przypisano do nich części oraz pracowników.", breakdownsToSave.size());
+    }
+
+    private Set<Employee> selectRandomTechnicians(List<Employee> technicians, int count) {
+        if (technicians == null || technicians.isEmpty() || count <= 0) {
+            return new HashSet<>();
         }
-        breakdownUsedPartsRepository.saveAll(usedPartsList);
-        log.info("Utworzono {} awarii i przypisano do nich części.", breakdowns.size());
+        List<Employee> shuffledTechnicians = new ArrayList<>(technicians);
+        Collections.shuffle(shuffledTechnicians);
+
+        int actualCount = Math.min(count, shuffledTechnicians.size());
+
+        return new HashSet<>(shuffledTechnicians.subList(0, actualCount));
+    }
+
+
+    private List<BreakdownUsedParts> createUsedPartsForBreakdown(Breakdown breakdown, List<SparePart> allSpareParts) {
+        int numberOfParts = RANDOM.nextInt(4);
+        List<BreakdownUsedParts> usedParts = new ArrayList<>();
+        for (int i = 0; i < numberOfParts; i++) {
+            usedParts.add(BreakdownUsedParts.builder()
+                    .breakdown(breakdown)
+                    .sparePart(getRandomElement(allSpareParts))
+                    .quantity(RANDOM.nextInt(2) + 1)
+                    .build());
+        }
+        return usedParts;
+    }
+
+    private String generateRandomDescription() {
+        return getRandomElement(PROBLEM_TYPES) + " " + getRandomElement(COMPONENTS) + ".";
+    }
+
+    private LocalDateTime generateRandomPastDateTime(boolean isOld) {
+        int maxDaysAgo = isOld ? 30 : 2;
+        int randomDays = isOld ? RANDOM.nextInt(maxDaysAgo) + 2 : RANDOM.nextInt(maxDaysAgo);
+        int randomHours = RANDOM.nextInt(24);
+        int randomMinutes = RANDOM.nextInt(60);
+        return LocalDateTime.now().minusDays(randomDays).minusHours(randomHours).minusMinutes(randomMinutes);
+    }
+
+    private String generateSpecialistComment(boolean isOpen, boolean isWaitingForPart) {
+        if (isOpen) {
+            return isWaitingForPart ? "Oczekuje na dostawę części specjalistycznej." : "";
+        }
+        return getRandomElement(SPECIALIST_ACTIONS) + " " + getRandomElement(REPAIRED_COMPONENTS) + ". Maszyna przetestowana, działa poprawnie.";
+    }
+
+    private <T> T getRandomElement(List<T> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(RANDOM.nextInt(list.size()));
     }
 }

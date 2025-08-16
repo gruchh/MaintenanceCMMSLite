@@ -1,9 +1,7 @@
 package com.cmms.lite.core.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -11,11 +9,15 @@ import javax.validation.constraints.PastOrPresent;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "breakdowns")
 public class Breakdown {
@@ -46,6 +48,7 @@ public class Breakdown {
     @JoinColumn(name = "machine_id", nullable = false)
     private Machine machine;
 
+    @Builder.Default
     @OneToMany(mappedBy = "breakdown")
     private List<BreakdownUsedParts> usedPartsList = new ArrayList<>();
 
@@ -62,4 +65,13 @@ public class Breakdown {
     @Enumerated(EnumType.STRING)
     @Column(name = "breakdown_type", nullable = false)
     private BreakdownType type;
+
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "breakdowns_employees",
+            joinColumns = @JoinColumn(name = "breakdown_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
+    )
+    private Set<Employee> assignedEmployees = new HashSet<>();
 }

@@ -1,9 +1,7 @@
 package com.cmms.lite.core.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
@@ -14,7 +12,9 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "spare_parts")
 public class SparePart {

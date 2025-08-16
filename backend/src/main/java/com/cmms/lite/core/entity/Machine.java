@@ -1,9 +1,7 @@
 package com.cmms.lite.core.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
@@ -14,7 +12,9 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "machines")
 public class Machine {
@@ -48,6 +48,7 @@ public class Machine {
     @Lob
     private String description;
 
+    @Builder.Default
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Breakdown> breakdownsList = new ArrayList<>();
 }
