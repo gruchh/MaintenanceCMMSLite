@@ -8,6 +8,17 @@ public final class EmployeeDTOs {
 
     private EmployeeDTOs() {}
 
+    @Schema(name = "EmployeeCreateRequest", description = "Data required to create a new employee")
+    public record CreateRequest(
+            @Schema(description = "ID of the existing user to be linked as an employee.", example = "1")
+            @NotNull
+            Long userId,
+
+            @Schema(description = "ID of the employee's role.", example = "3")
+            @NotNull
+            Long roleId
+    ) {}
+
     @Schema(name = "EmployeeUpdateRequest", description = "Data required to update an employee's role")
     public record UpdateRequest(
             @NotNull(message = "Role ID cannot be null.")

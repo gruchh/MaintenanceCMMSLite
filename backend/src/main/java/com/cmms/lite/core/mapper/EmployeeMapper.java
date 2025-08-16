@@ -14,13 +14,13 @@ import java.util.List;
 )
 public interface EmployeeMapper {
 
-    @Mapping(source = "user.username", target = "username") // Mapujemy username na username
+    @Mapping(source = "user.username", target = "username")
     @Mapping(source = "user.email", target = "email")
     @Mapping(source = "employeeRole.name", target = "role")
     EmployeeDTOs.Response toResponse(Employee employee);
 
-    List<EmployeeDTOs.Response> toResponseList(List<Employee> employees);
-
-    @Mapping(source = "user.username", target = "username") // Mapujemy username na username
+    @Mapping(source = "user.username", target = "username")
     EmployeeDTOs.SummaryResponse toSummaryResponse(Employee employee);
+
+    List<EmployeeDTOs.SummaryResponse> toSummaryResponseList(List<Employee> employees);
 }
