@@ -13,8 +13,8 @@
  * Data required to update a spare part
  */
 export interface SparePartUpdateRequest { 
-    name?: string;
-    price?: number;
+    name: string;
+    price: number;
     producer?: string;
 }
 

@@ -30,23 +30,21 @@ import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables'
 import { Configuration }                                     from '../configuration';
 import { BaseService } from '../api.base.service';
 import {
-    AuthenticationServiceInterface
-} from './authentication.serviceInterface';
+    SecurityControllerServiceInterface
+} from './securityController.serviceInterface';
 
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticationService extends BaseService implements AuthenticationServiceInterface {
+export class SecurityControllerService extends BaseService implements SecurityControllerServiceInterface {
 
     constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string|string[], @Optional() configuration?: Configuration) {
         super(basePath, configuration);
     }
 
     /**
-     * Get current user profile
-     * Retrieves profile information for the currently authenticated user. Requires a valid JWT Bearer token.
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
@@ -80,7 +78,7 @@ export class AuthenticationService extends BaseService implements Authentication
             }
         }
 
-        let localVarPath = `/getCurrentUser`;
+        let localVarPath = `/auth/getCurrentUser`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<UserProfileResponse>('get', `${basePath}${localVarPath}`,
             {
@@ -96,8 +94,6 @@ export class AuthenticationService extends BaseService implements Authentication
     }
 
     /**
-     * Authenticate a user (login)
-     * Verifies user credentials and returns a JWT token if they are valid.
      * @param jwtAuthRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -144,7 +140,7 @@ export class AuthenticationService extends BaseService implements Authentication
             }
         }
 
-        let localVarPath = `/login`;
+        let localVarPath = `/auth/login`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<JwtAuthResponse>('post', `${basePath}${localVarPath}`,
             {
@@ -161,8 +157,6 @@ export class AuthenticationService extends BaseService implements Authentication
     }
 
     /**
-     * Register a new user
-     * Creates a new user account and returns a JWT token upon successful registration.
      * @param registerRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
@@ -209,7 +203,7 @@ export class AuthenticationService extends BaseService implements Authentication
             }
         }
 
-        let localVarPath = `/register`;
+        let localVarPath = `/auth/register`;
         const { basePath, withCredentials } = this.configuration;
         return this.httpClient.request<JwtAuthResponse>('post', `${basePath}${localVarPath}`,
             {

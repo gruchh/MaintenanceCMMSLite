@@ -13,8 +13,8 @@
  * Data required to update an existing machine
  */
 export interface MachineUpdateRequest { 
-    code?: string;
-    fullName?: string;
+    code: string;
+    fullName: string;
     serialNumber?: string;
     manufacturer?: string;
     productionDate?: string;

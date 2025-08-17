@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "generate-api": "rimraf ./src/app/core/api/generated && openapi-generator-cli generate --input-spec http://localhost:8080/v3/api-docs --output ./src/app/core/api/generated --generator-name typescript-angular --additional-properties=withInterfaces=true,providedInRoot=true,enumPropertyNaming=original"
+    "api:generate:dev": "rimraf ./src/app/core/api/generated && openapi-generator-cli generate --input-spec http://localhost:8080/v3/api-docs --output ./src/app/core/api/generated --generator-name typescript-angular --additional-properties=withInterfaces=true,providedInRoot=true,enumPropertyNaming=original",
+    "api:generate:prod": "rimraf ./src/app/core/api/generated && openapi-generator-cli generate --input-spec https://api.twojadomena.com/v3/api-docs --output ./src/app/core/api/generated --generator-name typescript-angular --additional-properties=withInterfaces=true,providedInRoot=true,enumPropertyNaming=original"
   },
   "prettier": {
     "overrides": [

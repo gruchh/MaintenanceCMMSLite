@@ -4,14 +4,16 @@ README.md
 api.base.service.ts
 api.module.ts
 api/api.ts
-api/authentication.service.ts
-api/authentication.serviceInterface.ts
 api/breakdown.service.ts
 api/breakdown.serviceInterface.ts
 api/breakdownTypes.service.ts
 api/breakdownTypes.serviceInterface.ts
+api/employees.service.ts
+api/employees.serviceInterface.ts
 api/machine.service.ts
 api/machine.serviceInterface.ts
+api/securityController.service.ts
+api/securityController.serviceInterface.ts
 api/sparePart.service.ts
 api/sparePart.serviceInterface.ts
 configuration.ts
@@ -24,6 +26,10 @@ model/breakdownStats.ts
 model/breakdownTypeResponse.ts
 model/breakdownUsedPartResponse.ts
 model/closeRequest.ts
+model/employeeCreateRequest.ts
+model/employeeResponse.ts
+model/employeeSummaryResponse.ts
+model/employeeUpdateRequest.ts
 model/jwtAuthRequest.ts
 model/jwtAuthResponse.ts
 model/machineCreateRequest.ts
@@ -31,6 +37,7 @@ model/machineDetailsResponse.ts
 model/machineSummaryResponse.ts
 model/machineUpdateRequest.ts
 model/models.ts
+model/pageEmployeeSummaryResponse.ts
 model/pageMachineDetailsResponse.ts
 model/pageResponse.ts
 model/pageSparePartResponse.ts

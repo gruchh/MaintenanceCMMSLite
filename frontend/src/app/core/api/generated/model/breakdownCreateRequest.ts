@@ -13,9 +13,9 @@
  * Data required to create a new breakdown report
  */
 export interface BreakdownCreateRequest { 
-    description?: string;
-    machineId?: number;
-    type?: BreakdownCreateRequest.TypeEnum;
+    description: string;
+    machineId: number;
+    type: BreakdownCreateRequest.TypeEnum;
 }
 export namespace BreakdownCreateRequest {
     export const TypeEnum = {

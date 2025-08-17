@@ -21,26 +21,26 @@ import { Configuration }                                     from '../configurat
 
 
 
-export interface AuthenticationServiceInterface {
+export interface SecurityControllerServiceInterface {
     defaultHeaders: HttpHeaders;
     configuration: Configuration;
 
     /**
-     * Get current user profile
-     * Retrieves profile information for the currently authenticated user. Requires a valid JWT Bearer token.
+     * 
+     * 
      */
     getCurrentUser(extraHttpRequestParams?: any): Observable<UserProfileResponse>;
 
     /**
-     * Authenticate a user (login)
-     * Verifies user credentials and returns a JWT token if they are valid.
+     * 
+     * 
      * @param jwtAuthRequest 
      */
     login(jwtAuthRequest: JwtAuthRequest, extraHttpRequestParams?: any): Observable<JwtAuthResponse>;
 
     /**
-     * Register a new user
-     * Creates a new user account and returns a JWT token upon successful registration.
+     * 
+     * 
      * @param registerRequest 
      */
     register(registerRequest: RegisterRequest, extraHttpRequestParams?: any): Observable<JwtAuthResponse>;

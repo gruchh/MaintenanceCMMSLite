@@ -13,8 +13,8 @@
  * Data required to create a new machine
  */
 export interface MachineCreateRequest { 
-    code?: string;
-    fullName?: string;
+    code: string;
+    fullName: string;
     serialNumber?: string;
     manufacturer?: string;
     productionDate?: string;

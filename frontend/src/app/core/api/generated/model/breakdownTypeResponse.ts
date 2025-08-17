@@ -13,7 +13,7 @@
  * Represents a breakdown type for the frontend
  */
 export interface BreakdownTypeResponse { 
-    value?: string;
-    displayName?: string;
+    value: string;
+    displayName: string;
 }
 

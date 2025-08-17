@@ -10,16 +10,16 @@
 
 
 /**
- * Data required to add a spare part to a breakdown
+ * Data required to create a new employee
  */
-export interface BreakdownAddPartRequest { 
+export interface EmployeeCreateRequest { 
     /**
-     * ID of the spare part from the inventory.
+     * ID of the existing user to be linked as an employee.
      */
-    sparePartId: number;
+    userId: number;
     /**
-     * The quantity of parts used.
+     * ID of the employee\'s role.
      */
-    quantity: number;
+    roleId: number;
 }
 

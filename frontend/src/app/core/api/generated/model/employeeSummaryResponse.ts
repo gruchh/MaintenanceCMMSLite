@@ -9,8 +9,11 @@
  */
 
 
-export interface JwtAuthRequest { 
-    username: string;
-    password: string;
+/**
+ * A response object with summary employee data
+ */
+export interface EmployeeSummaryResponse { 
+    id?: number;
+    username?: string;
 }
 

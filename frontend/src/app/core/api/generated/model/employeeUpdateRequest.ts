@@ -9,8 +9,10 @@
  */
 
 
-export interface JwtAuthRequest { 
-    username: string;
-    password: string;
+/**
+ * Data required to update an employee\'s role
+ */
+export interface EmployeeUpdateRequest { 
+    roleId: number;
 }
 

@@ -10,6 +10,6 @@
 
 
 export interface CloseRequest { 
-    specialistComment?: string;
+    specialistComment: string;
 }
 
