@@ -5,6 +5,7 @@ import com.cmms.lite.core.repository.*;
 import com.cmms.lite.security.entity.Role;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
+import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,7 +19,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -36,9 +39,11 @@ public class DataInitializer {
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
     private final EmployeeRoleRepository employeeRoleRepository;
+    private final EmployeeDetailsRepository employeeDetailsRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final Random RANDOM = new Random();
+    private static final Faker FAKER = new Faker(new Locale("pl"));
     private static final List<String> ROLE_NAMES = List.of("Automatyk", "Mechanik", "Ślusarz", "Spawacz", "Elektronik", "Kierownik", "Manager");
     private static final List<String> PROBLEM_TYPES = List.of("Nagły zanik", "Problem z", "Błąd", "Głośna praca", "Wyciek", "Niska wydajność", "Przegrzewanie się", "Brak komunikacji z");
     private static final List<String> COMPONENTS = List.of("napędem osi Z", "systemem smarowania", "układem chłodzenia", "panelem sterowania HMI", "głównym wrzecionem", "magazynem narzędzi", "pompy hydraulicznej", "falownikiem");
@@ -58,6 +63,7 @@ public class DataInitializer {
 
         Map<String, EmployeeRole> employeeRoles = createEmployeeRoles();
         List<Employee> employees = createUsersAndEmployees(employeeRoles);
+        createEmployeeDetails(employees);
         List<Machine> machines = createMachines();
         List<SparePart> spareParts = createSpareParts();
         createBreakdowns(machines, spareParts, employees);
@@ -75,20 +81,20 @@ public class DataInitializer {
         return roles.stream().collect(Collectors.toMap(EmployeeRole::getName, Function.identity()));
     }
 
-    private record UserData(String username, String email, String password, Role role, String employeeRoleName) {
+    private record UserData(String firstName, String lastName, String username, String email, String password, Role role, String employeeRoleName) {
     }
 
     private List<Employee> createUsersAndEmployees(Map<String, EmployeeRole> roles) {
         log.info("Tworzenie użytkowników i pracowników...");
 
         List<UserData> usersData = List.of(
-                new UserData("admin", "admin@cmms.com", "admin12345", Role.ADMIN, "Manager"),
-                new UserData("kierownik", "kierownik@cmms.com", "kierownik123", Role.TECHNICAN, "Kierownik"),
-                new UserData("automatyk", "automatyk@cmms.com", "technik123", Role.TECHNICAN, "Automatyk"),
-                new UserData("mechanik", "mechanik@cmms.com", "technik123", Role.TECHNICAN, "Mechanik"),
-                new UserData("elektronik", "elektronik@cmms.com", "technik123", Role.TECHNICAN, "Elektronik"),
-                new UserData("slusarz", "slusarz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Ślusarz"),
-                new UserData("spawacz", "spawacz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Spawacz")
+                new UserData("Adam", "Nowak", "admin", "admin@cmms.com", "admin12345", Role.ADMIN, "Manager"),
+                new UserData("Jan", "Kowalski", "kierownik", "kierownik@cmms.com", "kierownik123", Role.TECHNICAN, "Kierownik"),
+                new UserData("Tomasz", "Wiśniewski", "automatyk", "automatyk@cmms.com", "technik123", Role.TECHNICAN, "Automatyk"),
+                new UserData("Marek", "Wójcik", "mechanik", "mechanik@cmms.com", "technik123", Role.TECHNICAN, "Mechanik"),
+                new UserData("Piotr", "Kowalczyk", "elektronik", "elektronik@cmms.com", "technik123", Role.TECHNICAN, "Elektronik"),
+                new UserData("Krzysztof", "Zieliński", "slusarz", "slusarz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Ślusarz"),
+                new UserData("Grzegorz", "Szymański", "spawacz", "spawacz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Spawacz")
         );
 
         List<User> savedUsers = new ArrayList<>();
@@ -96,6 +102,8 @@ public class DataInitializer {
 
         for (UserData data : usersData) {
             User user = User.builder()
+                    .firstName(data.firstName())
+                    .lastName(data.lastName())
                     .username(data.username())
                     .email(data.email())
                     .password(passwordEncoder.encode(data.password()))
@@ -114,6 +122,41 @@ public class DataInitializer {
         List<Employee> savedEmployees = employeeRepository.saveAll(employeesToSave);
         log.info("Utworzono {} użytkowników i przypisano im role pracownicze.", savedUsers.size());
         return savedEmployees;
+    }
+
+    private void createEmployeeDetails(List<Employee> employees) {
+        log.info("Tworzenie szczegółów pracowników...");
+        List<EmployeeDetails> detailsToSave = new ArrayList<>();
+
+        for (Employee employee : employees) {
+            LocalDate dateOfBirth = FAKER.date().birthday(25, 60).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate hireDate = FAKER.date().past(15 * 365, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            Address address = new Address(
+                    FAKER.address().streetAddress(),
+                    FAKER.address().city(),
+                    FAKER.address().zipCode(),
+                    "Polska"
+            );
+
+            EmployeeDetails details = EmployeeDetails.builder()
+                    .employee(employee)
+                    .dateOfBirth(dateOfBirth)
+                    .hireDate(hireDate)
+                    .phoneNumber(FAKER.phoneNumber().cellPhone())
+                    .address(address)
+                    .contractEndDate(RANDOM.nextBoolean() ? hireDate.plusYears(RANDOM.nextInt(5) + 1) : null)
+                    .salary(BigDecimal.valueOf(RANDOM.nextDouble(5000, 15000)).setScale(2, RoundingMode.HALF_UP))
+                    .educationLevel(EducationLevel.values()[RANDOM.nextInt(EducationLevel.values().length)])
+                    .fieldOfStudy(RANDOM.nextBoolean() ? FAKER.educator().course() : null)
+                    .emergencyContactName(FAKER.name().fullName())
+                    .emergencyContactPhone(FAKER.phoneNumber().cellPhone())
+                    .build();
+            detailsToSave.add(details);
+        }
+
+        employeeDetailsRepository.saveAll(detailsToSave);
+        log.info("Utworzono szczegóły dla {} pracowników.", detailsToSave.size());
     }
 
     private record MachineData(String code, String fullName, String manufacturer, String description, int yearsOld) {
@@ -184,8 +227,7 @@ public class DataInitializer {
         for (int i = 0; i < 25; i++) {
             boolean isOldAndClosed = i < 20 && RANDOM.nextInt(10) != 0;
             boolean isOldAndOpen = i < 20 && !isOldAndClosed;
-            boolean isNewAndClosed = i >= 20 && RANDOM.nextInt(4) == 0;
-            boolean isOpen = !isOldAndClosed && !isNewAndClosed;
+            boolean isOpen = !isOldAndClosed;
 
             LocalDateTime reportedAt = generateRandomPastDateTime(isOldAndClosed || isOldAndOpen);
             LocalDateTime startedAt = reportedAt.minusMinutes(RANDOM.nextInt(120));
@@ -213,6 +255,7 @@ public class DataInitializer {
                         .map(part -> part.getSparePart().getPrice().multiply(new BigDecimal(part.getQuantity())))
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
                 breakdown.setTotalCost(totalCost);
+                breakdown.setUsedPartsList(usedPartsForThisBreakdown);
             } else {
                 breakdown.setTotalCost(BigDecimal.ZERO);
             }
@@ -220,7 +263,15 @@ public class DataInitializer {
         }
 
         breakdownRepository.saveAll(breakdownsToSave);
-        breakdownUsedPartsRepository.saveAll(allUsedPartsToSave);
+
+        for (Breakdown breakdown : breakdownsToSave) {
+            if (breakdown.getUsedPartsList() != null) {
+                for (BreakdownUsedParts part : breakdown.getUsedPartsList()) {
+                    part.setBreakdown(breakdown);
+                }
+                breakdownUsedPartsRepository.saveAll(breakdown.getUsedPartsList());
+            }
+        }
         log.info("Utworzono {} awarii i przypisano do nich części oraz pracowników.", breakdownsToSave.size());
     }
 
@@ -240,12 +291,15 @@ public class DataInitializer {
     private List<BreakdownUsedParts> createUsedPartsForBreakdown(Breakdown breakdown, List<SparePart> allSpareParts) {
         int numberOfParts = RANDOM.nextInt(4);
         List<BreakdownUsedParts> usedParts = new ArrayList<>();
-        for (int i = 0; i < numberOfParts; i++) {
-            usedParts.add(BreakdownUsedParts.builder()
-                    .breakdown(breakdown)
-                    .sparePart(getRandomElement(allSpareParts))
-                    .quantity(RANDOM.nextInt(2) + 1)
-                    .build());
+        if (numberOfParts > 0) {
+            Collections.shuffle(allSpareParts);
+            for (int i = 0; i < numberOfParts; i++) {
+                usedParts.add(BreakdownUsedParts.builder()
+                        .breakdown(breakdown)
+                        .sparePart(allSpareParts.get(i))
+                        .quantity(RANDOM.nextInt(2) + 1)
+                        .build());
+            }
         }
         return usedParts;
     }

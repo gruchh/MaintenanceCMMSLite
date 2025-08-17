@@ -34,10 +34,16 @@ public class EmployeeService {
     public EmployeeDTOs.Response createEmployee(EmployeeDTOs.CreateRequest request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND, request.userId())));
+
+        if (employeeRepository.existsById(user.getId())) {
+            throw new EmployeeRoleNotFoundException("Użytkownik o ID " + user.getId() + " jest już zarejestrowany jako pracownik.");
+        }
+
         EmployeeRole role = employeeRoleRepository.findById(request.roleId())
                 .orElseThrow(() -> new EmployeeRoleNotFoundException(String.format(ROLE_NOT_FOUND, request.roleId())));
 
         Employee employee = new Employee();
+        employee.setId(user.getId());
         employee.setUser(user);
         employee.setEmployeeRole(role);
 
@@ -47,19 +53,20 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public EmployeeDTOs.Response getEmployeeById(Long employeeId) {
-        Employee employee = getEmployeeByIdOrThrow(employeeId);
+        Employee employee = employeeRepository.findByIdWithDetails(employeeId)
+                .orElseThrow(() -> new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId)));
         return employeeMapper.toResponse(employee);
     }
 
     @Transactional(readOnly = true)
     public Page<EmployeeDTOs.SummaryResponse> getAllEmployees(Pageable pageable) {
-        return employeeRepository.findAll(pageable)
+        return employeeRepository.findAllWithSummary(pageable)
                 .map(employeeMapper::toSummaryResponse);
     }
 
     @Transactional
-    public EmployeeDTOs.Response updateEmployeeRole(Long employeeId, EmployeeDTOs.UpdateRequest request) {
-        Employee employee = getEmployeeByIdOrThrow(employeeId);
+    public EmployeeDTOs.Response updateEmployeeRole(Long employeeId, EmployeeDTOs.UpdateRoleRequest request) {
+        Employee employee = getEmployeeByIdWithDetailsOrThrow(employeeId);
 
         EmployeeRole newRole = employeeRoleRepository.findById(request.roleId())
                 .orElseThrow(() -> new EmployeeRoleNotFoundException(String.format(ROLE_NOT_FOUND, request.roleId())));
@@ -72,12 +79,14 @@ public class EmployeeService {
 
     @Transactional
     public void deleteEmployee(Long employeeId) {
-        Employee employee = getEmployeeByIdOrThrow(employeeId);
-        employeeRepository.delete(employee);
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId));
+        }
+        employeeRepository.deleteById(employeeId);
     }
 
-    private Employee getEmployeeByIdOrThrow(Long employeeId) {
-        return employeeRepository.findById(employeeId)
+    private Employee getEmployeeByIdWithDetailsOrThrow(Long employeeId) {
+        return employeeRepository.findByIdWithDetails(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId)));
     }
 }

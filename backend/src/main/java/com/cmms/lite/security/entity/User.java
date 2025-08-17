@@ -24,6 +24,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "First name cannot be blank.")
+    @Size(max = 50)
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @NotBlank(message = "Last name cannot be blank.")
+    @Size(max = 50)
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
     @NotBlank
     @Size(min = 3, max = 50)
     @Column(nullable = false, unique = true)
@@ -38,6 +48,9 @@ public class User {
     @Email
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -55,4 +68,12 @@ public class User {
     )
     @Column(name = "role")
     private Set<Role> roles;
+
+    @Transient
+    public String getFullName() {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        }
+        return "";
+    }
 }
