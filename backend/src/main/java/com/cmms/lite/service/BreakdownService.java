@@ -9,7 +9,7 @@ import com.cmms.lite.core.mapper.BreakdownMapper;
 import com.cmms.lite.core.repository.BreakdownRepository;
 import com.cmms.lite.core.repository.MachineRepository;
 import com.cmms.lite.core.repository.SparePartRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.cmms.lite.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,15 +29,15 @@ public class BreakdownService {
     private final MachineRepository machineRepository;
     private final BreakdownMapper breakdownMapper;
 
-    private static final String BREAKDOWN_NOT_FOUND = "Breakdown not found with id: ";
-    private static final String LATEST_BREAKDOWN_NOT_FOUND = "No breakdowns found.";
-    private static final String MACHINE_NOT_FOUND = "Machine not found with id: ";
-    private static final String PART_NOT_FOUND = "SparePart not found with id: ";
+    private static final String BREAKDOWN_NOT_FOUND = "Awaria o ID %d nie została znaleziona.";
+    private static final String LATEST_BREAKDOWN_NOT_FOUND = "Nie znaleziono żadnych awarii.";
+    private static final String MACHINE_NOT_FOUND = "Maszyna o ID %d nie została znaleziona.";
+    private static final String PART_NOT_FOUND = "Część zamienna o ID %d nie została znaleziona.";
 
     @Transactional
     public BreakdownDTOs.Response createBreakdown(BreakdownDTOs.CreateRequest request) {
         Machine machine = machineRepository.findById(request.machineId())
-                .orElseThrow(() -> new EntityNotFoundException(MACHINE_NOT_FOUND + request.machineId()));
+                .orElseThrow(() -> new MachineNotFoundException(String.format(MACHINE_NOT_FOUND, request.machineId())));
 
         Breakdown breakdown = new Breakdown();
         breakdown.setDescription(request.description());
@@ -65,7 +65,7 @@ public class BreakdownService {
     public BreakdownDTOs.Response addPartToBreakdown(Long breakdownId, BreakdownDTOs.AddPartRequest request) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
         SparePart sparePart = sparePartRepository.findById(request.sparePartId())
-                .orElseThrow(() -> new EntityNotFoundException(PART_NOT_FOUND + request.sparePartId()));
+                .orElseThrow(() -> new SparePartNotFoundException(String.format(PART_NOT_FOUND, request.sparePartId())));
 
         BreakdownUsedParts usedPart = new BreakdownUsedParts();
         usedPart.setBreakdown(breakdown);
@@ -84,7 +84,7 @@ public class BreakdownService {
         boolean removed = breakdown.getUsedPartsList().removeIf(part -> part.getId().equals(usedPartId));
 
         if (!removed) {
-            throw new EntityNotFoundException("Used part with id " + usedPartId + " not found in breakdown " + breakdownId);
+            throw new UsedPartNotFoundException("Użyta część o ID " + usedPartId + " nie została znaleziona w awarii o ID " + breakdownId);
         }
 
         recalculateTotalCost(breakdown);
@@ -96,7 +96,7 @@ public class BreakdownService {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
 
         if (!breakdown.getOpened()) {
-            throw new IllegalStateException("Breakdown is already closed.");
+            throw new IllegalOperationException("Awaria jest już zamknięta.");
         }
 
         breakdown.setOpened(false);
@@ -109,14 +109,13 @@ public class BreakdownService {
     @Transactional(readOnly = true)
     public BreakdownDTOs.Response getLatestBreakdown() {
         Breakdown latestBreakdown = breakdownRepository.findTopByOrderByReportedAtDesc()
-                .orElseThrow(() -> new EntityNotFoundException(LATEST_BREAKDOWN_NOT_FOUND));
+                .orElseThrow(() -> new BreakdownNotFoundException(LATEST_BREAKDOWN_NOT_FOUND));
         return breakdownMapper.toResponse(latestBreakdown);
     }
 
     @Transactional(readOnly = true)
     public BreakdownDTOs.BreakdownStatsDTO getBreakdownStats() {
         LocalDateTime now = LocalDateTime.now();
-
         Long daysSinceLast = breakdownRepository.findTopByOrderByFinishedAtDesc()
                 .map(b -> ChronoUnit.DAYS.between(b.getFinishedAt(), now))
                 .orElse(null);
@@ -132,7 +131,7 @@ public class BreakdownService {
 
     private Breakdown getBreakdownByIdOrThrow(Long id) {
         return breakdownRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(BREAKDOWN_NOT_FOUND + id));
+                .orElseThrow(() -> new BreakdownNotFoundException(String.format(BREAKDOWN_NOT_FOUND, id)));
     }
 
     private void recalculateTotalCost(Breakdown breakdown) {

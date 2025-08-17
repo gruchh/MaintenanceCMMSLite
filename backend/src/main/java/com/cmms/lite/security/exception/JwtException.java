@@ -1,14 +1,11 @@
 package com.cmms.lite.security.exception;
 
-import org.springframework.http.HttpStatus;
-
-public class JwtException extends ValidationException {
+public class JwtException extends AppAuthenticationException {
     public JwtException(String message) {
-        super(message, HttpStatus.UNAUTHORIZED);
+        super(message);
     }
 
     public JwtException(String message, Throwable cause) {
-        super(message, HttpStatus.UNAUTHORIZED);
-        this.initCause(cause);
+        super(message, cause);
     }
 }

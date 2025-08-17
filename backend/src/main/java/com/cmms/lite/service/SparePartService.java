@@ -4,7 +4,7 @@ import com.cmms.lite.api.dto.SparePartDTOs;
 import com.cmms.lite.core.entity.SparePart;
 import com.cmms.lite.core.mapper.SparePartMapper;
 import com.cmms.lite.core.repository.SparePartRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.cmms.lite.exception.SparePartNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ public class SparePartService {
     private final SparePartRepository sparePartRepository;
     private final SparePartMapper sparePartMapper;
 
-    private static final String NOT_FOUND = "SparePart not found with id: ";
+    private static final String NOT_FOUND = "Część zamienna o ID %d nie została znaleziona.";
 
     @Transactional(readOnly = true)
     public Page<SparePartDTOs.Response> getAllSpareParts(Pageable pageable) {
@@ -50,13 +50,13 @@ public class SparePartService {
     @Transactional
     public void deleteSparePart(Long id) {
         if (!sparePartRepository.existsById(id)) {
-            throw new EntityNotFoundException(NOT_FOUND + id);
+            throw new SparePartNotFoundException(String.format(NOT_FOUND, id));
         }
         sparePartRepository.deleteById(id);
     }
 
     private SparePart getSparePartByIdOrThrow(Long id) {
         return sparePartRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND + id));
+                .orElseThrow(() -> new SparePartNotFoundException(String.format(NOT_FOUND, id)));
     }
 }
