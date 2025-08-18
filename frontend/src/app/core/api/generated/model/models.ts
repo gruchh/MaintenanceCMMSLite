@@ -7,7 +7,7 @@ export * from './closeRequest';
 export * from './employeeCreateRequest';
 export * from './employeeResponse';
 export * from './employeeSummaryResponse';
-export * from './employeeUpdateRequest';
+export * from './employeeUpdateRoleRequest';
 export * from './jwtAuthRequest';
 export * from './jwtAuthResponse';
 export * from './machineCreateRequest';

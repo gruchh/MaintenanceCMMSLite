@@ -12,7 +12,7 @@
 /**
  * Data required to update an employee\'s role
  */
-export interface EmployeeUpdateRequest { 
+export interface EmployeeUpdateRoleRequest { 
     roleId: number;
 }
 

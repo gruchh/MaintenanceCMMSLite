@@ -1,74 +1,77 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <-- Import CommonModule
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
-// Definicja interfejsu dla obiektu pracownika dla lepszej kontroli typów
-export interface Employee {
-  id: number;
-  name: string;
-  email: string;
-  position: string;
-  status: 'Dostępny' | 'Niedostępny'; // Użycie typu unii dla precyzyjnego statusu
-  imageUrl: string;
-}
+import {
+  EmployeesService,
+  EmployeeSummaryResponse,
+  Pageable,
+  PageEmployeeSummaryResponse
+} from '../../../core/api/generated';
 
 @Component({
-  selector: 'app-employees', // Zmieniono selector dla spójności z nazwą (opcjonalne)
+  selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule], // <-- Dodaj CommonModule do imports
+  imports: [CommonModule],
   templateUrl: './employee.component.html',
 })
-export class EmpolyeesComponent {
+export class EmpolyeesComponent implements OnInit {
+  private employeeService = inject(EmployeesService);
 
-  // Flaga do kontrolowania widoczności elementów dla administratora.
-  // Ustaw na 'true', aby pokazać kolumnę "Akcja".
-  public isAdmin: boolean = false;
+  public isAdmin: boolean = true;
+  public employees: EmployeeSummaryResponse[] = [];
 
-  // Lista pracowników utrzymania ruchu
-  public employees: Employee[] = [
-    {
-      id: 1,
-      name: 'Neil Sims',
-      email: 'neil.sims@example.com',
-      position: 'Elektryk',
-      status: 'Dostępny',
-      imageUrl: 'https://flowbite.com/docs/images/people/profile-picture-1.jpg',
-    },
-    {
-      id: 2,
-      name: 'Bonnie Green',
-      email: 'bonnie@example.com',
-      position: 'Mechanik',
-      status: 'Dostępny',
-      imageUrl: 'https://flowbite.com/docs/images/people/profile-picture-3.jpg',
-    },
-    {
-      id: 3,
-      name: 'Jese Leos',
-      email: 'jese@example.com',
-      position: 'Automatyk',
-      status: 'Dostępny',
-      imageUrl: 'https://flowbite.com/docs/images/people/profile-picture-2.jpg',
-    },
-    {
-      id: 4,
-      name: 'Thomas Lean',
-      email: 'thomas@example.com',
-      position: 'Ślusarz',
-      status: 'Dostępny',
-      imageUrl: 'https://flowbite.com/docs/images/people/profile-picture-4.jpg',
-    },
-    {
-      id: 5,
-      name: 'Leslie Livingston',
-      email: 'leslie@example.com',
-      position: 'Operator wózka',
-      status: 'Niedostępny',
-      imageUrl: 'https://flowbite.com/docs/images/people/profile-picture-5.jpg',
-    },
-  ];
+  public currentPage: number = 0;
+  public pageSize: number = 10;
+  public totalElements: number = 0;
+  public totalPages: number = 0;
 
-  constructor() {
-    // Tutaj w przyszłości możesz umieścić logikę do pobierania danych z serwisu
-    // lub sprawdzania uprawnień użytkownika.
+  public pageSizes: number[] = [5, 10, 25, 50, 100];
+
+  ngOnInit(): void {
+    this.loadEmployees();
+  }
+
+  loadEmployees(): void {
+    const pageable: Pageable = {
+      page: this.currentPage,
+      size: this.pageSize,
+    };
+
+    this.employeeService.getAllEmployees(pageable).subscribe({
+      next: (page: PageEmployeeSummaryResponse) => {
+        this.employees = page.content ?? [];
+        this.totalElements = page.totalElements ?? 0;
+        this.totalPages = page.totalPages ?? 0;
+
+        console.log('Załadowano stronę:', (page.number ?? 0) + 1);
+      },
+      error: (err) => {
+        console.error('Błąd podczas ładowania pracowników', err);
+        this.employees = [];
+        this.totalElements = 0;
+        this.totalPages = 0;
+      }
+    });
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadEmployees();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadEmployees();
+    }
+  }
+
+  onPageSizeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.pageSize = +target.value;
+    this.currentPage = 0;
+    this.loadEmployees();
   }
 }

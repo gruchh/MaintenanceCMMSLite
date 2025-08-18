@@ -29,7 +29,7 @@ model/closeRequest.ts
 model/employeeCreateRequest.ts
 model/employeeResponse.ts
 model/employeeSummaryResponse.ts
-model/employeeUpdateRequest.ts
+model/employeeUpdateRoleRequest.ts
 model/jwtAuthRequest.ts
 model/jwtAuthResponse.ts
 model/machineCreateRequest.ts

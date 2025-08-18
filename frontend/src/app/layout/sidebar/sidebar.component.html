@@ -13,15 +13,16 @@
 }
 <aside
   class="bg-white border-r border-gray-200 h-screen fixed top-0 left-0 flex flex-col transition-all duration-300 ease-in-out z-30"
-  [ngClass]="{
-    'w-64': isDesktop || (isMobile && isSidebarOpen),
-    'w-20': isTablet,
-    'translate-x-0': isDesktop || isTablet || (isMobile && isSidebarOpen),
-    '-translate-x-full': isMobile && !isSidebarOpen
-  }"
+  [class.w-64]="isDesktop || (isMobile && isSidebarOpen)"
+  [class.w-20]="isTablet"
+  [class.translate-x-0]="isDesktop || isTablet || (isMobile && isSidebarOpen)"
+  [class.-translate-x-full]="isMobile && !isSidebarOpen"
 >
-  <div class="flex items-center h-16 shrink-0 border-b border-gray-100 px-4"
-       [ngClass]="{'justify-center': isTablet, 'justify-start': isDesktop || isMobile}">
+  <div
+    class="flex items-center h-16 shrink-0 border-b border-gray-100 px-4"
+    [class.justify-center]="isTablet"
+    [class.justify-start]="isDesktop || isMobile"
+  >
     <div class="flex items-center gap-3">
       <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-yellow-400 shrink-0">
         <ng-icon name="heroCubeTransparent" size="20" class="text-white"></ng-icon>
@@ -32,40 +33,38 @@
     </div>
   </div>
   <nav class="flex-1 space-y-1 p-2 mt-2">
-    <a
-      *ngFor="let item of menuItems"
-      [routerLink]="item.path"
-      routerLinkActive="bg-yellow-50 text-yellow-600 font-semibold"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-      [ngClass]="{'justify-center': isTablet}"
-      (click)="onNavClick()"
-      [title]="isTablet ? item.label : ''"
-    >
-      <ng-icon [name]="item.iconName" size="24" class="shrink-0"></ng-icon>
-      @if (isDesktop || isMobile) {
-        <span class="ml-4 text-sm whitespace-nowrap">
-          {{ item.label }}
-        </span>
-      }
-    </a>
+    @for (item of menuItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="bg-yellow-50 text-yellow-600 font-semibold"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+        [class.justify-center]="isTablet"
+        (click)="onNavClick()"
+        [title]="isTablet ? item.label : ''"
+      >
+        <ng-icon [name]="item.iconName" size="24" class="shrink-0"></ng-icon>
+        @if (isDesktop || isMobile) {
+          <span class="ml-4 text-sm whitespace-nowrap">{{ item.label }}</span>
+        }
+      </a>
+    }
   </nav>
   <div class="p-2 border-t border-gray-100 shrink-0">
-    <a
-      *ngFor="let item of bottomItems"
-      href="#"
-      (click)="item.action(); $event.preventDefault()"
-      class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
-      [ngClass]="{'justify-center': isTablet}"
-      [title]="isTablet ? item.label : ''"
-    >
-      <ng-icon [name]="item.iconName" size="24" class="shrink-0"></ng-icon>
-      @if (isDesktop || isMobile) {
-        <span class="ml-4 text-sm whitespace-nowrap">
-          {{ item.label }}
-        </span>
-      }
-    </a>
+    @for (item of bottomItems; track item.label) {
+      <a
+        href="#"
+        (click)="item.action(); $event.preventDefault()"
+        class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-200"
+        [class.justify-center]="isTablet"
+        [title]="isTablet ? item.label : ''"
+      >
+        <ng-icon [name]="item.iconName" size="24" class="shrink-0"></ng-icon>
+        @if (isDesktop || isMobile) {
+          <span class="ml-4 text-sm whitespace-nowrap">{{ item.label }}</span>
+        }
+      </a>
+    }
   </div>
 </aside>
 @if (isMobile && isSidebarOpen) {

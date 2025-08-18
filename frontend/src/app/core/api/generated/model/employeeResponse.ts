@@ -15,7 +15,33 @@
 export interface EmployeeResponse { 
     id?: number;
     username?: string;
+    lastName?: string;
+    firstName?: string;
+    fullName?: string;
     email?: string;
+    avatarUrl?: string;
     role?: string;
+    hireDate?: string;
+    phoneNumber?: string;
+    age?: number;
+    retirementDate?: string;
+    salary?: number;
+    educationLevel?: EmployeeResponse.EducationLevelEnum;
+    fieldOfStudy?: string;
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
 }
+export namespace EmployeeResponse {
+    export const EducationLevelEnum = {
+        PRIMARY: 'PRIMARY',
+        SECONDARY: 'SECONDARY',
+        BACHELOR: 'BACHELOR',
+        MASTER: 'MASTER',
+        DOCTORATE: 'DOCTORATE'
+    } as const;
+    export type EducationLevelEnum = typeof EducationLevelEnum[keyof typeof EducationLevelEnum];
+}
+
 

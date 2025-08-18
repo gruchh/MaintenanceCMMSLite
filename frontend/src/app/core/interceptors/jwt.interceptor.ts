@@ -1,32 +1,25 @@
-import { Injectable, inject } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { inject, Injector } from '@angular/core';
 import { AuthService } from '../api/auth.service';
 import { environment } from '../../../environments/environment';
 
-@Injectable()
-export class JwtInterceptor implements HttpInterceptor {
-  private authService = inject(AuthService);
-  private apiUrl = environment.apiUrl;
+export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+  const injector = inject(Injector);
+  const isApiUrl = req.url.startsWith(environment.apiUrl);
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.authService.getToken();
-    const isApiUrl = request.url.startsWith(this.apiUrl);
+  if (isApiUrl) {
+    const authService = injector.get(AuthService);
+    const token = authService.getToken();
 
-    if (token && isApiUrl) {
-      const cloned = request.clone({
+    if (token) {
+      const clonedReq = req.clone({
         setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      return next.handle(cloned);
+      return next(clonedReq);
     }
-
-    return next.handle(request);
   }
-}
+
+  return next(req);
+};

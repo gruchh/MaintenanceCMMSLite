@@ -13,7 +13,7 @@ import { Observable }                                        from 'rxjs';
 
 import { EmployeeCreateRequest } from '../model/models';
 import { EmployeeResponse } from '../model/models';
-import { EmployeeUpdateRequest } from '../model/models';
+import { EmployeeUpdateRoleRequest } from '../model/models';
 import { PageEmployeeSummaryResponse } from '../model/models';
 import { Pageable } from '../model/models';
 
@@ -58,8 +58,8 @@ export interface EmployeesServiceInterface {
      * 
      * 
      * @param id 
-     * @param employeeUpdateRequest 
+     * @param employeeUpdateRoleRequest 
      */
-    updateEmployeeRole(id: number, employeeUpdateRequest: EmployeeUpdateRequest, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
+    updateEmployeeRole(id: number, employeeUpdateRoleRequest: EmployeeUpdateRoleRequest, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
 
 }

@@ -1,6 +1,8 @@
+// auth.service.ts - POPRAWIONY KOD
+
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, map, catchError, throwError, tap } from 'rxjs';
+import { Observable, BehaviorSubject, map, catchError, throwError, tap, of } from 'rxjs'; // Dodaj 'of'
 import { environment } from '../../../environments/environment';
 import { JwtAuthRequest, JwtAuthResponse, UserProfileDto, UserProfileResponse } from './generated';
 
@@ -16,10 +18,6 @@ export class AuthService {
   public currentUser$ = this.currentUserSource.asObservable();
   public isLoggedIn$ = this.currentUser$.pipe(map(user => !!user));
 
-  constructor() {
-    this.loadInitialUser();
-  }
-
   private fetchAndStoreUser(): Observable<UserProfileDto | null> {
     return this.http.get<UserProfileResponse>(`${this.apiUrl}/auth/getCurrentUser`).pipe(
       map(response => {
@@ -32,9 +30,17 @@ export class AuthService {
       }),
       catchError((error) => {
         this.logout();
-        return throwError(() => error);
+        return of(null);
       })
     );
+  }
+
+  public initializeAuthState(): Observable<UserProfileDto | null> {
+    const token = this.getToken();
+    if (token) {
+      return this.fetchAndStoreUser();
+    }
+    return of(null);
   }
 
   login(credentials: JwtAuthRequest): Observable<JwtAuthResponse> {
@@ -53,13 +59,6 @@ export class AuthService {
   logout(): void {
     this.removeToken();
     this.currentUserSource.next(null);
-  }
-
-  private loadInitialUser(): void {
-    const token = this.getToken();
-    if (token) {
-      this.fetchAndStoreUser().subscribe();
-    }
   }
 
   saveToken(token: string): void {
