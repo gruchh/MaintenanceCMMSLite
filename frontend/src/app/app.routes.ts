@@ -7,6 +7,7 @@ import { OverviewComponent } from './features/dashboard/overview/overview.compon
 import { EmpolyeesComponent } from './features/dashboard/employees/employee.component';
 import { SparePartsComponent } from './features/dashboard/spare-parts/spare-parts.component';
 import { BreakdownsComponent } from './features/dashboard/breakdowns/breakdowns.component';
+import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   {
@@ -26,6 +27,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardLayoutComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: '',

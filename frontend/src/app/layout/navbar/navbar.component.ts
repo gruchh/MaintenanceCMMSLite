@@ -1,8 +1,8 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { LoginModalComponent } from '../../shared/components/login-modal/login-modal.component';
 import { AuthService } from '../../core/api/auth.service';
+import { LoginModalService } from '../../core/api/login-modal.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,16 +10,19 @@ import { AuthService } from '../../core/api/auth.service';
   imports: [
     CommonModule,
     RouterLink,
-    RouterLinkActive,
-    LoginModalComponent
+    RouterLinkActive
   ],
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {
-  public authService = inject(AuthService);
+  private authService = inject(AuthService);
   private router = inject(Router);
-  public isMobileMenuOpen = signal(false);
-  public isModalOpen = signal(false);
+  private loginModalService = inject(LoginModalService);
+
+  isLoggedIn = this.authService.isLoggedIn;
+  currentUser = this.authService.currentUser;
+
+  isMobileMenuOpen = signal(false);
 
   public navLinks = [
     { path: '/report-breakdown', label: 'Zgłoś awarię' },
@@ -30,18 +33,12 @@ export class NavbarComponent {
     this.isMobileMenuOpen.update(v => !v);
   }
 
-  toggleModal(): void {
-    this.isModalOpen.update(v => !v);
-    if (this.isModalOpen()) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+  openLoginModal(): void {
+    this.loginModalService.open();
   }
 
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);
-    console.log('Wylogowano.');
   }
 }

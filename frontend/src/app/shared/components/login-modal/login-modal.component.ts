@@ -1,7 +1,6 @@
 import { Component, signal, inject, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/api/auth.service';
 
@@ -13,11 +12,10 @@ import { AuthService } from '../../../core/api/auth.service';
 })
 export class LoginModalComponent {
   @Input({ required: true }) isOpen = false;
-  @Output() close = new EventEmitter<void>();
+  @Output() close = new EventEmitter<boolean>();
 
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
-  private router = inject(Router);
 
   public passwordVisible = signal(false);
   public isSubmitting = signal(false);
@@ -40,11 +38,11 @@ export class LoginModalComponent {
     this.passwordVisible.update(v => !v);
   }
 
-  closeModal(): void {
+  closeModal(success: boolean = false): void {
     this.loginForm.reset();
     this.errorMessage.set(null);
     this.isSubmitting.set(false);
-    this.close.emit();
+    this.close.emit(success);
   }
 
   onSubmit(): void {
@@ -58,8 +56,7 @@ export class LoginModalComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
         console.log('Logowanie udane!');
-        this.closeModal();
-        this.router.navigate(['/dashboard']);
+        this.closeModal(true);
       },
       error: (err: HttpErrorResponse) => {
         if (err.error && typeof err.error.accessToken === 'string') {

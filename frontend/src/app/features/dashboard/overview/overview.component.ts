@@ -68,7 +68,6 @@ export class OverviewComponent implements OnInit {
     },
   ];
 
-  // ====== NOWE: dane do wykresu wydajności ======
   days: string[] = ['Pon', 'Wto', 'Śro', 'Czw', 'Pią', 'Sob', 'Nie'];
   performanceData: number[] = [85, 90, 78, 88, 92, 95, 80];
   performanceSpotlightDate = '18 Gru, 2024';
@@ -79,13 +78,11 @@ export class OverviewComponent implements OnInit {
     return Math.round((sum / this.performanceData.length));
   }
 
-  // MTBF/MTTR – rok/miesiąc
   mtbfYear = '250 godzin';
   mtbfMonth = '22 godziny';
   mttrYear = '1.5 godziny';
   mttrMonth = '0.9 godziny';
 
-  // ====== Rysowanie ścieżki dla SVG ======
   viewBoxWidth = 400;
   viewBoxHeight = 150;
   paddingX = 10;

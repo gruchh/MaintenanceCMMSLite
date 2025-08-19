@@ -1,8 +1,6 @@
-// auth.service.ts - POPRAWIONY KOD
-
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, map, catchError, throwError, tap, of } from 'rxjs'; // Dodaj 'of'
+import { Observable, map, catchError, of, tap, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { JwtAuthRequest, JwtAuthResponse, UserProfileDto, UserProfileResponse } from './generated';
 
@@ -14,21 +12,20 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   private readonly authTokenKey = 'authToken';
 
-  private currentUserSource = new BehaviorSubject<UserProfileDto | null>(null);
-  public currentUser$ = this.currentUserSource.asObservable();
-  public isLoggedIn$ = this.currentUser$.pipe(map(user => !!user));
+  currentUser = signal<UserProfileDto | null>(null);
+  isLoggedIn = computed(() => !!this.currentUser());
 
   private fetchAndStoreUser(): Observable<UserProfileDto | null> {
     return this.http.get<UserProfileResponse>(`${this.apiUrl}/auth/getCurrentUser`).pipe(
       map(response => {
-        if (response && response.status === 'success' && response.data) {
-          this.currentUserSource.next(response.data);
+        if (response?.status === 'success' && response.data) {
+          this.currentUser.set(response.data);
           return response.data;
         }
         this.logout();
         return null;
       }),
-      catchError((error) => {
+      catchError(() => {
         this.logout();
         return of(null);
       })
@@ -40,40 +37,35 @@ export class AuthService {
     if (token) {
       return this.fetchAndStoreUser();
     }
+    this.currentUser.set(null);
     return of(null);
   }
 
-  login(credentials: JwtAuthRequest): Observable<JwtAuthResponse> {
+  login(credentials: JwtAuthRequest): Observable<UserProfileDto | null> {
     return this.http
       .post<JwtAuthResponse>(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
-        tap((loginResponse) => {
-          if (loginResponse && loginResponse.accessToken) {
+        switchMap((loginResponse) => {
+          if (loginResponse?.accessToken) {
             this.saveToken(loginResponse.accessToken);
-            this.fetchAndStoreUser().subscribe();
+            return this.fetchAndStoreUser();
           }
+          this.logout();
+          return of(null);
+        }),
+        catchError((error) => {
+          this.logout();
+          return throwError(() => error);
         })
       );
   }
 
   logout(): void {
     this.removeToken();
-    this.currentUserSource.next(null);
+    this.currentUser.set(null);
   }
 
-  saveToken(token: string): void {
-    localStorage.setItem(this.authTokenKey, token);
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(this.authTokenKey);
-  }
-
-  removeToken(): void {
-    localStorage.removeItem(this.authTokenKey);
-  }
-
-  isLoggedIn(): boolean {
-    return this.currentUserSource.value !== null;
-  }
+  saveToken(token: string): void { localStorage.setItem(this.authTokenKey, token); }
+  getToken(): string | null { return localStorage.getItem(this.authTokenKey); }
+  removeToken(): void { localStorage.removeItem(this.authTokenKey); }
 }
