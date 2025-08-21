@@ -37,9 +37,9 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
     }
 
-    @PutMapping("/{id}/role")
-    public ResponseEntity<EmployeeDTOs.Response> updateEmployeeRole(@PathVariable Long id, @Valid @RequestBody EmployeeDTOs.UpdateRoleRequest request) {
-        return ResponseEntity.ok(employeeService.updateEmployeeRole(id, request));
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeDTOs.Response> updateEmployeeDetails(@PathVariable Long id, @Valid @RequestBody EmployeeDTOs.DetailsRequest request) {
+        return ResponseEntity.ok(employeeService.updateEmployeeDetails(id, request));
     }
 
     @DeleteMapping("/{id}")

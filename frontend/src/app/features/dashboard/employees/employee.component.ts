@@ -7,11 +7,12 @@ import {
   Pageable,
   PageEmployeeSummaryResponse
 } from '../../../core/api/generated';
+import { EmployeeEditModalComponent } from '../../../shared/components/employee-edit-modal/employee-edit-modal.component';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EmployeeEditModalComponent],
   templateUrl: './employee.component.html',
 })
 export class EmpolyeesComponent implements OnInit {
@@ -26,6 +27,10 @@ export class EmpolyeesComponent implements OnInit {
   public totalPages: number = 0;
 
   public pageSizes: number[] = [5, 10, 25, 50, 100];
+
+  public isModalOpen = false;
+  public selectedEmployeeId: number | null = null;
+
 
   ngOnInit(): void {
     this.loadEmployees();
@@ -42,8 +47,6 @@ export class EmpolyeesComponent implements OnInit {
         this.employees = page.content ?? [];
         this.totalElements = page.totalElements ?? 0;
         this.totalPages = page.totalPages ?? 0;
-
-        console.log('Załadowano stronę:', (page.number ?? 0) + 1);
       },
       error: (err) => {
         console.error('Błąd podczas ładowania pracowników', err);
@@ -72,6 +75,23 @@ export class EmpolyeesComponent implements OnInit {
     const target = event.target as HTMLSelectElement;
     this.pageSize = +target.value;
     this.currentPage = 0;
+    this.loadEmployees();
+  }
+
+  openEditModal(employee: EmployeeSummaryResponse): void {
+    this.selectedEmployeeId = employee.id ?? null;
+    if (this.selectedEmployeeId) {
+      this.isModalOpen = true;
+    }
+  }
+
+  closeEditModal(): void {
+    this.isModalOpen = false;
+    this.selectedEmployeeId = null;
+  }
+
+  handleEmployeeUpdate(): void {
+    this.closeEditModal();
     this.loadEmployees();
   }
 }

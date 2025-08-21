@@ -19,7 +19,6 @@ import java.util.Set;
 public class Employee {
 
     @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY) // USUNIĘTE - To powodowało konflikt z @MapsId
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -59,7 +59,9 @@
               <td class="px-6 py-4">{{ employee.role }}</td>
               @if (isAdmin) {
                 <td class="px-6 py-4">
-                  <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edytuj pracownika</a>
+                  <a (click)="openEditModal(employee)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">
+                    Edytuj pracownika
+                  </a>
                 </td>
               }
             </tr>
@@ -103,3 +105,10 @@
     </nav>
   </div>
 </div>
+
+<app-employee-edit-modal
+  [isOpen]="isModalOpen"
+  [employeeId]="selectedEmployeeId"
+  (closeModal)="closeEditModal()"
+  (employeeUpdated)="handleEmployeeUpdate()">
+</app-employee-edit-modal>

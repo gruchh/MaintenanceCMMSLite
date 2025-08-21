@@ -27,9 +27,9 @@ model/breakdownTypeResponse.ts
 model/breakdownUsedPartResponse.ts
 model/closeRequest.ts
 model/employeeCreateRequest.ts
+model/employeeDetailsRequest.ts
 model/employeeResponse.ts
 model/employeeSummaryResponse.ts
-model/employeeUpdateRoleRequest.ts
 model/jwtAuthRequest.ts
 model/jwtAuthResponse.ts
 model/machineCreateRequest.ts

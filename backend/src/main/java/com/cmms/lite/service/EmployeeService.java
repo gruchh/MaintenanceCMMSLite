@@ -1,7 +1,9 @@
 package com.cmms.lite.service;
 
 import com.cmms.lite.api.dto.EmployeeDTOs;
+import com.cmms.lite.core.entity.Address;
 import com.cmms.lite.core.entity.Employee;
+import com.cmms.lite.core.entity.EmployeeDetails;
 import com.cmms.lite.core.entity.EmployeeRole;
 import com.cmms.lite.core.mapper.EmployeeMapper;
 import com.cmms.lite.core.repository.EmployeeRepository;
@@ -53,7 +55,7 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public EmployeeDTOs.Response getEmployeeById(Long employeeId) {
-        Employee employee = employeeRepository.findByIdWithDetails(employeeId)
+        Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId)));
         return employeeMapper.toResponse(employee);
     }
@@ -65,13 +67,35 @@ public class EmployeeService {
     }
 
     @Transactional
-    public EmployeeDTOs.Response updateEmployeeRole(Long employeeId, EmployeeDTOs.UpdateRoleRequest request) {
+    public EmployeeDTOs.Response updateEmployeeDetails(Long employeeId, EmployeeDTOs.DetailsRequest request) {
         Employee employee = getEmployeeByIdWithDetailsOrThrow(employeeId);
 
-        EmployeeRole newRole = employeeRoleRepository.findById(request.roleId())
-                .orElseThrow(() -> new EmployeeRoleNotFoundException(String.format(ROLE_NOT_FOUND, request.roleId())));
+        EmployeeDetails details = employee.getEmployeeDetails();
+        if (details == null) {
+            details = new EmployeeDetails();
+            employee.setEmployeeDetails(details);
+            details.setEmployee(employee);
+        }
 
-        employee.setEmployeeRole(newRole);
+        Address address = details.getAddress();
+        if (address == null) {
+            address = new Address();
+            details.setAddress(address);
+        }
+        address.setStreet(request.street());
+        address.setCity(request.city());
+        address.setPostalCode(request.postalCode());
+        address.setCountry(request.country());
+
+        details.setPhoneNumber(request.phoneNumber());
+        details.setDateOfBirth(request.dateOfBirth());
+        details.setHireDate(request.hireDate());
+        details.setContractEndDate(request.contractEndDate());
+        details.setSalary(request.salary());
+        details.setEducationLevel(request.educationLevel());
+        details.setFieldOfStudy(request.fieldOfStudy());
+        details.setEmergencyContactName(request.emergencyContactName());
+        details.setEmergencyContactPhone(request.emergencyContactPhone());
 
         Employee updatedEmployee = employeeRepository.save(employee);
         return employeeMapper.toResponse(updatedEmployee);

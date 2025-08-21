@@ -10,34 +10,24 @@
 
 
 /**
- * A response object with detailed employee data
+ * Data for creating or updating employee\'s details
  */
-export interface EmployeeResponse { 
-    id?: number;
-    username?: string;
-    lastName?: string;
-    firstName?: string;
-    fullName?: string;
-    email?: string;
-    avatarUrl?: string;
-    role?: string;
-    phoneNumber?: string;
-    dateOfBirth?: string;
-    hireDate?: string;
-    street?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
+export interface EmployeeDetailsRequest { 
+    phoneNumber: string;
+    dateOfBirth: string;
+    hireDate: string;
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
     contractEndDate?: string;
-    salary?: number;
-    educationLevel?: EmployeeResponse.EducationLevelEnum;
+    salary: number;
+    educationLevel: EmployeeDetailsRequest.EducationLevelEnum;
     fieldOfStudy?: string;
     emergencyContactName?: string;
     emergencyContactPhone?: string;
-    age?: number;
-    retirementDate?: string;
 }
-export namespace EmployeeResponse {
+export namespace EmployeeDetailsRequest {
     export const EducationLevelEnum = {
         PRIMARY: 'PRIMARY',
         SECONDARY: 'SECONDARY',
