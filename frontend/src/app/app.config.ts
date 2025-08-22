@@ -4,15 +4,13 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { apiConfigFactory } from '../main';
-import { ApiModule } from './core/api/generated';
+import { ApiModule, BASE_PATH } from './core/api/generated';
+import { environment } from '../environments/environment.prod';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     importProvidersFrom(ApiModule.forRoot(apiConfigFactory)),
-
-    provideHttpClient(
-      withInterceptors([jwtInterceptor])
-    )
-  ]
+    provideHttpClient(withInterceptors([jwtInterceptor])),
+  ],
 };

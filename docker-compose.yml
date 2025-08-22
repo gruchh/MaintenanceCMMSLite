@@ -5,12 +5,32 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8091:80"
-    environment:
-      - API_URL=http://backend:8080/api
     depends_on:
-      - backend
+      api-codegen:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
     networks:
       - app-network
+
+  api-codegen:
+    image: openapitools/openapi-generator-cli:v7.7.0
+    working_dir: /local
+    volumes:
+      - ./frontend:/local
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    command: >
+      sh -c "
+        until wget -q --spider http://backend:8080/v3/api-docs; do
+          echo 'Backend nie jest jeszcze gotowy, ponawiam próbę za 2 sekundy...'
+          sleep 2
+        done &&
+        echo 'Backend jest gotowy. Generowanie klienta API...' &&
+        /usr/local/bin/docker-entrypoint.sh generate -i http://backend:8080/v3/api-docs -o /local/src/app/core/api/generated -g typescript-angular --additional-properties=withInterfaces=true,providedInRoot=true,enumPropertyNaming=original
+      "
 
   backend:
     build:

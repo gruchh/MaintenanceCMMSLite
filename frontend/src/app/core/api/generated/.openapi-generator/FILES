@@ -1,7 +1,5 @@
 .gitignore
-.openapi-generator-ignore
 README.md
-api.base.service.ts
 api.module.ts
 api/api.ts
 api/breakdown.service.ts
@@ -52,5 +50,4 @@ model/sparePartUpdateRequest.ts
 model/userProfileDto.ts
 model/userProfileResponse.ts
 param.ts
-provide-api.ts
 variables.ts

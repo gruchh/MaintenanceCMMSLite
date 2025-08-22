@@ -1,12 +1,11 @@
-# Stage 1: Build the Angular application
-FROM node:alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
-COPY . .
 RUN npm install
+COPY . .
 RUN npm run build
 
-# Stage 2: Serve the application with Nginx
+# ETAP 2: Serwowanie aplikacji za pomocą Nginx
 FROM nginx:alpine
 COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
 COPY default.conf /etc/nginx/conf.d/default.conf
