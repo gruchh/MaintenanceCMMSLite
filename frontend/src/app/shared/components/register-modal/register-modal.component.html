@@ -1,0 +1,107 @@
+@if (isOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-sm animate-fade-in">
+    <div class="relative w-full max-w-md rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-slate-800 shadow-2xl ring-1 ring-black/5 animate-scale-in">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="p-8">
+        <div class="mb-8 text-center">
+          <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/50">
+            <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+            </svg>
+          </div>
+          <h3 class="bg-gradient-to-r from-indigo-600 to-slate-800 bg-clip-text text-2xl font-bold text-transparent">
+            Utwórz nowe konto
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">Dołącz do nas i zacznij działać!</p>
+        </div>
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label for="firstName" class="block text-sm font-semibold text-slate-600">Imię</label>
+              <input id="firstName" type="text" formControlName="firstName"
+                     class="mt-1 block w-full rounded-lg border border-slate-300 bg-white/50 px-4 py-3 shadow-sm transition duration-300 ease-in-out focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-sm"
+                     [ngClass]="{ 'border-red-500': f['firstName'].invalid && f['firstName'].touched }" />
+              @if (f['firstName'].invalid && f['firstName'].touched) {
+                <div class="mt-1 text-xs text-red-600">
+                  @if (f['firstName'].errors?.['required']) { <div>Imię jest wymagane.</div> }
+                </div>
+              }
+            </div>
+            <div>
+              <label for="lastName" class="block text-sm font-semibold text-slate-600">Nazwisko</label>
+              <input id="lastName" type="text" formControlName="lastName"
+                     class="mt-1 block w-full rounded-lg border border-slate-300 bg-white/50 px-4 py-3 shadow-sm transition duration-300 ease-in-out focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-sm"
+                     [ngClass]="{ 'border-red-500': f['lastName'].invalid && f['lastName'].touched }" />
+              @if (f['lastName'].invalid && f['lastName'].touched) {
+                <div class="mt-1 text-xs text-red-600">
+                  @if (f['lastName'].errors?.['required']) { <div>Nazwisko jest wymagane.</div> }
+                </div>
+              }
+            </div>
+          </div>
+          <div>
+            <label for="reg-username" class="block text-sm font-semibold text-slate-600">Login</label>
+            <input id="reg-username" type="text" formControlName="username"
+                   class="mt-1 block w-full rounded-lg border border-slate-300 bg-white/50 px-4 py-3 shadow-sm transition duration-300 ease-in-out focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-sm"
+                   autocomplete="username" />
+            @if (f['username'].invalid && (f['username'].dirty || f['username'].touched)) {
+              <div class="mt-1 text-xs text-red-600">
+                @if (f['username'].errors?.['required']) { <div>Login jest wymagany.</div> }
+                @if (f['username'].errors?.['minlength']) { <div>Login musi mieć co najmniej 3 znaki.</div> }
+              </div>
+            }
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-semibold text-slate-600">Adres e-mail</label>
+            <input id="email" type="email" formControlName="email"
+                   class="mt-1 block w-full rounded-lg border border-slate-300 bg-white/50 px-4 py-3 shadow-sm transition duration-300 ease-in-out focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-sm"
+                   autocomplete="email" />
+            @if (f['email'].invalid && (f['email'].dirty || f['email'].touched)) {
+              <div class="mt-1 text-xs text-red-600">
+                @if (f['email'].errors?.['required']) { <div>Adres e-mail jest wymagany.</div> }
+                @if (f['email'].errors?.['email']) { <div>Wprowadź poprawny adres e-mail.</div> }
+              </div>
+            }
+          </div>
+          <div>
+            <label for="reg-password" class="block text-sm font-semibold text-slate-600">Hasło</label>
+            <div class="relative mt-1">
+              <input [type]="passwordVisible() ? 'text' : 'password'" id="reg-password" formControlName="password"
+                     class="block w-full rounded-lg border border-slate-300 bg-white/50 px-4 py-3 shadow-sm transition duration-300 ease-in-out focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 sm:text-sm"
+                     autocomplete="new-password" />
+              <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-indigo-500">
+              </button>
+            </div>
+            @if (f['password'].invalid && (f['password'].dirty || f['password'].touched)) {
+              <div class="mt-1 text-xs text-red-600">
+                @if (f['password'].errors?.['required']) { <div>Hasło jest wymagane.</div> }
+                @if (f['password'].errors?.['minlength']) { <div>Hasło musi mieć co najmniej 8 znaków.</div> }
+              </div>
+            }
+          </div>
+          @if(errorMessage()) {
+            <div class="rounded-lg bg-red-100/50 p-3 text-center text-sm text-red-600">
+              {{ errorMessage() }}
+            </div>
+          }
+        </div>
+        <div class="mt-8">
+          <button type="submit" [disabled]="registerForm.invalid || isSubmitting()"
+                  class="w-full transform-gpu rounded-lg border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 text-base font-medium text-white shadow-lg shadow-indigo-500/40 transition-all duration-300 ease-in-out hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:from-slate-400 disabled:to-slate-500 disabled:shadow-none">
+            {{ isSubmitting() ? 'Rejestrowanie...' : 'Zarejestruj się' }}
+          </button>
+        </div>
+        <div class="mt-6 text-center text-sm text-slate-500">
+          Masz już konto?
+          <button type="button" (click)="openLogin.emit()" class="ml-1 font-semibold text-indigo-600 transition-colors hover:text-indigo-500 hover:underline">
+            Zaloguj się
+          </button>
+        </div>
+        <div class="mt-4 text-center">
+          <button type="button" (click)="closeModal()" class="text-sm text-slate-500 transition-colors hover:text-slate-700">
+            Anuluj
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

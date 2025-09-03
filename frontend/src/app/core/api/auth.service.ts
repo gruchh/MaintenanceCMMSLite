@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, catchError, of, tap, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { JwtAuthRequest, JwtAuthResponse, UserProfileDto, UserProfileResponse } from './generated';
+import { JwtAuthRequest, JwtAuthResponse, RegisterRequest, UserProfileDto, UserProfileResponse } from './generated';
 
 @Injectable({
   providedIn: 'root',
@@ -55,6 +55,25 @@ export class AuthService {
         }),
         catchError((error) => {
           this.logout();
+          return throwError(() => error);
+        })
+      );
+  }
+
+   register(userData: RegisterRequest): Observable<UserProfileDto | null> {
+    return this.http
+      .post<JwtAuthResponse>(`${this.apiUrl}/auth/register`, userData)
+      .pipe(
+        switchMap((registerResponse) => {
+          if (registerResponse?.accessToken) {
+            this.saveToken(registerResponse.accessToken);
+            return this.fetchAndStoreUser();
+          }
+          this.logout();
+          return of(null);
+        }),
+        catchError((error) => {
+          this.logout(); // W przypadku błędu rejestracji również wylogowujemy (jeśli jakiś token jakimś cudem był)
           return throwError(() => error);
         })
       );

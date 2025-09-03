@@ -1,31 +1,51 @@
-import { Component, inject, OnInit } from '@angular/core'; // <-- Dodaj OnInit
-import { CommonModule } from '@angular/common';
-import { LoginModalService } from './core/api/login-modal.service';
-import { LoginModalComponent } from './shared/components/login-modal/login-modal.component';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/api/auth.service';
+import { CommonModule } from '@angular/common';
+import { LoginModalComponent } from './shared/components/login-modal/login-modal.component';
+import { RegisterModalComponent } from './shared/components/register-modal/register-modal.component';
+import { ModalService } from './core/api/modal.service';
+
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule, LoginModalComponent],
+  imports: [
+    RouterOutlet,
+    CommonModule,
+    LoginModalComponent,
+    RegisterModalComponent
+  ],
   templateUrl: './app.html',
-  styleUrl: './app.css',
 })
 export class App implements OnInit {
-  private loginModalService = inject(LoginModalService);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private modalService = inject(ModalService);
 
-  isLoginModalOpen = this.loginModalService.isModalOpen;
+  isLoginModalOpen = this.modalService.isLoginModalOpen;
+  isRegisterModalOpen = this.modalService.isRegisterModalOpen;
 
   ngOnInit(): void {
     this.authService.initializeAuthState().subscribe();
   }
 
-  onModalClose(isSuccess: boolean): void {
-    this.loginModalService.close();
+  switchToRegister(): void {
+    this.modalService.openRegisterModal();
+  }
 
+  switchToLogin(): void {
+    this.modalService.openLoginModal();
+  }
+
+  onLoginModalClose(isSuccess: boolean): void {
+    this.modalService.closeAllModals();
+    if (isSuccess) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  onRegisterModalClose(isSuccess: boolean): void {
+    this.modalService.closeAllModals();
     if (isSuccess) {
       this.router.navigate(['/dashboard']);
     }

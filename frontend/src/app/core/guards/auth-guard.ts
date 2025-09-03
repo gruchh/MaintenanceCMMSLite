@@ -1,16 +1,15 @@
 import { inject } from "@angular/core";
 import { CanActivateFn } from "@angular/router";
 import { AuthService } from "../api/auth.service";
-import { LoginModalService } from "../api/login-modal.service";
+import { ModalService } from "../api/modal.service";
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
-  const loginModalService = inject(LoginModalService);
+  const modalService = inject(ModalService);
 
   if (authService.isLoggedIn()) {
-    return true;
+    return true; // Użytkownik jest zalogowany, więc kontynuujemy.
   }
-
-  loginModalService.open();
+  modalService.openLoginModal();
   return false;
 };

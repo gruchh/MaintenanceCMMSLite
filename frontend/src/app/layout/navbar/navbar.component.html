@@ -1,7 +1,6 @@
 <nav class="bg-white shadow-sm sticky top-0 z-40">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
-      <!-- Sekcja z logo -->
       <div class="flex-shrink-0">
         <a routerLink="/" class="flex items-center">
           <svg class="h-8 w-auto" viewBox="0 0 250 40" xmlns="http://www.w3.org/2000/svg">
@@ -18,8 +17,6 @@
           </svg>
         </a>
       </div>
-
-      <!-- Linki nawigacyjne (desktop) -->
       <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
         @for (link of navLinks; track link.path) {
           <a [routerLink]="link.path" routerLinkActive="border-indigo-500 text-gray-900" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-indigo-500 text-sm font-medium">
@@ -27,8 +24,6 @@
           </a>
         }
       </div>
-
-      <!-- Sekcja użytkownika (desktop) -->
       <div class="hidden sm:ml-6 sm:flex sm:items-center">
         @if (isLoggedIn()) {
           @if (currentUser(); as user) {
@@ -45,8 +40,6 @@
           </button>
         }
       </div>
-
-      <!-- Przycisk menu mobilnego -->
       <div class="-mr-2 flex items-center sm:hidden">
         <button (click)="toggleMobileMenu()" type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" [attr.aria-expanded]="isMobileMenuOpen()">
           <span class="sr-only">Otwórz menu</span>
@@ -55,12 +48,10 @@
           } @else {
             <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
           }
-        </button>
+        </button>-
       </div>
     </div>
   </div>
-
-  <!-- Menu mobilne -->
   @if (isMobileMenuOpen()) {
     <div class="sm:hidden" id="mobile-menu">
       <div class="px-2 pt-2 pb-3 space-y-1">

@@ -1,8 +1,15 @@
-<router-outlet></router-outlet>
+<main>
+  <router-outlet></router-outlet>
+</main>
 
-@if (isLoginModalOpen()) {
-  <app-login-modal
-    [isOpen]="isLoginModalOpen()"
-    (close)="onModalClose($event)">
-  </app-login-modal>
-}
+<app-login-modal
+  [isOpen]="isLoginModalOpen()"
+  (close)="onLoginModalClose($event)"
+  (openRegister)="switchToRegister()">
+</app-login-modal>
+
+<app-register-modal
+  [isOpen]="isRegisterModalOpen()"
+  (close)="onRegisterModalClose($event)"
+  (openLogin)="switchToLogin()">
+</app-register-modal>

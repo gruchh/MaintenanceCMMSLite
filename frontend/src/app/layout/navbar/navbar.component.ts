@@ -1,8 +1,8 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/api/auth.service';
-import { LoginModalService } from '../../core/api/login-modal.service';
+import { ModalService } from '../../core/api/modal.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,11 +17,10 @@ import { LoginModalService } from '../../core/api/login-modal.service';
 export class NavbarComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
-  private loginModalService = inject(LoginModalService);
+  private modalService = inject(ModalService);
 
   isLoggedIn = this.authService.isLoggedIn;
   currentUser = this.authService.currentUser;
-
   isMobileMenuOpen = signal(false);
 
   public navLinks = [
@@ -34,11 +33,18 @@ export class NavbarComponent {
   }
 
   openLoginModal(): void {
-    this.loginModalService.open();
+    this.modalService.openLoginModal();
+
+    if (this.isMobileMenuOpen()) {
+      this.isMobileMenuOpen.set(false);
+    }
   }
 
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);
+    if (this.isMobileMenuOpen()) {
+      this.isMobileMenuOpen.set(false);
+    }
   }
 }
