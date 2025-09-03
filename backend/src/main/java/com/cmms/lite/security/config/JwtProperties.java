@@ -9,14 +9,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-
     @Data
     @Validated
     @Component
     @ConfigurationProperties(prefix = "jwt.token")
     public class JwtProperties {
 
-        @NotBlank(message = "JWT secret key cannot be blank")
+    @NotBlank(message = "JWT secret key cannot be blank")
     @Size(min = 32, message = "JWT secret key must have at least 32 characters for HS256 algorithm")
     private String secretKey;
 

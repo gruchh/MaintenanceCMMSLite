@@ -2,7 +2,7 @@ package com.cmms.lite.security.service;
 
 import com.cmms.lite.security.config.JwtProperties;
 import com.cmms.lite.security.entity.Role;
-import com.cmms.lite.security.exception.JwtException;
+import com.cmms.lite.security.exception.AppJwtException;
 import com.cmms.lite.security.exception.JwtTokenExpiredException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class JwtService {
 
     private final JwtProperties jwtProperties;
+    private final Clock clock;
 
     public String generateToken(String username, String email, Set<Role> roles) {
         Map<String, Object> claims = new HashMap<>();
@@ -33,12 +36,14 @@ public class JwtService {
                 .map(Role::name)
                 .collect(Collectors.toSet()));
 
+        Instant now = Instant.now(clock);
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(username)
                 .issuer(jwtProperties.getIssuer())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtProperties.getDuration()))
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(jwtProperties.getDuration())))
                 .signWith(getKey(), Jwts.SIG.HS256)
                 .compact();
     }
@@ -80,6 +85,7 @@ public class JwtService {
     public Claims extractAllClaims(String token) {
         try {
             return Jwts.parser()
+                    .clock(() -> Date.from(Instant.now(clock)))
                     .verifyWith(getKey())
                     .build()
                     .parseSignedClaims(token)
@@ -89,24 +95,12 @@ public class JwtService {
             throw new JwtTokenExpiredException("JWT token has expired");
         } catch (Exception e) {
             log.error("Error parsing JWT token: {}", e.getMessage());
-            throw new JwtException("Invalid JWT token", e);
+            throw new AppJwtException("Invalid JWT token", e);
         }
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        try {
-            final String userName = extractUsername(token);
-            return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (JwtTokenExpiredException e) {
-            log.error("JWT token validation failed - token expired for user: {}", userDetails.getUsername());
-            return false;
-        } catch (JwtException e) {
-            log.error("JWT token validation failed for user {}: {}", userDetails.getUsername(), e.getMessage());
-            return false;
-        } catch (Exception e) {
-            log.error("Unexpected error during JWT token validation for user {}: {}", userDetails.getUsername(), e.getMessage());
-            return false;
-        }
+        return isTokenValid(token, userDetails.getUsername());
     }
 
     public boolean isTokenValid(String token, String username) {
@@ -116,7 +110,7 @@ public class JwtService {
         } catch (JwtTokenExpiredException e) {
             log.error("JWT token validation failed - token expired for user: {}", username);
             return false;
-        } catch (JwtException e) {
+        } catch (AppJwtException e) {
             log.error("JWT token validation failed for user {}: {}", username, e.getMessage());
             return false;
         } catch (Exception e) {
@@ -127,7 +121,7 @@ public class JwtService {
 
     public boolean isTokenExpired(String token) {
         try {
-            return extractExpiration(token).before(new Date());
+            return extractExpiration(token).before(Date.from(Instant.now(clock)));
         } catch (ExpiredJwtException e) {
             log.debug("Token is expired: {}", e.getMessage());
             return true;
@@ -144,7 +138,7 @@ public class JwtService {
         } catch (JwtTokenExpiredException e) {
             log.error("JWT token validity check failed - token expired: {}", e.getMessage());
             return false;
-        } catch (JwtException e) {
+        } catch (AppJwtException e) {
             log.error("JWT token validity check failed: {}", e.getMessage());
             return false;
         } catch (Exception e) {
