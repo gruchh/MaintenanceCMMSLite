@@ -24,4 +24,7 @@ import org.springframework.validation.annotation.Validated;
 
     @NotBlank(message = "JWT issuer cannot be blank")
     private String issuer = "gruchh";
+
+    @Min(value = 3600000, message = "Token duration must be at least 1 hour (3600000ms)")
+    private long refreshDuration = 604800000L;
 }

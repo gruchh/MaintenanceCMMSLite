@@ -13,6 +13,7 @@ import { Observable }                                        from 'rxjs';
 
 import { JwtAuthRequest } from '../model/models';
 import { JwtAuthResponse } from '../model/models';
+import { RefreshTokenRequest } from '../model/models';
 import { RegisterRequest } from '../model/models';
 import { UserProfileResponse } from '../model/models';
 
@@ -37,6 +38,13 @@ export interface SecurityControllerServiceInterface {
      * @param jwtAuthRequest 
      */
     login(jwtAuthRequest: JwtAuthRequest, extraHttpRequestParams?: any): Observable<JwtAuthResponse>;
+
+    /**
+     * 
+     * 
+     * @param refreshTokenRequest 
+     */
+    refreshToken(refreshTokenRequest: RefreshTokenRequest, extraHttpRequestParams?: any): Observable<JwtAuthResponse>;
 
     /**
      * 

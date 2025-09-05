@@ -11,6 +11,8 @@
 
 export interface JwtAuthResponse { 
     accessToken?: string;
+    refreshToken?: string;
     tokenType?: string;
+    message?: string;
 }
 

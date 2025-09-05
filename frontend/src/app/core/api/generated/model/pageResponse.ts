@@ -20,9 +20,9 @@ export interface PageResponse {
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
-    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
+    pageable?: PageableObject;
     empty?: boolean;
 }
 

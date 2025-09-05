@@ -39,7 +39,6 @@ class JwtServiceTest {
     @BeforeEach
     void setUp() {
         when(jwtProperties.getSecretKey()).thenReturn(TEST_SECRET);
-
         jwtService = new JwtService(jwtProperties, FIXED_CLOCK);
     }
 
@@ -48,50 +47,57 @@ class JwtServiceTest {
     }
 
     @Test
-    void shouldCorrectlyGenerateTokenAndExtractUsername() {
+    void extractUsername_shouldReturnCorrectUsername_fromGeneratedToken() {
         setUpTokenGeneration();
         when(jwtProperties.getDuration()).thenReturn(1000L * 60 * 15);
-        String token = jwtService.generateToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
+        String token = jwtService.generateAccessToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
+
         String extractedUsername = jwtService.extractUsername(token);
+
         assertThat(token).isNotNull().isNotEmpty();
         assertThat(extractedUsername).isEqualTo(TEST_USERNAME);
     }
 
     @Test
-    void shouldThrowJwtTokenExpiredExceptionForExpiredToken() {
+    void extractAllClaims_shouldThrowJwtTokenExpiredException_whenTokenIsExpired() {
         setUpTokenGeneration();
         when(jwtProperties.getDuration()).thenReturn(-1000L);
-        String expiredToken = jwtService.generateToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
+        String expiredToken = jwtService.generateAccessToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
+
         assertThatThrownBy(() -> jwtService.extractAllClaims(expiredToken))
                 .isInstanceOf(JwtTokenExpiredException.class)
                 .hasMessage("JWT token has expired");
     }
 
     @Test
-    void shouldThrowAppJwtExceptionForMalformedToken() {
+    void extractAllClaims_shouldThrowAppJwtException_whenTokenIsMalformed() {
         String malformedToken = "this.is.not.a.valid.token";
+
         assertThatThrownBy(() -> jwtService.extractAllClaims(malformedToken))
                 .isInstanceOf(AppJwtException.class)
                 .hasMessage("Invalid JWT token");
     }
 
     @Test
-    void validateTokenShouldReturnFalseForExpiredToken() {
+    void validateToken_shouldThrowJwtTokenExpiredException_whenTokenIsExpired() {
         setUpTokenGeneration();
         when(jwtProperties.getDuration()).thenReturn(-1000L);
-        String expiredToken = jwtService.generateToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
+        String expiredToken = jwtService.generateAccessToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
         UserDetails userDetails = User.withUsername(TEST_USERNAME).password("").roles("SUBCONTRACTOR").build();
-        boolean isValid = jwtService.validateToken(expiredToken, userDetails);
-        assertThat(isValid).isFalse();
+
+        assertThatThrownBy(() -> jwtService.validateToken(expiredToken, userDetails))
+                .isInstanceOf(JwtTokenExpiredException.class);
     }
 
     @Test
-    void validateTokenShouldReturnTrueForValidToken() {
+    void validateToken_shouldReturnTrue_whenTokenIsValidAndMatchesUser() {
         setUpTokenGeneration();
         when(jwtProperties.getDuration()).thenReturn(1000L * 60 * 15);
-        String validToken = jwtService.generateToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
+        String validToken = jwtService.generateAccessToken(TEST_USERNAME, TEST_EMAIL, TEST_ROLES);
         UserDetails userDetails = User.withUsername(TEST_USERNAME).password("").roles("SUBCONTRACTOR").build();
+
         boolean isValid = jwtService.validateToken(validToken, userDetails);
+
         assertThat(isValid).isTrue();
     }
 }

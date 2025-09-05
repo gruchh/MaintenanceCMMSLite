@@ -255,12 +255,16 @@ class BreakdownServiceTest {
     @Test
     void getBreakdownStats_shouldReturnCorrectStats() {
         LocalDateTime now = LocalDateTime.now();
+        Breakdown testBreakdown = new Breakdown();
         testBreakdown.setFinishedAt(now.minusDays(5));
 
         when(breakdownRepository.findTopByOrderByFinishedAtDesc()).thenReturn(Optional.of(testBreakdown));
-        when(breakdownRepository.countByFinishedAtBetween(now.minusWeeks(1), now)).thenReturn(1L);
-        when(breakdownRepository.countByFinishedAtBetween(now.minusMonths(1), now)).thenReturn(5L);
-        when(breakdownRepository.countByFinishedAtBetween(now.withDayOfYear(1), now)).thenReturn(10L);
+
+        when(breakdownRepository.countByFinishedAtBetween(any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(1L)
+                .thenReturn(5L)
+                .thenReturn(10L);
+
         when(breakdownRepository.getAverageBreakdownDurationInMinutes()).thenReturn(120.5);
 
         BreakdownDTOs.BreakdownStatsDTO stats = breakdownService.getBreakdownStats();

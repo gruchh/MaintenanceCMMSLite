@@ -17,10 +17,9 @@ public class JwtTokenValidator {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new AppJwtException("Brak lub nieprawidłowy nagłówek Authorization");
         }
-
         String token = authHeader.substring(7);
         String username = jwtService.extractUsername(token);
-        if (username == null || !jwtService.isTokenValid(token, username)) {
+        if (username == null || jwtService.isTokenExpired(token)) {
             throw new AppJwtException("Nieprawidłowy lub wygasły token JWT");
         }
 

@@ -1,13 +1,16 @@
 package com.cmms.lite.service;
 
 import com.cmms.lite.api.dto.EmployeeDTOs;
+import com.cmms.lite.core.entity.Address;
 import com.cmms.lite.core.entity.Employee;
+import com.cmms.lite.core.entity.EmployeeDetails;
 import com.cmms.lite.core.entity.EmployeeRole;
 import com.cmms.lite.core.mapper.EmployeeMapper;
 import com.cmms.lite.core.repository.EmployeeRepository;
 import com.cmms.lite.core.repository.EmployeeRoleRepository;
 import com.cmms.lite.exception.EmployeeNotFoundException;
 import com.cmms.lite.exception.EmployeeRoleNotFoundException;
+import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.exception.UserNotFoundException;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
@@ -46,7 +49,7 @@ class EmployeeServiceTest {
     private Employee testEmployee;
     private EmployeeDTOs.CreateRequest createRequest;
     private EmployeeDTOs.Response responseDTO;
-    private EmployeeDTOs.DetailsRequest detailsRequest;
+    private EmployeeDTOs.UpdateRequest updateRequest;
 
     @BeforeEach
     void setUp() {
@@ -62,6 +65,10 @@ class EmployeeServiceTest {
         testEmployee.setId(1L);
         testEmployee.setUser(testUser);
         testEmployee.setEmployeeRole(testRole);
+        EmployeeDetails details = new EmployeeDetails();
+        details.setAddress(new Address());
+        testEmployee.setEmployeeDetails(details);
+
 
         createRequest = new EmployeeDTOs.CreateRequest(1L, 1L);
         responseDTO = new EmployeeDTOs.Response(1L, "testuser", null, null, null, null, null, "Mechanic", null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null);
@@ -94,7 +101,7 @@ class EmployeeServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(employeeRepository.existsById(1L)).thenReturn(true);
 
-        assertThrows(EmployeeRoleNotFoundException.class, () -> employeeService.createEmployee(createRequest));
+        assertThrows(IllegalOperationException.class, () -> employeeService.createEmployee(createRequest));
     }
 
     @Test
@@ -108,7 +115,7 @@ class EmployeeServiceTest {
 
     @Test
     void getEmployeeById_shouldReturnEmployee_whenEmployeeExists() {
-        when(employeeRepository.findById(1L)).thenReturn(Optional.of(testEmployee));
+        when(employeeRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(testEmployee));
         when(employeeMapper.toResponse(testEmployee)).thenReturn(responseDTO);
 
         EmployeeDTOs.Response result = employeeService.getEmployeeById(1L);
@@ -119,31 +126,35 @@ class EmployeeServiceTest {
 
     @Test
     void getEmployeeById_shouldThrowEmployeeNotFoundException_whenEmployeeDoesNotExist() {
-        when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(employeeRepository.findByIdWithDetails(1L)).thenReturn(Optional.empty());
 
         assertThrows(EmployeeNotFoundException.class, () -> employeeService.getEmployeeById(1L));
     }
 
     @Test
-    void updateEmployeeDetails_shouldUpdateDetailsSuccessfully_whenDetailsAreNull() {
-        detailsRequest = new EmployeeDTOs.DetailsRequest("123456789", null, null, "Street", "City", "00-000", "Country", null, null, null, null, null, null);
+    void updateEmployee_shouldUpdateDetailsSuccessfully() {
+        EmployeeDTOs.AddressUpdateRequest addressRequest = new EmployeeDTOs.AddressUpdateRequest("Street", "City", "00-000", "Country");
+        updateRequest = new EmployeeDTOs.UpdateRequest(null, "123456789", null, null, addressRequest, null, null, null, null, null, null);
+
         when(employeeRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(testEmployee));
         when(employeeRepository.save(any(Employee.class))).thenReturn(testEmployee);
         when(employeeMapper.toResponse(testEmployee)).thenReturn(responseDTO);
 
-        employeeService.updateEmployeeDetails(1L, detailsRequest);
+        employeeService.updateEmployee(1L, updateRequest);
 
         assertThat(testEmployee.getEmployeeDetails()).isNotNull();
         assertThat(testEmployee.getEmployeeDetails().getAddress()).isNotNull();
         assertThat(testEmployee.getEmployeeDetails().getAddress().getCity()).isEqualTo("City");
+        assertThat(testEmployee.getEmployeeDetails().getPhoneNumber()).isEqualTo("123456789");
         verify(employeeRepository, times(1)).save(testEmployee);
     }
 
     @Test
-    void updateEmployeeDetails_shouldThrowEmployeeNotFoundException_whenEmployeeDoesNotExist() {
+    void updateEmployee_shouldThrowEmployeeNotFoundException_whenEmployeeDoesNotExist() {
+        updateRequest = new EmployeeDTOs.UpdateRequest(null, null, null, null, null, null, null, null, null, null, null);
         when(employeeRepository.findByIdWithDetails(1L)).thenReturn(Optional.empty());
 
-        assertThrows(EmployeeNotFoundException.class, () -> employeeService.updateEmployeeDetails(1L, detailsRequest));
+        assertThrows(EmployeeNotFoundException.class, () -> employeeService.updateEmployee(1L, updateRequest));
     }
 
     @Test

@@ -10,6 +10,6 @@ public class TimeConfig {
 
     @Bean
     public Clock clock() {
-        return Clock.systemUTC(); // produkcyjny zegar
+        return Clock.systemUTC();
     }
 }

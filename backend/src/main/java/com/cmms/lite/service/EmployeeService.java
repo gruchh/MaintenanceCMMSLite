@@ -83,8 +83,6 @@ public class EmployeeService {
         employeeRepository.deleteById(employeeId);
     }
 
-    // --- METODY POMOCNICZE ---
-
     private void updateRole(Employee employee, Long roleId) {
         Optional.ofNullable(roleId).ifPresent(id -> {
             EmployeeRole role = employeeRoleRepository.findById(id)

@@ -21,6 +21,7 @@ export * from './pageResponse';
 export * from './pageSparePartResponse';
 export * from './pageable';
 export * from './pageableObject';
+export * from './refreshTokenRequest';
 export * from './registerRequest';
 export * from './response';
 export * from './sortObject';

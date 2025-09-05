@@ -8,7 +8,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const modalService = inject(ModalService);
 
   if (authService.isLoggedIn()) {
-    return true; // Użytkownik jest zalogowany, więc kontynuujemy.
+    return true;
   }
   modalService.openLoginModal();
   return false;

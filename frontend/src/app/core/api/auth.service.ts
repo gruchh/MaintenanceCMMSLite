@@ -1,8 +1,9 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, catchError, of, tap, switchMap, throwError } from 'rxjs';
+import { Observable, map, catchError, of, tap, switchMap, throwError, BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { JwtAuthRequest, JwtAuthResponse, RegisterRequest, UserProfileDto, UserProfileResponse } from './generated';
+import { TokenStorageService } from './token-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,10 +11,13 @@ import { JwtAuthRequest, JwtAuthResponse, RegisterRequest, UserProfileDto, UserP
 export class AuthService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
-  private readonly authTokenKey = 'authToken';
+  private tokenStorage = inject(TokenStorageService);
 
   currentUser = signal<UserProfileDto | null>(null);
   isLoggedIn = computed(() => !!this.currentUser());
+
+  isRefreshingToken = false;
+  tokenRefreshed$ = new BehaviorSubject<boolean>(false);
 
   private fetchAndStoreUser(): Observable<UserProfileDto | null> {
     return this.http.get<UserProfileResponse>(`${this.apiUrl}/auth/getCurrentUser`).pipe(
@@ -33,7 +37,7 @@ export class AuthService {
   }
 
   public initializeAuthState(): Observable<UserProfileDto | null> {
-    const token = this.getToken();
+    const token = this.tokenStorage.getAccessToken();
     if (token) {
       return this.fetchAndStoreUser();
     }
@@ -46,8 +50,8 @@ export class AuthService {
       .post<JwtAuthResponse>(`${this.apiUrl}/auth/login`, credentials)
       .pipe(
         switchMap((loginResponse) => {
-          if (loginResponse?.accessToken) {
-            this.saveToken(loginResponse.accessToken);
+          if (loginResponse?.accessToken && loginResponse.refreshToken) {
+            this.tokenStorage.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
             return this.fetchAndStoreUser();
           }
           this.logout();
@@ -65,26 +69,45 @@ export class AuthService {
       .post<JwtAuthResponse>(`${this.apiUrl}/auth/register`, userData)
       .pipe(
         switchMap((registerResponse) => {
-          if (registerResponse?.accessToken) {
-            this.saveToken(registerResponse.accessToken);
+          if (registerResponse?.accessToken && registerResponse.refreshToken) {
+            this.tokenStorage.saveTokens(registerResponse.accessToken, registerResponse.refreshToken);
             return this.fetchAndStoreUser();
           }
           this.logout();
           return of(null);
         }),
         catchError((error) => {
-          this.logout(); // W przypadku błędu rejestracji również wylogowujemy (jeśli jakiś token jakimś cudem był)
+          this.logout();
           return throwError(() => error);
         })
       );
   }
 
-  logout(): void {
-    this.removeToken();
-    this.currentUser.set(null);
+  // NOWA METODA: Kluczowa logika odświeżania tokena
+  refreshToken(): Observable<JwtAuthResponse> {
+    const refreshToken = this.tokenStorage.getRefreshToken();
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('Brak tokena odświeżającego.'));
+    }
+
+    return this.http.post<JwtAuthResponse>(`${this.apiUrl}/auth/refresh-token`, { refreshToken }).pipe(
+      tap((tokens) => {
+        if (tokens.accessToken && tokens.refreshToken) {
+          this.tokenStorage.saveTokens(tokens.accessToken, tokens.refreshToken);
+        } else {
+          this.logout();
+        }
+      }),
+      catchError((error) => {
+        this.logout();
+        return throwError(() => error);
+      })
+    );
   }
 
-  saveToken(token: string): void { localStorage.setItem(this.authTokenKey, token); }
-  getToken(): string | null { return localStorage.getItem(this.authTokenKey); }
-  removeToken(): void { localStorage.removeItem(this.authTokenKey); }
+  logout(): void {
+    this.tokenStorage.clearTokens();
+    this.currentUser.set(null);
+  }
 }

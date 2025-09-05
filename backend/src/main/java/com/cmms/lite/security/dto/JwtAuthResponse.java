@@ -1,17 +1,23 @@
 package com.cmms.lite.security.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class JwtAuthResponse {
 
     private String accessToken;
-    private String tokenType;
+    private String refreshToken;
 
-    @Builder
-    public JwtAuthResponse(String accessToken) {
-        this.accessToken = accessToken;
-        this.tokenType = "Bearer";
-    }
+    @Builder.Default
+    private String tokenType = "Bearer";
+
+    private String message;
 }
