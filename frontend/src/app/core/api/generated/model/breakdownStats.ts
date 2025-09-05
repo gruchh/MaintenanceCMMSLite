@@ -10,7 +10,7 @@
 
 
 /**
- * Statistics related to breakdowns
+ * Statystyki związane z awariami
  */
 export interface BreakdownStats { 
     daysSinceLastBreakdown?: number;

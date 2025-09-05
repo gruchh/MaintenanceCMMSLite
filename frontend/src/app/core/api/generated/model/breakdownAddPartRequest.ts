@@ -10,15 +10,15 @@
 
 
 /**
- * Data required to add a spare part to a breakdown
+ * Dane wymagane do dodania części zamiennej do awarii
  */
 export interface BreakdownAddPartRequest { 
     /**
-     * ID of the spare part from the inventory.
+     * ID części zamiennej z magazynu.
      */
     sparePartId: number;
     /**
-     * The quantity of parts used.
+     * Liczba użytych części.
      */
     quantity: number;
 }

@@ -10,7 +10,7 @@
 
 
 /**
- * A response object for a part used in a breakdown
+ * Obiekt odpowiedzi dla części użytej podczas awarii
  */
 export interface BreakdownUsedPartResponse { 
     id?: number;

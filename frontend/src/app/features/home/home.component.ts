@@ -6,7 +6,7 @@ import { StatCardComponent } from '../../shared/components/stat-card/stat-card.c
 import {
   BreakdownService,
   BreakdownStats,
-  Response,
+  BreakdownResponse,
 } from '../../core/api/generated';
 
 type StatCardData = {
@@ -120,7 +120,7 @@ export class HomeComponent {
   }
 
   private mapLatestBreakdownToData(
-    latest: Response | null | undefined
+    latest: BreakdownResponse | null | undefined
   ): LastFailureData {
     if (!latest) {
       return {

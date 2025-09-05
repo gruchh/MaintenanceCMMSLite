@@ -14,7 +14,7 @@ public final class BreakdownDTOs {
 
     private BreakdownDTOs() {}
 
-    @Schema(name = "BreakdownCreateRequest", description = "Data required to create a new breakdown report")
+    @Schema(name = "BreakdownCreateRequest", description = "Dane wymagane do utworzenia nowego zgłoszenia awarii")
     public record CreateRequest(
 
             @NotBlank String description,
@@ -22,19 +22,21 @@ public final class BreakdownDTOs {
             @NotNull BreakdownType type
     ) {}
 
-    @Schema(name = "BreakdownAddPartRequest", description = "Data required to add a spare part to a breakdown")
+    @Schema(name = "BreakdownAddPartRequest", description = "Dane wymagane do dodania części zamiennej do awarii")
     public record AddPartRequest(
-            @Schema(description = "ID of the spare part from the inventory.", example = "105")
+            @Schema(description = "ID części zamiennej z magazynu.", example = "105")
             @NotNull @Positive Long sparePartId,
 
-            @Schema(description = "The quantity of parts used.", example = "2")
+            @Schema(description = "Liczba użytych części.", example = "2")
             @NotNull @Positive Integer quantity
     ) {}
 
+    @Schema(name = "BreakdownCloseRequest", description = "Dane wymagane do zamknięcia zgłoszenia awarii")
     public record CloseRequest(
             @NotBlank String specialistComment
     ) {}
 
+    @Schema(name = "BreakdownResponse", description = "Obiekt odpowiedzi zawierający szczegóły awarii")
     public record Response(
             Long id,
             String description,
@@ -49,7 +51,7 @@ public final class BreakdownDTOs {
             List<UsedPartResponse> usedParts
     ) {}
 
-    @Schema(name = "BreakdownUsedPartResponse", description = "A response object for a part used in a breakdown")
+    @Schema(name = "BreakdownUsedPartResponse", description = "Obiekt odpowiedzi dla części użytej podczas awarii")
     public record UsedPartResponse(
             Long id,
             Long sparePartId,
@@ -58,7 +60,7 @@ public final class BreakdownDTOs {
             BigDecimal pricePerUnit
     ) {}
 
-    @Schema(name = "BreakdownStats", description = "Statistics related to breakdowns")
+    @Schema(name = "BreakdownStats", description = "Statystyki związane z awariami")
     public record BreakdownStatsDTO(
             Long daysSinceLastBreakdown,
             Long breakdownsLastWeek,

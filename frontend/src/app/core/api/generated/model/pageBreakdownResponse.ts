@@ -8,21 +8,21 @@
  * Do not edit the class manually.
  */
 import { PageableObject } from './pageableObject';
-import { Response } from './response';
 import { SortObject } from './sortObject';
+import { BreakdownResponse } from './breakdownResponse';
 
 
-export interface PageResponse { 
+export interface PageBreakdownResponse { 
     totalElements?: number;
     totalPages?: number;
     size?: number;
-    content?: Array<Response>;
+    content?: Array<BreakdownResponse>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

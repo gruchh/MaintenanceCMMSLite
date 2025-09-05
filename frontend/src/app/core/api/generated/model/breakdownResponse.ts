@@ -11,7 +11,10 @@ import { BreakdownUsedPartResponse } from './breakdownUsedPartResponse';
 import { MachineSummaryResponse } from './machineSummaryResponse';
 
 
-export interface Response { 
+/**
+ * Obiekt odpowiedzi zawierający szczegóły awarii
+ */
+export interface BreakdownResponse { 
     id?: number;
     description?: string;
     reportedAt?: string;
@@ -19,12 +22,12 @@ export interface Response {
     finishedAt?: string;
     opened?: boolean;
     specialistComment?: string;
-    type?: Response.TypeEnum;
+    type?: BreakdownResponse.TypeEnum;
     totalCost?: number;
     machine?: MachineSummaryResponse;
     usedParts?: Array<BreakdownUsedPartResponse>;
 }
-export namespace Response {
+export namespace BreakdownResponse {
     export const TypeEnum = {
         MECHANICAL: 'MECHANICAL',
         AUTOMATICAL: 'AUTOMATICAL',

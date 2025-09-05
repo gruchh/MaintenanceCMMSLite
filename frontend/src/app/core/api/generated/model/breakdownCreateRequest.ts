@@ -10,7 +10,7 @@
 
 
 /**
- * Data required to create a new breakdown report
+ * Dane wymagane do utworzenia nowego zgłoszenia awarii
  */
 export interface BreakdownCreateRequest { 
     description: string;
