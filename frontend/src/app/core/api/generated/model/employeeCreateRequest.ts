@@ -10,15 +10,15 @@
 
 
 /**
- * Data required to create a new employee
+ * Dane wymagane do stworzenia nowego pracownika
  */
 export interface EmployeeCreateRequest { 
     /**
-     * ID of the existing user to be linked as an employee.
+     * ID istniejącego użytkownika, który ma zostać pracownikiem.
      */
     userId: number;
     /**
-     * ID of the employee\'s role.
+     * ID roli pracownika.
      */
     roleId: number;
 }

@@ -12,11 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping(value = "/api/v1/employees", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-@Tag(name = "Employees", description = "API for managing employees")
+@Tag(name = "Employees", description = "API do zarządzania pracownikami")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -37,9 +36,12 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDTOs.Response> updateEmployeeDetails(@PathVariable Long id, @Valid @RequestBody EmployeeDTOs.DetailsRequest request) {
-        return ResponseEntity.ok(employeeService.updateEmployeeDetails(id, request));
+    @PatchMapping("/{id}")
+    public ResponseEntity<EmployeeDTOs.Response> updateEmployee(
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeDTOs.UpdateRequest request
+    ) {
+        return ResponseEntity.ok(employeeService.updateEmployee(id, request));
     }
 
     @DeleteMapping("/{id}")

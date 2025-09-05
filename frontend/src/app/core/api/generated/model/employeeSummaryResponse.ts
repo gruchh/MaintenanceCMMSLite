@@ -10,7 +10,7 @@
 
 
 /**
- * A response object with summary employee data
+ * Podstawowe dane pracownika
  */
 export interface EmployeeSummaryResponse { 
     id?: number;

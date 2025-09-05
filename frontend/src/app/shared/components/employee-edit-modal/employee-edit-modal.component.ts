@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EmployeesService, EmployeeDetailsRequest, EmployeeResponse } from '../../../core/api/generated';
+// ZMIANA: Importujemy nowe DTO do aktualizacji
+import { EmployeesService, EmployeeUpdateRequest, EmployeeResponse } from '../../../core/api/generated';
 
 @Component({
   selector: 'app-employee-edit-modal',
@@ -17,7 +18,7 @@ export class EmployeeEditModalComponent implements OnChanges {
   @Input()
   set employeeId(id: number | null) {
     this._employeeId = id;
-    if (id) {
+    if (id && this.isOpen) { // Ładuj dane tylko jeśli modal jest otwarty
       this.loadEmployeeDetails(id);
     }
   }
@@ -30,12 +31,14 @@ export class EmployeeEditModalComponent implements OnChanges {
   @Output() employeeUpdated = new EventEmitter<void>();
 
   public editForm: FormGroup;
-  public educationLevels = Object.values(EmployeeDetailsRequest.EducationLevelEnum);
+  // ZMIANA: Enum pobierany z nowego DTO
+  public educationLevels = Object.values(EmployeeUpdateRequest.EducationLevelEnum);
   public isLoading = false;
   public errorMessage: string | null = null;
 
   constructor() {
     this.editForm = this.fb.group({
+      // Struktura formularza pozostaje bez zmian, ponieważ odzwierciedla pola w UI
       phoneNumber: ['', Validators.required],
       dateOfBirth: ['', Validators.required],
       hireDate: ['', Validators.required],
@@ -56,26 +59,29 @@ export class EmployeeEditModalComponent implements OnChanges {
     if (changes['isOpen'] && !changes['isOpen'].currentValue) {
       this.resetModalState();
     }
+    // Jeśli modal się otwiera i ma już ID, załaduj dane
+    if (changes['isOpen'] && changes['isOpen'].currentValue && this.employeeId) {
+      this.loadEmployeeDetails(this.employeeId);
+    }
   }
 
+  // Ta metoda pozostaje bez zmian - pobieranie danych jest oddzielone od ich aktualizacji
   loadEmployeeDetails(id: number): void {
     this.isLoading = true;
     this.errorMessage = null;
+    this.editForm.reset(); // Wyczyść formularz przed załadowaniem nowych danych
 
     this.employeeService.getEmployeeById(id).subscribe({
       next: (employee: EmployeeResponse) => {
         this.editForm.patchValue({
           phoneNumber: employee.phoneNumber,
-
           dateOfBirth: this.formatDate(employee.dateOfBirth),
           hireDate: this.formatDate(employee.hireDate),
           street: employee.street,
           city: employee.city,
           postalCode: employee.postalCode,
           country: employee.country,
-
           contractEndDate: this.formatDate(employee.contractEndDate),
-
           salary: employee.salary,
           educationLevel: employee.educationLevel,
           fieldOfStudy: employee.fieldOfStudy,
@@ -92,21 +98,46 @@ export class EmployeeEditModalComponent implements OnChanges {
     });
   }
 
+  // ZMIANA: Cała logika wysyłania danych została przepisana
   onSubmit(): void {
     if (this.editForm.invalid || !this.employeeId) {
+      // Oznacz pola jako "dotknięte", aby pokazać błędy walidacji
+      this.editForm.markAllAsTouched();
       return;
     }
 
     this.isLoading = true;
-    const formValue: EmployeeDetailsRequest = this.editForm.value;
+    this.errorMessage = null;
+    const formValue = this.editForm.value;
 
-    this.employeeService.updateEmployeeDetails(this.employeeId, formValue).subscribe({
+    // KROK 1: Transformacja danych z płaskiego formularza do zagnieżdżonej struktury DTO
+    const payload: EmployeeUpdateRequest = {
+      phoneNumber: formValue.phoneNumber,
+      dateOfBirth: formValue.dateOfBirth,
+      hireDate: formValue.hireDate,
+      contractEndDate: formValue.contractEndDate || null,
+      salary: formValue.salary,
+      educationLevel: formValue.educationLevel,
+      fieldOfStudy: formValue.fieldOfStudy,
+      emergencyContactName: formValue.emergencyContactName,
+      emergencyContactPhone: formValue.emergencyContactPhone,
+      address: { // Tworzymy zagnieżdżony obiekt adresu
+        street: formValue.street,
+        city: formValue.city,
+        postalCode: formValue.postalCode,
+        country: formValue.country
+      }
+    };
+
+    // KROK 2: Wywołanie nowej metody serwisu z nowym payloadem
+    this.employeeService.updateEmployee(this.employeeId, payload).subscribe({
       next: () => {
         this.employeeUpdated.emit();
         this.onClose();
       },
       error: (err) => {
-        this.errorMessage = 'Wystąpił błąd podczas aktualizacji. Sprawdź poprawność danych.';
+        // Lepsza obsługa błędów z API (jeśli backend je zwraca)
+        this.errorMessage = err.error?.message || 'Wystąpił błąd podczas aktualizacji. Sprawdź poprawność danych.';
         this.isLoading = false;
         console.error(err);
       },
@@ -131,11 +162,8 @@ export class EmployeeEditModalComponent implements OnChanges {
     if (!date) {
       return null;
     }
-    try {
-      return new Date(date).toISOString().substring(0, 10);
-    } catch (e) {
-      console.error('Invalid date format:', date);
-      return null;
-    }
+    // Bezpieczniejsza obsługa daty
+    const d = new Date(date);
+    return !isNaN(d.getTime()) ? d.toISOString().substring(0, 10) : null;
   }
 }

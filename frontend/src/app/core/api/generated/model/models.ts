@@ -1,3 +1,4 @@
+export * from './addressUpdateRequest';
 export * from './breakdownAddPartRequest';
 export * from './breakdownCreateRequest';
 export * from './breakdownStats';
@@ -5,9 +6,9 @@ export * from './breakdownTypeResponse';
 export * from './breakdownUsedPartResponse';
 export * from './closeRequest';
 export * from './employeeCreateRequest';
-export * from './employeeDetailsRequest';
 export * from './employeeResponse';
 export * from './employeeSummaryResponse';
+export * from './employeeUpdateRequest';
 export * from './jwtAuthRequest';
 export * from './jwtAuthResponse';
 export * from './machineCreateRequest';

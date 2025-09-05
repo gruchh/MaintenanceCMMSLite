@@ -10,6 +10,7 @@ import com.cmms.lite.core.repository.EmployeeRepository;
 import com.cmms.lite.core.repository.EmployeeRoleRepository;
 import com.cmms.lite.exception.EmployeeNotFoundException;
 import com.cmms.lite.exception.EmployeeRoleNotFoundException;
+import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.exception.UserNotFoundException;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND, request.userId())));
 
         if (employeeRepository.existsById(user.getId())) {
-            throw new EmployeeRoleNotFoundException("Użytkownik o ID " + user.getId() + " jest już zarejestrowany jako pracownik.");
+            throw new IllegalOperationException("Użytkownik o ID " + user.getId() + " jest już zarejestrowany jako pracownik.");
         }
 
         EmployeeRole role = employeeRoleRepository.findById(request.roleId())
@@ -49,14 +52,12 @@ public class EmployeeService {
         employee.setUser(user);
         employee.setEmployeeRole(role);
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponse(savedEmployee);
+        return employeeMapper.toResponse(employeeRepository.save(employee));
     }
 
     @Transactional(readOnly = true)
     public EmployeeDTOs.Response getEmployeeById(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId)));
+        Employee employee = getEmployeeByIdWithDetailsOrThrow(employeeId);
         return employeeMapper.toResponse(employee);
     }
 
@@ -67,38 +68,11 @@ public class EmployeeService {
     }
 
     @Transactional
-    public EmployeeDTOs.Response updateEmployeeDetails(Long employeeId, EmployeeDTOs.DetailsRequest request) {
+    public EmployeeDTOs.Response updateEmployee(Long employeeId, EmployeeDTOs.UpdateRequest request) {
         Employee employee = getEmployeeByIdWithDetailsOrThrow(employeeId);
-
-        EmployeeDetails details = employee.getEmployeeDetails();
-        if (details == null) {
-            details = new EmployeeDetails();
-            employee.setEmployeeDetails(details);
-            details.setEmployee(employee);
-        }
-
-        Address address = details.getAddress();
-        if (address == null) {
-            address = new Address();
-            details.setAddress(address);
-        }
-        address.setStreet(request.street());
-        address.setCity(request.city());
-        address.setPostalCode(request.postalCode());
-        address.setCountry(request.country());
-
-        details.setPhoneNumber(request.phoneNumber());
-        details.setDateOfBirth(request.dateOfBirth());
-        details.setHireDate(request.hireDate());
-        details.setContractEndDate(request.contractEndDate());
-        details.setSalary(request.salary());
-        details.setEducationLevel(request.educationLevel());
-        details.setFieldOfStudy(request.fieldOfStudy());
-        details.setEmergencyContactName(request.emergencyContactName());
-        details.setEmergencyContactPhone(request.emergencyContactPhone());
-
-        Employee updatedEmployee = employeeRepository.save(employee);
-        return employeeMapper.toResponse(updatedEmployee);
+        updateRole(employee, request.roleId());
+        updateDetails(employee, request);
+        return employeeMapper.toResponse(employeeRepository.save(employee));
     }
 
     @Transactional
@@ -107,6 +81,56 @@ public class EmployeeService {
             throw new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId));
         }
         employeeRepository.deleteById(employeeId);
+    }
+
+    // --- METODY POMOCNICZE ---
+
+    private void updateRole(Employee employee, Long roleId) {
+        Optional.ofNullable(roleId).ifPresent(id -> {
+            EmployeeRole role = employeeRoleRepository.findById(id)
+                    .orElseThrow(() -> new EmployeeRoleNotFoundException(String.format(ROLE_NOT_FOUND, id)));
+            employee.setEmployeeRole(role);
+        });
+    }
+
+    private void updateDetails(Employee employee, EmployeeDTOs.UpdateRequest request) {
+        if (isAnyDetailFieldPresent(request)) {
+            EmployeeDetails details = Optional.ofNullable(employee.getEmployeeDetails()).orElseGet(() -> {
+                EmployeeDetails newDetails = new EmployeeDetails();
+                newDetails.setEmployee(employee);
+                employee.setEmployeeDetails(newDetails);
+                return newDetails;
+            });
+
+            Optional.ofNullable(request.phoneNumber()).ifPresent(details::setPhoneNumber);
+            Optional.ofNullable(request.dateOfBirth()).ifPresent(details::setDateOfBirth);
+            Optional.ofNullable(request.hireDate()).ifPresent(details::setHireDate);
+            Optional.ofNullable(request.contractEndDate()).ifPresent(details::setContractEndDate);
+            Optional.ofNullable(request.salary()).ifPresent(details::setSalary);
+            Optional.ofNullable(request.educationLevel()).ifPresent(details::setEducationLevel);
+            Optional.ofNullable(request.fieldOfStudy()).ifPresent(details::setFieldOfStudy);
+            Optional.ofNullable(request.emergencyContactName()).ifPresent(details::setEmergencyContactName);
+            Optional.ofNullable(request.emergencyContactPhone()).ifPresent(details::setEmergencyContactPhone);
+
+            Optional.ofNullable(request.address()).ifPresent(addressRequest -> {
+                Address address = Optional.ofNullable(details.getAddress()).orElseGet(() -> {
+                    Address newAddress = new Address();
+                    details.setAddress(newAddress);
+                    return newAddress;
+                });
+                Optional.ofNullable(addressRequest.street()).ifPresent(address::setStreet);
+                Optional.ofNullable(addressRequest.city()).ifPresent(address::setCity);
+                Optional.ofNullable(addressRequest.postalCode()).ifPresent(address::setPostalCode);
+                Optional.ofNullable(addressRequest.country()).ifPresent(address::setCountry);
+            });
+        }
+    }
+
+    private boolean isAnyDetailFieldPresent(EmployeeDTOs.UpdateRequest request) {
+        return request.phoneNumber() != null || request.dateOfBirth() != null || request.hireDate() != null ||
+                request.address() != null || request.contractEndDate() != null || request.salary() != null ||
+                request.educationLevel() != null || request.fieldOfStudy() != null ||
+                request.emergencyContactName() != null || request.emergencyContactPhone() != null;
     }
 
     private Employee getEmployeeByIdWithDetailsOrThrow(Long employeeId) {

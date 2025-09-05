@@ -3,7 +3,6 @@ package com.cmms.lite.api.dto;
 import com.cmms.lite.core.entity.EducationLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Positive;
@@ -13,51 +12,79 @@ import java.time.LocalDate;
 
 public final class EmployeeDTOs {
 
-    private EmployeeDTOs() {}
+    private EmployeeDTOs() {
+    }
 
-    @Schema(name = "EmployeeCreateRequest", description = "Data required to create a new employee")
+    @Schema(name = "EmployeeCreateRequest", description = "Dane wymagane do stworzenia nowego pracownika")
     public record CreateRequest(
-            @Schema(description = "ID of the existing user to be linked as an employee.", example = "1")
+            @Schema(description = "ID istniejącego użytkownika, który ma zostać pracownikiem.", example = "1")
             @NotNull
             Long userId,
 
-            @Schema(description = "ID of the employee's role.", example = "3")
+            @Schema(description = "ID roli pracownika.", example = "3")
             @NotNull
             Long roleId
-    ) {}
+    ) {
+    }
 
-    @Schema(name = "EmployeeDetailsRequest", description = "Data for creating or updating employee's details")
-    public record DetailsRequest(
-            @NotBlank String phoneNumber,
-            @NotNull @Past LocalDate dateOfBirth,
-            @NotNull LocalDate hireDate,
-            @NotBlank String street,
-            @NotBlank String city,
-            @NotBlank String postalCode,
-            @NotBlank String country,
-            LocalDate contractEndDate,
-            @NotNull @Positive BigDecimal salary,
-            @NotNull EducationLevel educationLevel,
-            String fieldOfStudy,
-            String emergencyContactName,
-            String emergencyContactPhone
-    ) {}
+    @Schema(name = "AddressUpdateRequest", description = "Dane do aktualizacji adresu. Wszystkie pola są opcjonalne.")
+    public record AddressUpdateRequest(
+            @Schema(description = "Ulica i numer", example = "Aleje Jerozolimskie 96")
+            String street,
 
-    @Schema(name = "EmployeeUpdateRequest", description = "Data required to update an employee's role and details")
+            @Schema(description = "Miasto", example = "Warszawa")
+            String city,
+
+            @Schema(description = "Kod pocztowy", example = "00-807")
+            String postalCode,
+
+            @Schema(description = "Kraj", example = "Polska")
+            String country
+    ) {
+    }
+
+    @Schema(name = "EmployeeUpdateRequest", description = "Dane do aktualizacji pracownika. Wszystkie pola są opcjonalne.")
     public record UpdateRequest(
-            @Schema(description = "ID of the employee's new role.", example = "2")
-            @NotNull(message = "Role ID cannot be null.")
-            @Positive(message = "Role ID must be a positive number.")
+            @Schema(description = "ID nowej roli pracownika.", example = "2")
+            @Positive(message = "ID roli musi być liczbą dodatnią.")
             Long roleId,
 
-            @Schema(description = "The detailed information for the employee.")
-            @NotNull(message = "Employee details cannot be null.")
+            @Schema(description = "Numer telefonu.", example = "500 100 200")
+            String phoneNumber,
+
+            @Schema(description = "Data urodzenia.", example = "1990-05-15")
+            @Past(message = "Data urodzenia musi być w przeszłości.")
+            LocalDate dateOfBirth,
+
+            @Schema(description = "Data zatrudnienia.", example = "2022-01-10")
+            LocalDate hireDate,
+
+            @Schema(description = "Szczegóły adresu.")
             @Valid
-            DetailsRequest details
-    ) {}
+            AddressUpdateRequest address,
 
+            @Schema(description = "Data końca kontraktu (opcjonalnie).", example = "2026-12-31")
+            LocalDate contractEndDate,
 
-    @Schema(name = "EmployeeResponse", description = "A response object with detailed employee data")
+            @Schema(description = "Wynagrodzenie.", example = "7500.50")
+            @Positive(message = "Wynagrodzenie musi być liczbą dodatnią.")
+            BigDecimal salary,
+
+            @Schema(description = "Poziom wykształcenia.", example = "MASTER")
+            EducationLevel educationLevel,
+
+            @Schema(description = "Kierunek studiów.", example = "Informatyka")
+            String fieldOfStudy,
+
+            @Schema(description = "Imię i nazwisko kontaktu alarmowego.", example = "Anna Kowalska")
+            String emergencyContactName,
+
+            @Schema(description = "Numer telefonu kontaktu alarmowego.", example = "501 202 303")
+            String emergencyContactPhone
+    ) {
+    }
+
+    @Schema(name = "EmployeeResponse", description = "Szczegółowe dane pracownika")
     public record Response(
             Long id,
             String username,
@@ -82,14 +109,10 @@ public final class EmployeeDTOs {
             String emergencyContactPhone,
             int age,
             LocalDate retirementDate
-    ) {}
+    ) {
+    }
 
-    @Schema(name = "EmployeeSummaryResponse", description = "A response object with summary employee data")
-    public record SummaryResponse(
-            Long id,
-            String username,
-            String fullName,
-            String avatarUrl,
-            String role
-    ) {}
+    @Schema(name = "EmployeeSummaryResponse", description = "Podstawowe dane pracownika")
+    public record SummaryResponse(Long id, String username, String fullName, String avatarUrl, String role) {
+    }
 }

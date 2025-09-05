@@ -12,8 +12,8 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { EmployeeCreateRequest } from '../model/models';
-import { EmployeeDetailsRequest } from '../model/models';
 import { EmployeeResponse } from '../model/models';
+import { EmployeeUpdateRequest } from '../model/models';
 import { PageEmployeeSummaryResponse } from '../model/models';
 import { Pageable } from '../model/models';
 
@@ -58,8 +58,8 @@ export interface EmployeesServiceInterface {
      * 
      * 
      * @param id 
-     * @param employeeDetailsRequest 
+     * @param employeeUpdateRequest 
      */
-    updateEmployeeDetails(id: number, employeeDetailsRequest: EmployeeDetailsRequest, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
+    updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
 
 }

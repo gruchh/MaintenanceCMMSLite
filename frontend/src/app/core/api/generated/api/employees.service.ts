@@ -19,9 +19,9 @@ import { Observable }                                        from 'rxjs';
 // @ts-ignore
 import { EmployeeCreateRequest } from '../model/employeeCreateRequest';
 // @ts-ignore
-import { EmployeeDetailsRequest } from '../model/employeeDetailsRequest';
-// @ts-ignore
 import { EmployeeResponse } from '../model/employeeResponse';
+// @ts-ignore
+import { EmployeeUpdateRequest } from '../model/employeeUpdateRequest';
 // @ts-ignore
 import { PageEmployeeSummaryResponse } from '../model/pageEmployeeSummaryResponse';
 // @ts-ignore
@@ -274,19 +274,19 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
     /**
      * @param id 
-     * @param employeeDetailsRequest 
+     * @param employeeUpdateRequest 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateEmployeeDetails(id: number, employeeDetailsRequest: EmployeeDetailsRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponse>;
-    public updateEmployeeDetails(id: number, employeeDetailsRequest: EmployeeDetailsRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponse>>;
-    public updateEmployeeDetails(id: number, employeeDetailsRequest: EmployeeDetailsRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponse>>;
-    public updateEmployeeDetails(id: number, employeeDetailsRequest: EmployeeDetailsRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponse>;
+    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponse>>;
+    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponse>>;
+    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling updateEmployeeDetails.');
+            throw new Error('Required parameter id was null or undefined when calling updateEmployee.');
         }
-        if (employeeDetailsRequest === null || employeeDetailsRequest === undefined) {
-            throw new Error('Required parameter employeeDetailsRequest was null or undefined when calling updateEmployeeDetails.');
+        if (employeeUpdateRequest === null || employeeUpdateRequest === undefined) {
+            throw new Error('Required parameter employeeUpdateRequest was null or undefined when calling updateEmployee.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -325,10 +325,10 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
         let localVarPath = `/api/v1/employees/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EmployeeResponse>('put', `${basePath}${localVarPath}`,
+        return this.httpClient.request<EmployeeResponse>('patch', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: employeeDetailsRequest,
+                body: employeeUpdateRequest,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
