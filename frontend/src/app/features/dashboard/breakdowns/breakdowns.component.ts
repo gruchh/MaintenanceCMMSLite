@@ -1,99 +1,124 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
   BreakdownResponse,
   BreakdownService,
   Pageable,
 } from '../../../core/api/generated';
-import { BreakdownCloseModalComponent } from '../../../shared/components/breakdown-close-modal/breakdown-close-modal.component';
+import { BreakdownCloseModalComponent } from './components/breakdown-close-modal/breakdown-close-modal.component';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-breakdowns',
   standalone: true,
-  imports: [CommonModule, DatePipe, BreakdownCloseModalComponent],
+  imports: [
+    CommonModule,
+    DatePipe,
+    BreakdownCloseModalComponent,
+    FormsModule,
+  ],
   templateUrl: './breakdowns.component.html',
 })
 export class BreakdownsComponent implements OnInit {
-  breakdowns: BreakdownResponse[] = [];
-  isLoading = true;
-  errorMessage: string | null = null;
+  private breakdownService = inject(BreakdownService);
 
-  currentPage = 0;
-  pageSize = 10;
-  totalElements = 0;
-  totalPages = 0;
+  breakdowns = signal<BreakdownResponse[]>([]);
+  isLoading = signal(true);
+  errorMessage = signal<string | null>(null);
+
+  currentPage = signal(0);
+  pageSize = signal(10);
+  totalElements = signal(0);
+  totalPages = signal(0);
   pageSizes = [5, 10, 25, 50, 100];
 
-  isModalOpen = false;
-  selectedBreakdownId: number | null = null;
+  isModalOpen = signal(false);
+  selectedBreakdownId = signal<number | null>(null);
 
   isAdmin = true;
 
-  constructor(private breakdownService: BreakdownService) {}
+  searchTerm = model('');
+  private searchSubject = new Subject<string>();
 
   ngOnInit(): void {
     this.fetchBreakdowns();
+
+    this.searchSubject
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((searchValue) => {
+        this.currentPage.set(0);
+        this.fetchBreakdowns(searchValue);
+      });
   }
 
-  fetchBreakdowns(): void {
-    this.isLoading = true;
-    this.errorMessage = null;
+  fetchBreakdowns(search: string = ''): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-    const pageable: any = {
-      page: this.currentPage,
-      size: this.pageSize,
+    const pageable: PageableRequest = {
+      page: this.currentPage(),
+      size: this.pageSize(),
       sort: 'reportedAt,desc',
     };
 
-    this.breakdownService.getAllBreakdowns(pageable).subscribe({
-      next: (response) => {
-        this.breakdowns = response.content || [];
-        this.totalElements = response.totalElements || 0;
-        this.totalPages = response.totalPages || 0;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage =
-          'Nie udało się załadować danych o awariach. Spróbuj ponownie później.';
-        this.isLoading = false;
-        console.error(err);
-      },
-    });
+    this.breakdownService
+      .getAllBreakdowns(pageable as unknown as Pageable, search)
+      .subscribe({
+        next: (response) => {
+          this.breakdowns.set(response.content || []);
+          this.totalElements.set(response.totalElements || 0);
+          this.totalPages.set(response.totalPages || 0);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          this.errorMessage.set(
+            'Nie udało się załadować danych o awariach. Spróbuj ponownie później.'
+          );
+          this.isLoading.set(false);
+          console.error(err);
+        },
+      });
+  }
+
+  onSearchChange(): void {
+    this.searchSubject.next(this.searchTerm());
   }
 
   onPageSizeChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    this.pageSize = +target.value;
-    this.currentPage = 0;
-    this.fetchBreakdowns();
+    this.pageSize.set(+target.value);
+    this.currentPage.set(0);
+    this.fetchBreakdowns(this.searchTerm());
   }
 
   previousPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-      this.fetchBreakdowns();
+    if (this.currentPage() > 0) {
+      this.currentPage.update((page) => page - 1);
+      this.fetchBreakdowns(this.searchTerm());
     }
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.fetchBreakdowns();
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update((page) => page + 1);
+      this.fetchBreakdowns(this.searchTerm());
     }
   }
 
   openCloseModal(breakdown: BreakdownResponse): void {
-    this.selectedBreakdownId = breakdown.id ?? null;
-    this.isModalOpen = true;
+    this.selectedBreakdownId.set(breakdown.id ?? null);
+    this.isModalOpen.set(true);
   }
 
   closeCloseModal(): void {
-    this.isModalOpen = false;
-    this.selectedBreakdownId = null;
+    this.isModalOpen.set(false);
+    this.selectedBreakdownId.set(null);
   }
 
   handleBreakdownClosed(): void {
     this.closeCloseModal();
-    this.fetchBreakdowns();
+    this.fetchBreakdowns(this.searchTerm());
   }
 }

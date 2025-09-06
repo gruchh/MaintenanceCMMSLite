@@ -1,9 +1,9 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map, catchError, of, tap, switchMap, throwError, BehaviorSubject } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { JwtAuthRequest, JwtAuthResponse, RegisterRequest, UserProfileDto, UserProfileResponse } from './generated';
 import { TokenStorageService } from './token-storage.service';
+import { environment } from '../../../../environments/environment';
+import { JwtAuthRequest, JwtAuthResponse, RegisterRequest, UserProfileDto, UserProfileResponse } from '../generated';
 
 @Injectable({
   providedIn: 'root',
@@ -83,7 +83,6 @@ export class AuthService {
       );
   }
 
-  // NOWA METODA: Kluczowa logika odświeżania tokena
   refreshToken(): Observable<JwtAuthResponse> {
     const refreshToken = this.tokenStorage.getRefreshToken();
     if (!refreshToken) {

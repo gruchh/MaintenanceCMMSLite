@@ -1,8 +1,8 @@
-import { Component, signal, inject, Output, EventEmitter } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../core/api/auth.service';
-import { ModalService } from '../../core/api/modal.service';
+import { ModalService } from '../../core/api/services/modal.service';
+import { AuthService } from '../../core/api/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -32,8 +32,8 @@ export class NavbarComponent {
     this.isMobileMenuOpen.update(v => !v);
   }
 
-  openLoginModal(): void {
-    this.modalService.openLoginModal();
+  openAuthModal(): void {
+    this.modalService.open('login');
 
     if (this.isMobileMenuOpen()) {
       this.isMobileMenuOpen.set(false);

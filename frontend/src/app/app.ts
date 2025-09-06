@@ -1,10 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { AuthService } from './core/api/auth.service';
 import { CommonModule } from '@angular/common';
 import { LoginModalComponent } from './shared/components/login-modal/login-modal.component';
 import { RegisterModalComponent } from './shared/components/register-modal/register-modal.component';
-import { ModalService } from './core/api/modal.service';
+import { ModalService, ModalType } from './core/api/services/modal.service';
+import { AuthService } from './core/api/services/auth.service';
 
 
 @Component({
@@ -22,30 +22,20 @@ export class App implements OnInit {
   private authService = inject(AuthService);
   private modalService = inject(ModalService);
 
-  isLoginModalOpen = this.modalService.isLoginModalOpen;
-  isRegisterModalOpen = this.modalService.isRegisterModalOpen;
+  activeModal = this.modalService.activeModal;
+  isLoginModalOpen = computed(() => this.activeModal() === 'login');
+  isRegisterModalOpen = computed(() => this.activeModal() === 'register');
 
   ngOnInit(): void {
     this.authService.initializeAuthState().subscribe();
   }
 
-  switchToRegister(): void {
-    this.modalService.openRegisterModal();
+  switchToModal(modalType: 'login' | 'register'): void {
+    this.modalService.open(modalType);
   }
 
-  switchToLogin(): void {
-    this.modalService.openLoginModal();
-  }
-
-  onLoginModalClose(isSuccess: boolean): void {
-    this.modalService.closeAllModals();
-    if (isSuccess) {
-      this.router.navigate(['/dashboard']);
-    }
-  }
-
-  onRegisterModalClose(isSuccess: boolean): void {
-    this.modalService.closeAllModals();
+  onModalClose(isSuccess: boolean): void {
+    this.modalService.close();
     if (isSuccess) {
       this.router.navigate(['/dashboard']);
     }

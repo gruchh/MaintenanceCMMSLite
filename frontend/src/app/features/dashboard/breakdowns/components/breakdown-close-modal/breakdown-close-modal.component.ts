@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BreakdownCloseRequest, BreakdownService } from '../../../core/api/generated';
+import { BreakdownCloseRequest, BreakdownService } from '../../../../../core/api/generated';
 
 @Component({
   selector: 'app-breakdown-close-modal',

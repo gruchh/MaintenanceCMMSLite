@@ -48,8 +48,9 @@ export interface BreakdownServiceInterface {
      * 
      * 
      * @param pageable 
+     * @param search 
      */
-    getAllBreakdowns(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageBreakdownResponse>;
+    getAllBreakdowns(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageBreakdownResponse>;
 
     /**
      * 

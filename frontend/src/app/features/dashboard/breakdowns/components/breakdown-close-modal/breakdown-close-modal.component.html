@@ -1,12 +1,7 @@
-<!-- Renderuj całą zawartość modala tylko wtedy, gdy właściwość `isOpen` jest prawdziwa -->
 @if (isOpen) {
-  <!-- Tło (overlay) z efektem rozmycia, animacją wejścia i obsługą kliknięć -->
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-
-    <!-- Główny kontener modala z animacją, stylami i tłem gradientowym -->
     <div class="relative w-full max-w-lg animate-scale-in rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-slate-800 shadow-2xl ring-1 ring-black/5">
 
-      <!-- Nagłówek modala -->
       <div class="flex items-start justify-between rounded-t p-6">
         <div>
           <h3 class="bg-gradient-to-r from-indigo-600 to-slate-800 bg-clip-text text-2xl font-bold text-transparent">
@@ -14,24 +9,17 @@
           </h3>
           <p class="mt-1 text-sm text-slate-500">Dodaj notatki serwisowe, aby zamknąć zgłoszenie.</p>
         </div>
-        <!-- Przycisk "X" do zamykania modala -->
         <button (click)="onClose()" type="button" class="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-900" aria-label="Zamknij modal">
           <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
         </button>
       </div>
-
-      <!-- Formularz z bindowaniem do grupy `closeForm` i obsługą zdarzenia `ngSubmit` -->
       <form [formGroup]="closeForm" (ngSubmit)="onSubmit()">
         <div class="space-y-6 p-6">
-
-          <!-- Blok błędu API, wyświetlany warunkowo -->
           @if (errorMessage) {
             <div class="rounded-lg bg-red-100/50 p-3 text-center text-sm text-red-600" role="alert">
               {{ errorMessage }}
             </div>
           }
-
-          <!-- Pole tekstowe na notatki -->
           <div>
             <label for="closingNotes" class="block text-sm font-semibold text-slate-600">Notatki serwisowe</label>
             <textarea
@@ -42,21 +30,16 @@
               placeholder="Opisz wykonane czynności, zużyte części, itp."
               required>
             </textarea>
-
-            <!-- Komunikat walidacji, wyświetlany warunkowo -->
             @if (closeForm.get('closingNotes')?.invalid && closeForm.get('closingNotes')?.touched) {
               <p class="mt-1 text-sm text-red-500">Notatki są wymagane (min. 10 znaków).</p>
             }
           </div>
         </div>
-
-        <!-- Stopka modala z przyciskami akcji -->
         <div class="flex items-center justify-end space-x-4 rounded-b-2xl bg-slate-50/50 p-6">
           <button (click)="onClose()" type="button" class="transform-gpu rounded-lg border border-slate-300 bg-white/80 px-5 py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 ease-in-out hover:bg-slate-100 focus:z-10 focus:outline-none focus:ring-4 focus:ring-indigo-500/50">
             Anuluj
-          </button>
+          </button>*
           <button [disabled]="closeForm.invalid || isLoading" type="submit" class="transform-gpu rounded-lg border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-center text-sm font-medium text-white shadow-lg shadow-indigo-500/40 transition-all duration-300 ease-in-out hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:from-slate-400 disabled:to-slate-500 disabled:shadow-none disabled:cursor-not-allowed">
-            <!-- Zmiana tekstu przycisku w zależności od stanu ładowania -->
             @if (isLoading) {
               <span>Zamykanie...</span>
             } @else {

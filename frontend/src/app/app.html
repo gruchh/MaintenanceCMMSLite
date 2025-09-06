@@ -4,12 +4,12 @@
 
 <app-login-modal
   [isOpen]="isLoginModalOpen()"
-  (close)="onLoginModalClose($event)"
-  (openRegister)="switchToRegister()">
+  (close)="onModalClose($event)"
+  (openRegister)="switchToModal('register')">
 </app-login-modal>
 
 <app-register-modal
   [isOpen]="isRegisterModalOpen()"
-  (close)="onRegisterModalClose($event)"
-  (openLogin)="switchToLogin()">
+  (close)="onModalClose($event)"
+  (openLogin)="switchToModal('login')">
 </app-register-modal>

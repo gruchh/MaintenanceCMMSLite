@@ -1,4 +1,3 @@
-import { AuthService } from './../../core/api/auth.service';
 import { Component, inject, DestroyRef, signal, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -15,6 +14,7 @@ import {
   heroXMark,
 } from '@ng-icons/heroicons/outline';
 import { CommonModule, NgClass } from '@angular/common';
+import { AuthService } from '../../core/api/services/auth.service';
 
 const CUSTOM_BREAKPOINTS = {
   mobile: '(max-width: 767.98px)',

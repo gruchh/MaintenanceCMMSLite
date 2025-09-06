@@ -61,6 +61,15 @@ public class BreakdownService {
         return breakdownRepository.findAll(pageable).map(breakdownMapper::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    public Page<BreakdownDTOs.Response> searchBreakdowns(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllBreakdowns(pageable);
+        }
+        return breakdownRepository.searchByKeyword(keyword, pageable)
+                .map(breakdownMapper::toResponse);
+    }
+
     @Transactional
     public BreakdownDTOs.Response addPartToBreakdown(Long breakdownId, BreakdownDTOs.AddPartRequest request) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);

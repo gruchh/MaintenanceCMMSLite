@@ -23,8 +23,10 @@ public class BreakdownController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<BreakdownDTOs.Response>> getAllBreakdowns(Pageable pageable) {
-        return ResponseEntity.ok(breakdownService.getAllBreakdowns(pageable));
+    public ResponseEntity<Page<BreakdownDTOs.Response>> getAllBreakdowns(
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.ok(breakdownService.searchBreakdowns(search, pageable));
     }
 
     @GetMapping("/{id}")

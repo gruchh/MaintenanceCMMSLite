@@ -1,9 +1,9 @@
 import { HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError, filter, take } from 'rxjs';
-import { AuthService } from '../api/auth.service';
-import { TokenStorageService } from '../api/token-storage.service';
+import { TokenStorageService } from '../api/services/token-storage.service';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../api/services/auth.service';
 
 const addTokenHeader = (req: HttpRequest<unknown>, token: string) => {
   return req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
