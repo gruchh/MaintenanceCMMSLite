@@ -1,5 +1,6 @@
 package com.cmms.lite.api.controller;
 
+import com.cmms.lite.api.dto.BreakdownDTOs;
 import com.cmms.lite.api.dto.EmployeeDTOs;
 import com.cmms.lite.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,8 +34,11 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<EmployeeDTOs.SummaryResponse>> getAllEmployees(Pageable pageable) {
-        return ResponseEntity.ok(employeeService.getAllEmployees(pageable));
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<EmployeeDTOs.Response>> getAllBreakdowns(
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.ok(employeeService.searchEmployees(search, pageable));
     }
 
     @PatchMapping("/{id}")

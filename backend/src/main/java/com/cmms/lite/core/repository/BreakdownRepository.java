@@ -22,8 +22,11 @@ public interface BreakdownRepository extends JpaRepository<Breakdown, Long> {
     Optional<Breakdown> findTopByOrderByFinishedAtDesc();
     Optional<Breakdown> findTopByOrderByReportedAtDesc();
 
-    @Query("SELECT b FROM Breakdown b JOIN b.machine m " +
+    @Query(value = "SELECT b FROM Breakdown b JOIN b.machine m " +
             "WHERE lower(b.description) LIKE lower(concat('%', :keyword, '%')) " +
-            "OR lower(m.fullName) LIKE lower(concat('%', :keyword, '%'))")
+            "OR lower(m.fullName) LIKE lower(concat('%', :keyword, '%'))",
+            countQuery = "SELECT count(b) FROM Breakdown b JOIN b.machine m " +
+                    "WHERE lower(b.description) LIKE lower(concat('%', :keyword, '%')) " +
+                    "OR lower(m.fullName) LIKE lower(concat('%', :keyword, '%'))")
     Page<Breakdown> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

@@ -1,5 +1,6 @@
 package com.cmms.lite.service;
 
+import com.cmms.lite.api.dto.BreakdownDTOs;
 import com.cmms.lite.api.dto.EmployeeDTOs;
 import com.cmms.lite.core.entity.Address;
 import com.cmms.lite.core.entity.Employee;
@@ -62,9 +63,18 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public Page<EmployeeDTOs.SummaryResponse> getAllEmployees(Pageable pageable) {
+    public Page<EmployeeDTOs.Response> getAllEmployees(Pageable pageable) {
         return employeeRepository.findAllWithSummary(pageable)
-                .map(employeeMapper::toSummaryResponse);
+                .map(employeeMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EmployeeDTOs.Response> searchEmployees(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllEmployees(pageable);
+        }
+        return employeeRepository.searchByKeyword(keyword, pageable)
+                .map(employeeMapper::toResponse);
     }
 
     @Transactional

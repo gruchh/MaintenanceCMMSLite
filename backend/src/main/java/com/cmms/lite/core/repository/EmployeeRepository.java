@@ -20,4 +20,18 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT e FROM Employee e JOIN FETCH e.user u JOIN FETCH e.employeeRole er", // <-- TUTAJ BRAKOWAŁO PRZECINKA
             countQuery = "SELECT count(e) FROM Employee e")
     Page<Employee> findAllWithSummary(Pageable pageable);
+
+    @Query(value = "SELECT e FROM Employee e JOIN e.user u JOIN e.employeeRole er " +
+            "WHERE lower(u.firstName) LIKE lower(concat('%', :keyword, '%')) " +
+            "OR lower(u.lastName) LIKE lower(concat('%', :keyword, '%')) " +
+            "OR lower(u.username) LIKE lower(concat('%', :keyword, '%')) " +
+            "OR lower(u.email) LIKE lower(concat('%', :keyword, '%')) " +
+            "OR lower(er.name) LIKE lower(concat('%', :keyword, '%'))",
+            countQuery = "SELECT count(e) FROM Employee e JOIN e.user u JOIN e.employeeRole er " +
+                    "WHERE lower(u.firstName) LIKE lower(concat('%', :keyword, '%')) " +
+                    "OR lower(u.lastName) LIKE lower(concat('%', :keyword, '%')) " +
+                    "OR lower(u.username) LIKE lower(concat('%', :keyword, '%')) " +
+                    "OR lower(u.email) LIKE lower(concat('%', :keyword, '%')) " +
+                    "OR lower(er.name) LIKE lower(concat('%', :keyword, '%'))")
+    Page<Employee> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
