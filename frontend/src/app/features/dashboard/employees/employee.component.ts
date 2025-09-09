@@ -18,7 +18,7 @@ import { EmployeeEditModalComponent } from '../../../shared/components/employee-
   imports: [CommonModule, EmployeeEditModalComponent],
   templateUrl: './employee.component.html',
 })
-export class EmpolyeesComponent implements OnInit, OnDestroy {
+export class EmployeesComponent implements OnInit, OnDestroy {
   private employeeService = inject(EmployeesService);
   private searchSubject = new Subject<string>();
   private searchSubscription!: Subscription;

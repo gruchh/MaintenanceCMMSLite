@@ -14,6 +14,8 @@ api/machine.service.ts
 api/machine.serviceInterface.ts
 api/securityController.service.ts
 api/securityController.serviceInterface.ts
+api/shiftSchedule.service.ts
+api/shiftSchedule.serviceInterface.ts
 api/sparePart.service.ts
 api/sparePart.serviceInterface.ts
 configuration.ts
@@ -46,6 +48,9 @@ model/pageable.ts
 model/pageableObject.ts
 model/refreshTokenRequest.ts
 model/registerRequest.ts
+model/shiftEntryResponse.ts
+model/shiftScheduleGenerateRequest.ts
+model/shiftScheduleResponse.ts
 model/sortObject.ts
 model/sparePartCreateRequest.ts
 model/sparePartResponse.ts

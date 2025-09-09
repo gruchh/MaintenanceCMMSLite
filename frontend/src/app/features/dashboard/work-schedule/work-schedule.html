@@ -1,0 +1,59 @@
+<div class="p-6 space-y-6">
+  <h2 class="text-2xl font-bold text-gray-800">Work Schedule</h2>
+
+  <button
+    class="px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
+    (click)="createSchedule()"
+  >
+    Generate Schedule
+  </button>
+
+  @if (schedule(); as s) {
+  <div class="overflow-x-auto">
+    <h3 class="mt-6 text-lg font-semibold text-gray-700">
+      Schedule ID: {{ s.id }} ({{ s.startDate }} → {{ s.endDate }})
+    </h3>
+
+    <table
+      class="w-full mt-4 border border-gray-200 rounded-lg overflow-hidden"
+    >
+      <thead class="bg-gray-100 text-left text-sm font-medium text-gray-700">
+        <tr>
+          <th class="px-4 py-2 border-b">Date</th>
+          <th class="px-4 py-2 border-b">Brigade</th>
+          <th class="px-4 py-2 border-b">Shift</th>
+          <th class="px-4 py-2 border-b">Start</th>
+          <th class="px-4 py-2 border-b">End</th>
+        </tr>
+      </thead>
+      <tbody class="text-sm text-gray-600">
+        @for (entry of s.entries; track entry.id) {
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-4 py-2 border-b">{{ entry.date }}</td>
+          <td class="px-4 py-2 border-b">{{ entry.brigade }}</td>
+          <td class="px-4 py-2 border-b">{{ entry.shift }}</td>
+          <td class="px-4 py-2 border-b">
+            {{
+              entry.shift === "DAY"
+                ? "07:00"
+                : entry.shift === "NIGHT"
+                ? "19:00"
+                : "-"
+            }}
+          </td>
+          <td class="px-4 py-2 border-b">
+            {{
+              entry.shift === "DAY"
+                ? "19:00"
+                : entry.shift === "NIGHT"
+                ? "07:00"
+                : "-"
+            }}
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+</div>

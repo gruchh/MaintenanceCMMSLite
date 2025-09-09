@@ -12,6 +12,8 @@ import {
   heroArrowLeftOnRectangle,
   heroBars3,
   heroXMark,
+  heroCalendar,
+  heroCalendarDateRange,
 } from '@ng-icons/heroicons/outline';
 import { CommonModule, NgClass } from '@angular/common';
 import { AuthService } from '../../core/api/services/auth.service';
@@ -48,6 +50,7 @@ interface ActionItem {
       heroArrowLeftOnRectangle,
       heroBars3,
       heroXMark,
+      heroCalendarDateRange
     }),
   ],
 })
@@ -93,6 +96,11 @@ export class SidebarComponent {
       iconName: 'heroUsers',
       label: 'Pracownicy',
     },
+    {
+      path: '/dashboard/work-schedule',
+      iconName: 'heroCalendarDateRange',
+      label: 'Harmonogram',
+    }
   ];
 
   readonly bottomItems: ActionItem[] = [

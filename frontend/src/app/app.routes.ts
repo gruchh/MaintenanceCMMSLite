@@ -3,11 +3,12 @@ import { HomeComponent } from './features/home/home.component';
 import { DefaultLayoutComponent } from './layout/default-layout/default-layout.component';
 import { DashboardLayoutComponent } from './layout/dasboard-layout/dashboard-layout.component';
 import { OverviewComponent } from './features/dashboard/overview/overview.component';
-import { EmpolyeesComponent } from './features/dashboard/employees/employee.component';
+import { EmployeesComponent } from './features/dashboard/employees/employee.component';
 import { SparePartsComponent } from './features/dashboard/spare-parts/spare-parts.component';
 import { BreakdownsComponent } from './features/dashboard/breakdowns/breakdowns.component';
 import { authGuard } from './core/guards/auth-guard';
 import { BreakdownFormComponent } from './features/breakdowns/breakdown-form.component';
+import { WorkScheduleComponent } from './features/dashboard/work-schedule/work-schedule';
 
 export const routes: Routes = [
   {
@@ -39,11 +40,15 @@ export const routes: Routes = [
       },
       {
         path: 'employees',
-        component: EmpolyeesComponent,
+        component: EmployeesComponent,
       },
       {
         path: 'spare-parts',
         component: SparePartsComponent,
+      },
+      {
+        path: 'work-schedule',
+        component: WorkScheduleComponent,
       }
     ]
   }
