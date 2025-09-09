@@ -18,6 +18,18 @@ export interface EmployeeCreateRequest {
      */
     userId: number;
     /**
+     * Imię pracownika.
+     */
+    firstName: string;
+    /**
+     * Nazwisko pracownika.
+     */
+    lastName: string;
+    /**
+     * URL awatara pracownika.
+     */
+    avatarUrl?: string;
+    /**
      * ID roli pracownika.
      */
     roleId: number;

@@ -10,11 +10,11 @@ import org.mapstruct.ReportingPolicy;
 public interface EmployeeMapper {
 
     @Mapping(source = "user.username", target = "username")
-    @Mapping(source = "user.firstName", target = "firstName")
-    @Mapping(source = "user.lastName", target = "lastName")
-    @Mapping(source = "user.fullName", target = "fullName")
+    @Mapping(source = "firstName", target = "firstName")
+    @Mapping(source = "lastName", target = "lastName")
+    @Mapping(expression = "java(employee.getFirstName() + \" \" + employee.getLastName())", target = "fullName")
     @Mapping(source = "user.email", target = "email")
-    @Mapping(source = "user.avatarUrl", target = "avatarUrl")
+    @Mapping(source = "avatarUrl", target = "avatarUrl")
     @Mapping(source = "employeeRole.name", target = "role")
     @Mapping(source = "retirementDate", target = "retirementDate")
     @Mapping(source = "employeeDetails.hireDate", target = "hireDate")
@@ -32,9 +32,10 @@ public interface EmployeeMapper {
     @Mapping(source = "employeeDetails.address.postalCode", target = "postalCode")
     @Mapping(source = "employeeDetails.address.country", target = "country")
     EmployeeDTOs.Response toResponse(Employee employee);
+
     @Mapping(source = "user.username", target = "username")
-    @Mapping(source = "user.fullName", target = "fullName")
-    @Mapping(source = "user.avatarUrl", target = "avatarUrl")
+    @Mapping(expression = "java(employee.getFirstName() + \" \" + employee.getLastName())", target = "fullName")
+    @Mapping(source = "avatarUrl", target = "avatarUrl")
     @Mapping(source = "employeeRole.name", target = "role")
     EmployeeDTOs.SummaryResponse toSummaryResponse(Employee employee);
 }

@@ -15,14 +15,14 @@ import { SparePartResponse } from './sparePartResponse';
 export interface PageSparePartResponse { 
     totalElements?: number;
     totalPages?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<SparePartResponse>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 }
 

@@ -7,22 +7,22 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { EmployeeSummaryResponse } from './employeeSummaryResponse';
 import { PageableObject } from './pageableObject';
 import { SortObject } from './sortObject';
+import { EmployeeResponse } from './employeeResponse';
 
 
-export interface PageEmployeeSummaryResponse { 
+export interface PageEmployeeResponse { 
     totalElements?: number;
     totalPages?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
-    content?: Array<EmployeeSummaryResponse>;
+    content?: Array<EmployeeResponse>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 }
 

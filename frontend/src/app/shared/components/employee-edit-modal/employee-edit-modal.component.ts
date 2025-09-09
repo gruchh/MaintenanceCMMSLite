@@ -36,6 +36,8 @@ export class EmployeeEditModalComponent implements OnChanges {
 
   constructor() {
     this.editForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       phoneNumber: ['', Validators.required],
       dateOfBirth: ['', Validators.required],
       hireDate: ['', Validators.required],
@@ -49,6 +51,7 @@ export class EmployeeEditModalComponent implements OnChanges {
       fieldOfStudy: [''],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
+      avatarUrl: [''],
     });
   }
 
@@ -69,6 +72,8 @@ export class EmployeeEditModalComponent implements OnChanges {
     this.employeeService.getEmployeeById(id).subscribe({
       next: (employee: EmployeeResponse) => {
         this.editForm.patchValue({
+          firstName: employee.firstName,
+          lastName: employee.lastName,
           phoneNumber: employee.phoneNumber,
           dateOfBirth: this.formatDate(employee.dateOfBirth),
           hireDate: this.formatDate(employee.hireDate),
@@ -82,6 +87,7 @@ export class EmployeeEditModalComponent implements OnChanges {
           fieldOfStudy: employee.fieldOfStudy,
           emergencyContactName: employee.emergencyContactName,
           emergencyContactPhone: employee.emergencyContactPhone,
+          avatarUrl: employee.avatarUrl,
         });
         this.isLoading = false;
       },
@@ -104,6 +110,8 @@ export class EmployeeEditModalComponent implements OnChanges {
     const formValue = this.editForm.value;
 
     const payload: EmployeeUpdateRequest = {
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
       phoneNumber: formValue.phoneNumber,
       dateOfBirth: formValue.dateOfBirth,
       hireDate: formValue.hireDate,

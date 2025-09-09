@@ -1,6 +1,5 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.api.dto.BreakdownDTOs;
 import com.cmms.lite.api.dto.EmployeeDTOs;
 import com.cmms.lite.core.entity.Address;
 import com.cmms.lite.core.entity.Employee;
@@ -48,10 +47,14 @@ public class EmployeeService {
         EmployeeRole role = employeeRoleRepository.findById(request.roleId())
                 .orElseThrow(() -> new EmployeeRoleNotFoundException(String.format(ROLE_NOT_FOUND, request.roleId())));
 
-        Employee employee = new Employee();
-        employee.setId(user.getId());
-        employee.setUser(user);
-        employee.setEmployeeRole(role);
+        Employee employee = Employee.builder()
+                .id(user.getId())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .avatarUrl(request.avatarUrl())
+                .user(user)
+                .employeeRole(role)
+                .build();
 
         return employeeMapper.toResponse(employeeRepository.save(employee));
     }
@@ -80,6 +83,7 @@ public class EmployeeService {
     @Transactional
     public EmployeeDTOs.Response updateEmployee(Long employeeId, EmployeeDTOs.UpdateRequest request) {
         Employee employee = getEmployeeByIdWithDetailsOrThrow(employeeId);
+        updateBasicFields(employee, request);
         updateRole(employee, request.roleId());
         updateDetails(employee, request);
         return employeeMapper.toResponse(employeeRepository.save(employee));
@@ -91,6 +95,12 @@ public class EmployeeService {
             throw new EmployeeNotFoundException(String.format(EMPLOYEE_NOT_FOUND, employeeId));
         }
         employeeRepository.deleteById(employeeId);
+    }
+
+    private void updateBasicFields(Employee employee, EmployeeDTOs.UpdateRequest request) {
+        Optional.ofNullable(request.firstName()).ifPresent(employee::setFirstName);
+        Optional.ofNullable(request.lastName()).ifPresent(employee::setLastName);
+        Optional.ofNullable(request.avatarUrl()).ifPresent(employee::setAvatarUrl);
     }
 
     private void updateRole(Employee employee, Long roleId) {

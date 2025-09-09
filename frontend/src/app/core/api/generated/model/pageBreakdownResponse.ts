@@ -15,14 +15,14 @@ import { BreakdownResponse } from './breakdownResponse';
 export interface PageBreakdownResponse { 
     totalElements?: number;
     totalPages?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<BreakdownResponse>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 }
 

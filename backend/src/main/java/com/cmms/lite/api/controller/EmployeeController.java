@@ -1,6 +1,5 @@
 package com.cmms.lite.api.controller;
 
-import com.cmms.lite.api.dto.BreakdownDTOs;
 import com.cmms.lite.api.dto.EmployeeDTOs;
 import com.cmms.lite.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +34,7 @@ public class EmployeeController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<EmployeeDTOs.Response>> getAllBreakdowns(
+    public ResponseEntity<Page<EmployeeDTOs.Response>> getAllEmployees(
             @RequestParam(required = false) String search,
             Pageable pageable) {
         return ResponseEntity.ok(employeeService.searchEmployees(search, pageable));

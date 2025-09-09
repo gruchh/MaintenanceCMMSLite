@@ -1,12 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
   EmployeesService,
-  EmployeeSummaryResponse,
+  EmployeeResponse,
   Pageable,
-  PageEmployeeSummaryResponse
+  PageEmployeeResponse
 } from '../../../core/api/generated';
+
 import { EmployeeEditModalComponent } from '../../../shared/components/employee-edit-modal/employee-edit-modal.component';
 
 @Component({
@@ -15,11 +18,14 @@ import { EmployeeEditModalComponent } from '../../../shared/components/employee-
   imports: [CommonModule, EmployeeEditModalComponent],
   templateUrl: './employee.component.html',
 })
-export class EmpolyeesComponent implements OnInit {
+export class EmpolyeesComponent implements OnInit, OnDestroy {
   private employeeService = inject(EmployeesService);
+  private searchSubject = new Subject<string>();
+  private searchSubscription!: Subscription;
 
   public isAdmin: boolean = true;
-  public employees: EmployeeSummaryResponse[] = [];
+  public employees: EmployeeResponse[] = [];
+  public searchTerm: string = '';
 
   public currentPage: number = 0;
   public pageSize: number = 10;
@@ -31,9 +37,23 @@ export class EmpolyeesComponent implements OnInit {
   public isModalOpen = false;
   public selectedEmployeeId: number | null = null;
 
-
   ngOnInit(): void {
     this.loadEmployees();
+
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.searchTerm = term;
+      this.currentPage = 0;
+      this.loadEmployees();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
   }
 
   loadEmployees(): void {
@@ -42,8 +62,8 @@ export class EmpolyeesComponent implements OnInit {
       size: this.pageSize,
     };
 
-    this.employeeService.getAllEmployees(pageable).subscribe({
-      next: (page: PageEmployeeSummaryResponse) => {
+    this.employeeService.getAllEmployees(pageable, this.searchTerm).subscribe({
+      next: (page: PageEmployeeResponse) => {
         this.employees = page.content ?? [];
         this.totalElements = page.totalElements ?? 0;
         this.totalPages = page.totalPages ?? 0;
@@ -55,6 +75,11 @@ export class EmpolyeesComponent implements OnInit {
         this.totalPages = 0;
       }
     });
+  }
+
+  onSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchSubject.next(value);
   }
 
   nextPage(): void {
@@ -78,7 +103,7 @@ export class EmpolyeesComponent implements OnInit {
     this.loadEmployees();
   }
 
-  openEditModal(employee: EmployeeSummaryResponse): void {
+  openEditModal(employee: EmployeeResponse): void {
     this.selectedEmployeeId = employee.id ?? null;
     if (this.selectedEmployeeId) {
       this.isModalOpen = true;

@@ -14,7 +14,7 @@ import { Observable }                                        from 'rxjs';
 import { EmployeeCreateRequest } from '../model/models';
 import { EmployeeResponse } from '../model/models';
 import { EmployeeUpdateRequest } from '../model/models';
-import { PageEmployeeSummaryResponse } from '../model/models';
+import { PageEmployeeResponse } from '../model/models';
 import { Pageable } from '../model/models';
 
 
@@ -44,8 +44,9 @@ export interface EmployeesServiceInterface {
      * 
      * 
      * @param pageable 
+     * @param search 
      */
-    getAllEmployees(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageEmployeeSummaryResponse>;
+    getAllEmployees(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageEmployeeResponse>;
 
     /**
      * 

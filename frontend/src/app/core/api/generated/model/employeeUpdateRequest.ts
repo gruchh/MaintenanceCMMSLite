@@ -15,6 +15,18 @@ import { AddressUpdateRequest } from './addressUpdateRequest';
  */
 export interface EmployeeUpdateRequest { 
     /**
+     * Imię pracownika.
+     */
+    firstName?: string;
+    /**
+     * Nazwisko pracownika.
+     */
+    lastName?: string;
+    /**
+     * URL awatara pracownika.
+     */
+    avatarUrl?: string;
+    /**
      * ID nowej roli pracownika.
      */
     roleId?: number;

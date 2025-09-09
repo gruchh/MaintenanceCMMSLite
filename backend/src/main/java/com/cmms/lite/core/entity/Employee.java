@@ -2,7 +2,9 @@ package com.cmms.lite.core.entity;
 
 import com.cmms.lite.security.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -20,6 +22,19 @@ public class Employee {
 
     @Id
     private Long id;
+
+    @NotBlank(message = "First name cannot be blank.")
+    @Size(max = 50)
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @NotBlank(message = "Last name cannot be blank.")
+    @Size(max = 50)
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

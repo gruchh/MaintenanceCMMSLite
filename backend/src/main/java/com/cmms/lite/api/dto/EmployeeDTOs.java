@@ -3,9 +3,11 @@ package com.cmms.lite.api.dto;
 import com.cmms.lite.core.entity.EducationLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,6 +22,19 @@ public final class EmployeeDTOs {
             @Schema(description = "ID istniejącego użytkownika, który ma zostać pracownikiem.", example = "1")
             @NotNull
             Long userId,
+
+            @Schema(description = "Imię pracownika.", example = "Jan")
+            @NotBlank(message = "Imię nie może być puste.")
+            @Size(max = 50, message = "Imię nie może przekraczać 50 znaków.")
+            String firstName,
+
+            @Schema(description = "Nazwisko pracownika.", example = "Kowalski")
+            @NotBlank(message = "Nazwisko nie może być puste.")
+            @Size(max = 50, message = "Nazwisko nie może przekraczać 50 znaków.")
+            String lastName,
+
+            @Schema(description = "URL awatara pracownika.", example = "https://example.com/avatar.jpg")
+            String avatarUrl,
 
             @Schema(description = "ID roli pracownika.", example = "3")
             @NotNull
@@ -45,6 +60,17 @@ public final class EmployeeDTOs {
 
     @Schema(name = "EmployeeUpdateRequest", description = "Dane do aktualizacji pracownika. Wszystkie pola są opcjonalne.")
     public record UpdateRequest(
+            @Schema(description = "Imię pracownika.", example = "Jan")
+            @Size(max = 50, message = "Imię nie może przekraczać 50 znaków.")
+            String firstName,
+
+            @Schema(description = "Nazwisko pracownika.", example = "Kowalski")
+            @Size(max = 50, message = "Nazwisko nie może przekraczać 50 znaków.")
+            String lastName,
+
+            @Schema(description = "URL awatara pracownika.", example = "https://example.com/avatar.jpg")
+            String avatarUrl,
+
             @Schema(description = "ID nowej roli pracownika.", example = "2")
             @Positive(message = "ID roli musi być liczbą dodatnią.")
             Long roleId,

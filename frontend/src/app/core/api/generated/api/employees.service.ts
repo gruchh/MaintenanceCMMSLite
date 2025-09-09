@@ -23,7 +23,7 @@ import { EmployeeResponse } from '../model/employeeResponse';
 // @ts-ignore
 import { EmployeeUpdateRequest } from '../model/employeeUpdateRequest';
 // @ts-ignore
-import { PageEmployeeSummaryResponse } from '../model/pageEmployeeSummaryResponse';
+import { PageEmployeeResponse } from '../model/pageEmployeeResponse';
 // @ts-ignore
 import { Pageable } from '../model/pageable';
 
@@ -163,18 +163,21 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
     /**
      * @param pageable 
+     * @param search 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllEmployees(pageable: Pageable, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageEmployeeSummaryResponse>;
-    public getAllEmployees(pageable: Pageable, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageEmployeeSummaryResponse>>;
-    public getAllEmployees(pageable: Pageable, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageEmployeeSummaryResponse>>;
-    public getAllEmployees(pageable: Pageable, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageEmployeeResponse>;
+    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageEmployeeResponse>>;
+    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageEmployeeResponse>>;
+    public getAllEmployees(pageable: Pageable, search?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (pageable === null || pageable === undefined) {
             throw new Error('Required parameter pageable was null or undefined when calling getAllEmployees.');
         }
 
         let localVarQueryParameters = new HttpParams({encoder: this.encoder});
+        localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
+          <any>search, 'search');
         localVarQueryParameters = this.addToHttpParams(localVarQueryParameters,
           <any>pageable, 'pageable');
 
@@ -205,7 +208,7 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
         let localVarPath = `/api/v1/employees`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<PageEmployeeSummaryResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageEmployeeResponse>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,

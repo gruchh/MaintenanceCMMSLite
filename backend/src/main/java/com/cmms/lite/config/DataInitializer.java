@@ -81,20 +81,20 @@ public class DataInitializer {
         return roles.stream().collect(Collectors.toMap(EmployeeRole::getName, Function.identity()));
     }
 
-    private record UserData(String firstName, String lastName, String username, String email, String password, Role role, String employeeRoleName) {
+    private record UserData(String firstName, String lastName, String username, String email, String password, Role role, String employeeRoleName, String avatarUrl) {
     }
 
     private List<Employee> createUsersAndEmployees(Map<String, EmployeeRole> roles) {
         log.info("Tworzenie użytkowników i pracowników...");
 
         List<UserData> usersData = List.of(
-                new UserData("Adam", "Nowak", "admin", "admin@cmms.com", "admin12345", Role.ADMIN, "Manager"),
-                new UserData("Jan", "Kowalski", "kierownik", "kierownik@cmms.com", "kierownik123", Role.TECHNICAN, "Kierownik"),
-                new UserData("Tomasz", "Wiśniewski", "automatyk", "automatyk@cmms.com", "technik123", Role.TECHNICAN, "Automatyk"),
-                new UserData("Marek", "Wójcik", "mechanik", "mechanik@cmms.com", "technik123", Role.TECHNICAN, "Mechanik"),
-                new UserData("Piotr", "Kowalczyk", "elektronik", "elektronik@cmms.com", "technik123", Role.TECHNICAN, "Elektronik"),
-                new UserData("Krzysztof", "Zieliński", "slusarz", "slusarz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Ślusarz"),
-                new UserData("Grzegorz", "Szymański", "spawacz", "spawacz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Spawacz")
+                new UserData("Adam", "Nowak", "admin", "admin@cmms.com", "admin12345", Role.ADMIN, "Manager", "https://robohash.org/admin.png?set=set4"),
+                new UserData("Jan", "Kowalski", "kierownik", "kierownik@cmms.com", "kierownik123", Role.TECHNICAN, "Kierownik", "https://robohash.org/kierownik.png?set=set2"),
+                new UserData("Tomasz", "Wiśniewski", "automatyk", "automatyk@cmms.com", "technik123", Role.TECHNICAN, "Automatyk", "https://robohash.org/automatyk.png"),
+                new UserData("Marek", "Wójcik", "mechanik", "mechanik@cmms.com", "technik123", Role.TECHNICAN, "Mechanik", "https://robohash.org/mechanik.png"),
+                new UserData("Piotr", "Kowalczyk", "elektronik", "elektronik@cmms.com", "technik123", Role.TECHNICAN, "Elektronik", "https://robohash.org/elektronik.png?set=set3"),
+                new UserData("Krzysztof", "Zieliński", "slusarz", "slusarz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Ślusarz", "https://robohash.org/slusarz.png?set=set5"),
+                new UserData("Grzegorz", "Szymański", "spawacz", "spawacz@cmms.com", "podwykonawca123", Role.SUBCONTRACTOR, "Spawacz", "https://robohash.org/spawacz.png?set=set5")
         );
 
         List<User> savedUsers = new ArrayList<>();
@@ -102,8 +102,6 @@ public class DataInitializer {
 
         for (UserData data : usersData) {
             User user = User.builder()
-                    .firstName(data.firstName())
-                    .lastName(data.lastName())
                     .username(data.username())
                     .email(data.email())
                     .password(passwordEncoder.encode(data.password()))
@@ -115,6 +113,9 @@ public class DataInitializer {
 
             employeesToSave.add(Employee.builder()
                     .user(savedUser)
+                    .firstName(data.firstName())
+                    .lastName(data.lastName())
+                    .avatarUrl(data.avatarUrl())
                     .employeeRole(roles.get(data.employeeRoleName()))
                     .build());
         }

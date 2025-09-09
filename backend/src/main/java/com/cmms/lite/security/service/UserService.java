@@ -1,10 +1,6 @@
 package com.cmms.lite.security.service;
 
-import com.cmms.lite.security.dto.JwtAuthRequest;
-import com.cmms.lite.security.dto.JwtAuthResponse;
-import com.cmms.lite.security.dto.RefreshTokenRequest;
-import com.cmms.lite.security.dto.RegisterRequest;
-import com.cmms.lite.security.dto.UserProfileResponse;
+import com.cmms.lite.security.dto.*;
 import com.cmms.lite.security.entity.RefreshToken;
 import com.cmms.lite.security.entity.Role;
 import com.cmms.lite.security.entity.User;
@@ -45,8 +41,6 @@ public class UserService {
         }
 
         User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())

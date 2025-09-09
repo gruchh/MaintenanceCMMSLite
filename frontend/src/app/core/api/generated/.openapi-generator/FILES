@@ -30,7 +30,6 @@ model/breakdownTypeResponse.ts
 model/breakdownUsedPartResponse.ts
 model/employeeCreateRequest.ts
 model/employeeResponse.ts
-model/employeeSummaryResponse.ts
 model/employeeUpdateRequest.ts
 model/jwtAuthRequest.ts
 model/jwtAuthResponse.ts
@@ -40,7 +39,7 @@ model/machineSummaryResponse.ts
 model/machineUpdateRequest.ts
 model/models.ts
 model/pageBreakdownResponse.ts
-model/pageEmployeeSummaryResponse.ts
+model/pageEmployeeResponse.ts
 model/pageMachineDetailsResponse.ts
 model/pageSparePartResponse.ts
 model/pageable.ts
