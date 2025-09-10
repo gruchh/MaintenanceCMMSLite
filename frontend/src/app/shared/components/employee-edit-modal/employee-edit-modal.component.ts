@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EmployeesService, EmployeeUpdateRequest, EmployeeResponse } from '../../../core/api/generated';
+import { EmployeeResponseDTO, EmployeesService, UpdateEmployeeDTO } from '../../../core/api/generated';
 
 @Component({
   selector: 'app-employee-edit-modal',
@@ -30,7 +30,7 @@ export class EmployeeEditModalComponent implements OnChanges {
   @Output() employeeUpdated = new EventEmitter<void>();
 
   public editForm: FormGroup;
-  public educationLevels = Object.values(EmployeeUpdateRequest.EducationLevelEnum);
+  public educationLevels = Object.values(UpdateEmployeeDTO.EducationLevelEnum);
   public isLoading = false;
   public errorMessage: string | null = null;
 
@@ -70,7 +70,7 @@ export class EmployeeEditModalComponent implements OnChanges {
     this.editForm.reset();
 
     this.employeeService.getEmployeeById(id).subscribe({
-      next: (employee: EmployeeResponse) => {
+      next: (employee: EmployeeResponseDTO) => {
         this.editForm.patchValue({
           firstName: employee.firstName,
           lastName: employee.lastName,
@@ -109,7 +109,7 @@ export class EmployeeEditModalComponent implements OnChanges {
     this.errorMessage = null;
     const formValue = this.editForm.value;
 
-    const payload: EmployeeUpdateRequest = {
+    const payload: UpdateEmployeeDTO = {
       firstName: formValue.firstName,
       lastName: formValue.lastName,
       phoneNumber: formValue.phoneNumber,

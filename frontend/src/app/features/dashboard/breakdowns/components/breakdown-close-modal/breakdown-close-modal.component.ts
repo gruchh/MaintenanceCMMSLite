@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { BreakdownCloseRequest, BreakdownService } from '../../../../../core/api/generated';
+import { BreakdownService, CloseBreakdownDTO } from '../../../../../core/api/generated';
 
 @Component({
   selector: 'app-breakdown-close-modal',
@@ -49,7 +49,7 @@ export class BreakdownCloseModalComponent implements OnChanges {
     this.isLoading = true;
     this.errorMessage = null;
 
-    const request: BreakdownCloseRequest = {
+    const request: CloseBreakdownDTO = {
       specialistComment: this.closeForm.value.closingNotes,
     };
 

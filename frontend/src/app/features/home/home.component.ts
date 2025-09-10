@@ -4,9 +4,9 @@ import { forkJoin } from 'rxjs';
 
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import {
+  BreakdownResponseDTO,
   BreakdownService,
-  BreakdownStats,
-  BreakdownResponse,
+  BreakdownStatsDTO
 } from '../../core/api/generated';
 
 type StatCardData = {
@@ -77,7 +77,7 @@ export class HomeComponent {
     });
   }
 
-  private mapStatsToCardData(apiStats: BreakdownStats): StatCardData[] {
+  private mapStatsToCardData(apiStats: BreakdownStatsDTO): StatCardData[] {
     const roundIfNumber = (value: number | null | undefined): number | 'B/D' => {
       return typeof value === 'number' ? Math.round(value) : 'B/D';
     };
@@ -120,7 +120,7 @@ export class HomeComponent {
   }
 
   private mapLatestBreakdownToData(
-    latest: BreakdownResponse | null | undefined
+    latest: BreakdownResponseDTO | null | undefined
   ): LastFailureData {
     if (!latest) {
       return {

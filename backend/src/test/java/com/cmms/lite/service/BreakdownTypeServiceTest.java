@@ -1,7 +1,8 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.api.dto.BreakdownTypeDTOs;
-import com.cmms.lite.core.entity.BreakdownType;
+import com.cmms.lite.breakdownType.dto.BreakdownTypeResponseDTO;
+import com.cmms.lite.breakdownType.entity.BreakdownType;
+import com.cmms.lite.breakdownType.service.BreakdownTypeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,12 +21,12 @@ class BreakdownTypeServiceTest {
 
     @Test
     void getAllBreakdownTypesAsDto_shouldReturnListOfAllEnumValues() {
-        List<BreakdownTypeDTOs.Response> result = breakdownTypeService.getAllBreakdownTypesAsDto();
+        List<BreakdownTypeResponseDTO> result = breakdownTypeService.getAllBreakdownTypesAsDto();
 
         assertThat(result).isNotNull();
         assertEquals(BreakdownType.values().length, result.size());
 
-        BreakdownTypeDTOs.Response mechanicalType = result.stream()
+        BreakdownTypeResponseDTO mechanicalType = result.stream()
                 .filter(dto -> dto.value().equals(BreakdownType.MECHANICAL.name()))
                 .findFirst()
                 .orElse(null);

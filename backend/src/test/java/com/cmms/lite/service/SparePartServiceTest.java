@@ -1,10 +1,13 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.api.dto.SparePartDTOs;
-import com.cmms.lite.core.entity.SparePart;
-import com.cmms.lite.core.mapper.SparePartMapper;
-import com.cmms.lite.core.repository.SparePartRepository;
-import com.cmms.lite.exception.SparePartNotFoundException;
+import com.cmms.lite.sparePart.dto.CreateSparePartDTO;
+import com.cmms.lite.sparePart.dto.SparePartResponseDTO;
+import com.cmms.lite.sparePart.dto.UpdateSparePartDTO;
+import com.cmms.lite.sparePart.entity.SparePart;
+import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
+import com.cmms.lite.sparePart.mapper.SparePartMapper;
+import com.cmms.lite.sparePart.repository.SparePartRepository;
+import com.cmms.lite.sparePart.service.SparePartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,9 +36,9 @@ class SparePartServiceTest {
     private SparePartService sparePartService;
 
     private SparePart testSparePart;
-    private SparePartDTOs.Response responseDTO;
-    private SparePartDTOs.CreateRequest createRequest;
-    private SparePartDTOs.UpdateRequest updateRequest;
+    private SparePartResponseDTO responseDTO;
+    private CreateSparePartDTO createRequest;
+    private UpdateSparePartDTO updateRequest;
 
     @BeforeEach
     void setUp() {
@@ -44,9 +47,11 @@ class SparePartServiceTest {
         testSparePart.setName("Test Part");
         testSparePart.setPrice(BigDecimal.TEN);
 
-        responseDTO = new SparePartDTOs.Response(1L, "Test Part", BigDecimal.TEN, "Producer");
-        createRequest = new SparePartDTOs.CreateRequest("Test Part", BigDecimal.TEN, "Producer");
-        updateRequest = new SparePartDTOs.UpdateRequest("Updated Part", BigDecimal.ONE, "New Producer");
+        responseDTO = new SparePartResponseDTO(1L, "Test Part", BigDecimal.TEN, "Producer");
+
+
+        createRequest = new CreateSparePartDTO("Test Part", BigDecimal.TEN, "Producer");
+        updateRequest = new UpdateSparePartDTO("Updated Part", BigDecimal.ONE, "New Producer");
     }
 
     @Test
@@ -54,7 +59,7 @@ class SparePartServiceTest {
         when(sparePartRepository.findById(1L)).thenReturn(Optional.of(testSparePart));
         when(sparePartMapper.toResponse(testSparePart)).thenReturn(responseDTO);
 
-        SparePartDTOs.Response result = sparePartService.getSparePartById(1L);
+        SparePartResponseDTO result = sparePartService.getSparePartById(1L);
 
         assertThat(result).isNotNull();
         assertThat(result.id()).isEqualTo(1L);
@@ -73,10 +78,10 @@ class SparePartServiceTest {
         when(sparePartRepository.save(testSparePart)).thenReturn(testSparePart);
         when(sparePartMapper.toResponse(testSparePart)).thenReturn(responseDTO);
 
-        SparePartDTOs.Response result = sparePartService.createSparePart(createRequest);
+        SparePartResponseDTO result = sparePartService.createSparePart(createRequest);
 
         assertThat(result).isNotNull();
-        assertThat(result.name()).isEqualTo(createRequest.name());
+        assertThat(result.name()).isEqualTo(createRequest.getName());
         verify(sparePartRepository, times(1)).save(testSparePart);
     }
 
@@ -89,7 +94,7 @@ class SparePartServiceTest {
         when(sparePartRepository.save(testSparePart)).thenReturn(updatedPart);
         when(sparePartMapper.toResponse(updatedPart)).thenReturn(responseDTO);
 
-        SparePartDTOs.Response result = sparePartService.updateSparePart(1L, updateRequest);
+        SparePartResponseDTO result = sparePartService.updateSparePart(1L, updateRequest);
 
         assertThat(result).isNotNull();
         verify(sparePartMapper, times(1)).updateEntityFromRequest(updateRequest, testSparePart);

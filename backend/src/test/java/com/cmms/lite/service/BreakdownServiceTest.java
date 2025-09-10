@@ -1,16 +1,21 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.api.dto.BreakdownDTOs;
-import com.cmms.lite.api.dto.MachineDTOs;
-import com.cmms.lite.core.entity.*;
-import com.cmms.lite.core.mapper.BreakdownMapper;
-import com.cmms.lite.core.repository.BreakdownRepository;
-import com.cmms.lite.core.repository.MachineRepository;
-import com.cmms.lite.core.repository.SparePartRepository;
-import com.cmms.lite.exception.BreakdownNotFoundException;
+import com.cmms.lite.breakdown.dto.*;
+import com.cmms.lite.breakdown.entity.Breakdown;
+import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
+import com.cmms.lite.breakdown.exception.BreakdownNotFoundException;
+import com.cmms.lite.breakdown.mapper.BreakdownMapper;
+import com.cmms.lite.breakdown.repository.BreakdownRepository;
+import com.cmms.lite.breakdown.service.BreakdownService;
+import com.cmms.lite.breakdownType.entity.BreakdownType;
 import com.cmms.lite.exception.IllegalOperationException;
-import com.cmms.lite.exception.MachineNotFoundException;
-import com.cmms.lite.exception.UsedPartNotFoundException;
+import com.cmms.lite.machine.dto.MachineSummaryResponse;
+import com.cmms.lite.machine.entity.Machine;
+import com.cmms.lite.machine.exception.MachineNotFoundException;
+import com.cmms.lite.machine.repository.MachineRepository;
+import com.cmms.lite.sparePart.entity.SparePart;
+import com.cmms.lite.sparePart.exception.UsedPartNotFoundException;
+import com.cmms.lite.sparePart.repository.SparePartRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +54,7 @@ class BreakdownServiceTest {
     private Machine testMachine;
     private Breakdown testBreakdown;
     private SparePart testSparePart;
-    private BreakdownDTOs.Response responseDTO;
+    private BreakdownResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +78,7 @@ class BreakdownServiceTest {
         testBreakdown.setTotalCost(BigDecimal.ZERO);
         testBreakdown.setType(BreakdownType.MECHANICAL);
 
-        responseDTO = new BreakdownDTOs.Response(
+        responseDTO = new BreakdownResponseDTO(
                 1L,
                 "Test Description",
                 LocalDateTime.now(),
@@ -83,19 +88,19 @@ class BreakdownServiceTest {
                 null,
                 BreakdownType.MECHANICAL,
                 BigDecimal.ZERO,
-                new MachineDTOs.SummaryResponse(1L, "M-001", "Test Machine"),
+                new MachineSummaryResponse(1L, "M-001", "Test Machine"),
                 List.of()
         );
     }
 
     @Test
     void createBreakdown_shouldCreateBreakdownSuccessfully() {
-        BreakdownDTOs.CreateRequest createRequest = new BreakdownDTOs.CreateRequest("Test Description", 1L, BreakdownType.MECHANICAL);
+        CreateBreakdownDTO createRequest = new CreateBreakdownDTO("Test Description", 1L, BreakdownType.MECHANICAL);
         when(machineRepository.findById(1L)).thenReturn(Optional.of(testMachine));
         when(breakdownRepository.save(any(Breakdown.class))).thenReturn(testBreakdown);
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenReturn(responseDTO);
 
-        BreakdownDTOs.Response response = breakdownService.createBreakdown(createRequest);
+        BreakdownResponseDTO response = breakdownService.createBreakdown(createRequest);
 
         assertNotNull(response);
         assertEquals("Test Description", response.description());
@@ -104,7 +109,7 @@ class BreakdownServiceTest {
 
     @Test
     void createBreakdown_shouldThrowExceptionWhenMachineNotFound() {
-        BreakdownDTOs.CreateRequest createRequest = new BreakdownDTOs.CreateRequest("Test Description", 1L, BreakdownType.MECHANICAL);
+        CreateBreakdownDTO createRequest = new CreateBreakdownDTO("Test Description", 1L, BreakdownType.MECHANICAL);
         when(machineRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(MachineNotFoundException.class, () -> breakdownService.createBreakdown(createRequest));
@@ -115,7 +120,7 @@ class BreakdownServiceTest {
         when(breakdownRepository.findById(1L)).thenReturn(Optional.of(testBreakdown));
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenReturn(responseDTO);
 
-        BreakdownDTOs.Response response = breakdownService.getBreakdownById(1L);
+        BreakdownResponseDTO response = breakdownService.getBreakdownById(1L);
 
         assertNotNull(response);
         assertEquals("Test Description", response.description());
@@ -137,7 +142,7 @@ class BreakdownServiceTest {
         when(breakdownRepository.findAll(pageable)).thenReturn(breakdownPage);
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenReturn(responseDTO);
 
-        Page<BreakdownDTOs.Response> responsePage = breakdownService.getAllBreakdowns(pageable);
+        Page<BreakdownResponseDTO> responsePage = breakdownService.getAllBreakdowns(pageable);
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getContent().size());
@@ -146,20 +151,20 @@ class BreakdownServiceTest {
 
     @Test
     void addPartToBreakdown_shouldAddPartAndRecalculateCost() {
-        BreakdownDTOs.AddPartRequest addPartRequest = new BreakdownDTOs.AddPartRequest(1L, 2);
+        AddPartBreakdownDTO addPartRequest = new AddPartBreakdownDTO(1L, 2);
         when(breakdownRepository.findById(1L)).thenReturn(Optional.of(testBreakdown));
         when(sparePartRepository.findById(1L)).thenReturn(Optional.of(testSparePart));
         when(breakdownRepository.save(any(Breakdown.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenAnswer(invocation -> {
             Breakdown savedBreakdown = invocation.getArgument(0);
             Machine machine = savedBreakdown.getMachine();
-            MachineDTOs.SummaryResponse machineSummary = new MachineDTOs.SummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
-            return new BreakdownDTOs.Response(
+            MachineSummaryResponse machineSummary = new MachineSummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
+            return new BreakdownResponseDTO(
                     savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(), null, null,
                     savedBreakdown.getOpened(), null, savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
         });
 
-        BreakdownDTOs.Response response = breakdownService.addPartToBreakdown(1L, addPartRequest);
+        BreakdownResponseDTO response = breakdownService.addPartToBreakdown(1L, addPartRequest);
 
         assertEquals(1, testBreakdown.getUsedPartsList().size());
         assertEquals(new BigDecimal("20"), response.totalCost());
@@ -180,13 +185,13 @@ class BreakdownServiceTest {
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenAnswer(invocation -> {
             Breakdown savedBreakdown = invocation.getArgument(0);
             Machine machine = savedBreakdown.getMachine();
-            MachineDTOs.SummaryResponse machineSummary = new MachineDTOs.SummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
-            return new BreakdownDTOs.Response(
+            MachineSummaryResponse machineSummary = new MachineSummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
+            return new BreakdownResponseDTO(
                     savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(), null, null,
                     savedBreakdown.getOpened(), null, savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
         });
 
-        BreakdownDTOs.Response response = breakdownService.removePartFromBreakdown(1L, 10L);
+        BreakdownResponseDTO response = breakdownService.removePartFromBreakdown(1L, 10L);
 
         assertTrue(testBreakdown.getUsedPartsList().isEmpty());
         assertEquals(BigDecimal.ZERO, response.totalCost());
@@ -202,21 +207,21 @@ class BreakdownServiceTest {
 
     @Test
     void closeBreakdown_shouldCloseBreakdownSuccessfully() {
-        BreakdownDTOs.CloseRequest closeRequest = new BreakdownDTOs.CloseRequest("Test Comment");
+        CloseBreakdownDTO closeRequest = new CloseBreakdownDTO("Test Comment");
         when(breakdownRepository.findById(1L)).thenReturn(Optional.of(testBreakdown));
         when(breakdownRepository.save(any(Breakdown.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenAnswer(invocation -> {
             Breakdown savedBreakdown = invocation.getArgument(0);
             Machine machine = savedBreakdown.getMachine();
-            MachineDTOs.SummaryResponse machineSummary = new MachineDTOs.SummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
-            return new BreakdownDTOs.Response(
+            MachineSummaryResponse machineSummary = new MachineSummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
+            return new BreakdownResponseDTO(
                     savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(),
                     savedBreakdown.getStartedAt(), savedBreakdown.getFinishedAt(), savedBreakdown.getOpened(),
                     savedBreakdown.getSpecialistComment(), savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
         });
 
 
-        BreakdownDTOs.Response response = breakdownService.closeBreakdown(1L, closeRequest);
+        BreakdownResponseDTO response = breakdownService.closeBreakdown(1L, closeRequest);
 
         assertFalse(response.opened());
         assertNotNull(response.finishedAt());
@@ -227,7 +232,7 @@ class BreakdownServiceTest {
     @Test
     void closeBreakdown_shouldThrowExceptionWhenBreakdownAlreadyClosed() {
         testBreakdown.setOpened(false);
-        BreakdownDTOs.CloseRequest closeRequest = new BreakdownDTOs.CloseRequest("Test Comment");
+        CloseBreakdownDTO closeRequest = new CloseBreakdownDTO("Test Comment");
 
         when(breakdownRepository.findById(1L)).thenReturn(Optional.of(testBreakdown));
 
@@ -239,7 +244,7 @@ class BreakdownServiceTest {
         when(breakdownRepository.findTopByOrderByReportedAtDesc()).thenReturn(Optional.of(testBreakdown));
         when(breakdownMapper.toResponse(testBreakdown)).thenReturn(responseDTO);
 
-        BreakdownDTOs.Response response = breakdownService.getLatestBreakdown();
+        BreakdownResponseDTO response = breakdownService.getLatestBreakdown();
 
         assertNotNull(response);
         assertEquals(testBreakdown.getId(), response.id());
@@ -267,7 +272,7 @@ class BreakdownServiceTest {
 
         when(breakdownRepository.getAverageBreakdownDurationInMinutes()).thenReturn(120.5);
 
-        BreakdownDTOs.BreakdownStatsDTO stats = breakdownService.getBreakdownStats();
+        BreakdownStatsDTO stats = breakdownService.getBreakdownStats();
 
         assertEquals(5L, stats.daysSinceLastBreakdown());
         assertEquals(1L, stats.breakdownsLastWeek());

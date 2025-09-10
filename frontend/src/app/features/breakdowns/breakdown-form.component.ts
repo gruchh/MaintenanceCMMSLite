@@ -9,10 +9,10 @@ import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import {
-  BreakdownCreateRequest,
   BreakdownService,
-  BreakdownTypeResponse,
+  BreakdownTypeResponseDTO,
   BreakdownTypesService,
+  CreateBreakdownDTO,
   MachineDetailsResponse,
   MachineService,
 } from '../../core/api/generated';
@@ -33,7 +33,7 @@ export class BreakdownFormComponent {
 
   breakdownForm: FormGroup;
   machines$: Observable<MachineDetailsResponse[]>;
-  breakdownTypes$: Observable<BreakdownTypeResponse[]>;
+  breakdownTypes$: Observable<BreakdownTypeResponseDTO[]>;
   isSubmitting = false;
 
   constructor() {
@@ -71,7 +71,7 @@ export class BreakdownFormComponent {
     }
 
     this.isSubmitting = true;
-    const request: BreakdownCreateRequest = this.breakdownForm.value;
+    const request: CreateBreakdownDTO = this.breakdownForm.value;
 
     this.breakdownService
       .reportBreakdown(request)
@@ -88,7 +88,7 @@ export class BreakdownFormComponent {
   }
 
   getSliderStyle(
-    types: BreakdownTypeResponse[],
+    types: BreakdownTypeResponseDTO[],
     selectedValue: string
   ): { [key: string]: string } {
     if (!types || types.length === 0 || !selectedValue) {

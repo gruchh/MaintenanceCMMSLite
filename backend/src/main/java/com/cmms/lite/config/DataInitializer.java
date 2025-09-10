@@ -1,10 +1,25 @@
 package com.cmms.lite.config;
 
-import com.cmms.lite.core.entity.*;
-import com.cmms.lite.core.repository.*;
+import com.cmms.lite.breakdown.entity.Breakdown;
+import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
+import com.cmms.lite.breakdown.repository.BreakdownRepository;
+import com.cmms.lite.breakdown.repository.BreakdownUsedPartsRepository;
+import com.cmms.lite.breakdownType.entity.BreakdownType;
+import com.cmms.lite.employee.entity.Address;
+import com.cmms.lite.employee.entity.EducationLevel;
+import com.cmms.lite.employee.entity.Employee;
+import com.cmms.lite.employee.entity.EmployeeDetails;
+import com.cmms.lite.employee.repository.EmployeeDetailsRepository;
+import com.cmms.lite.employee.repository.EmployeeRepository;
+import com.cmms.lite.employee.repository.EmployeeRoleRepository;
+import com.cmms.lite.employeeRole.entity.EmployeeRole;
+import com.cmms.lite.machine.entity.Machine;
+import com.cmms.lite.machine.repository.MachineRepository;
 import com.cmms.lite.security.entity.Role;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
+import com.cmms.lite.sparePart.entity.SparePart;
+import com.cmms.lite.sparePart.repository.SparePartRepository;
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

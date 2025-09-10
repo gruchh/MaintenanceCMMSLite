@@ -11,7 +11,7 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { BreakdownTypeResponse } from '../model/models';
+import { BreakdownTypeResponseDTO } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -26,6 +26,6 @@ export interface BreakdownTypesServiceInterface {
      * 
      * 
      */
-    getBreakdownTypes(extraHttpRequestParams?: any): Observable<Array<BreakdownTypeResponse>>;
+    getBreakdownTypes(extraHttpRequestParams?: any): Observable<Array<BreakdownTypeResponseDTO>>;
 
 }

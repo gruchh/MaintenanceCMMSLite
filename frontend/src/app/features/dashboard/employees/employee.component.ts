@@ -4,10 +4,10 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
+  EmployeeResponseDTO,
   EmployeesService,
-  EmployeeResponse,
   Pageable,
-  PageEmployeeResponse
+  PageEmployeeResponseDTO
 } from '../../../core/api/generated';
 
 import { EmployeeEditModalComponent } from '../../../shared/components/employee-edit-modal/employee-edit-modal.component';
@@ -24,7 +24,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   private searchSubscription!: Subscription;
 
   public isAdmin: boolean = true;
-  public employees: EmployeeResponse[] = [];
+  public employees: EmployeeResponseDTO[] = [];
   public searchTerm: string = '';
 
   public currentPage: number = 0;
@@ -63,7 +63,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
     };
 
     this.employeeService.getAllEmployees(pageable, this.searchTerm).subscribe({
-      next: (page: PageEmployeeResponse) => {
+      next: (page: PageEmployeeResponseDTO) => {
         this.employees = page.content ?? [];
         this.totalElements = page.totalElements ?? 0;
         this.totalPages = page.totalPages ?? 0;
@@ -103,7 +103,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
     this.loadEmployees();
   }
 
-  openEditModal(employee: EmployeeResponse): void {
+  openEditModal(employee: EmployeeResponseDTO): void {
     this.selectedEmployeeId = employee.id ?? null;
     if (this.selectedEmployeeId) {
       this.isModalOpen = true;

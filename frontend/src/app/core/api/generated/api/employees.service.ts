@@ -17,15 +17,15 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { EmployeeCreateRequest } from '../model/employeeCreateRequest';
+import { CreateEmployeeDTO } from '../model/createEmployeeDTO';
 // @ts-ignore
-import { EmployeeResponse } from '../model/employeeResponse';
+import { EmployeeResponseDTO } from '../model/employeeResponseDTO';
 // @ts-ignore
-import { EmployeeUpdateRequest } from '../model/employeeUpdateRequest';
-// @ts-ignore
-import { PageEmployeeResponse } from '../model/pageEmployeeResponse';
+import { PageEmployeeResponseDTO } from '../model/pageEmployeeResponseDTO';
 // @ts-ignore
 import { Pageable } from '../model/pageable';
+// @ts-ignore
+import { UpdateEmployeeDTO } from '../model/updateEmployeeDTO';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -47,16 +47,16 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
     }
 
     /**
-     * @param employeeCreateRequest 
+     * @param createEmployeeDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createEmployee(employeeCreateRequest: EmployeeCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponse>;
-    public createEmployee(employeeCreateRequest: EmployeeCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponse>>;
-    public createEmployee(employeeCreateRequest: EmployeeCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponse>>;
-    public createEmployee(employeeCreateRequest: EmployeeCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (employeeCreateRequest === null || employeeCreateRequest === undefined) {
-            throw new Error('Required parameter employeeCreateRequest was null or undefined when calling createEmployee.');
+    public createEmployee(createEmployeeDTO: CreateEmployeeDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponseDTO>;
+    public createEmployee(createEmployeeDTO: CreateEmployeeDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponseDTO>>;
+    public createEmployee(createEmployeeDTO: CreateEmployeeDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponseDTO>>;
+    public createEmployee(createEmployeeDTO: CreateEmployeeDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (createEmployeeDTO === null || createEmployeeDTO === undefined) {
+            throw new Error('Required parameter createEmployeeDTO was null or undefined when calling createEmployee.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -95,10 +95,10 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
         let localVarPath = `/api/v1/employees`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EmployeeResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<EmployeeResponseDTO>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: employeeCreateRequest,
+                body: createEmployeeDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -167,9 +167,9 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageEmployeeResponse>;
-    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageEmployeeResponse>>;
-    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageEmployeeResponse>>;
+    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageEmployeeResponseDTO>;
+    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageEmployeeResponseDTO>>;
+    public getAllEmployees(pageable: Pageable, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageEmployeeResponseDTO>>;
     public getAllEmployees(pageable: Pageable, search?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (pageable === null || pageable === undefined) {
             throw new Error('Required parameter pageable was null or undefined when calling getAllEmployees.');
@@ -208,7 +208,7 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
         let localVarPath = `/api/v1/employees`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<PageEmployeeResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageEmployeeResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -227,9 +227,9 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getEmployeeById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponse>;
-    public getEmployeeById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponse>>;
-    public getEmployeeById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponse>>;
+    public getEmployeeById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponseDTO>;
+    public getEmployeeById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponseDTO>>;
+    public getEmployeeById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponseDTO>>;
     public getEmployeeById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getEmployeeById.');
@@ -262,7 +262,7 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
         let localVarPath = `/api/v1/employees/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EmployeeResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<EmployeeResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -277,19 +277,19 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
     /**
      * @param id 
-     * @param employeeUpdateRequest 
+     * @param updateEmployeeDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponse>;
-    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponse>>;
-    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponse>>;
-    public updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public updateEmployee(id: number, updateEmployeeDTO: UpdateEmployeeDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<EmployeeResponseDTO>;
+    public updateEmployee(id: number, updateEmployeeDTO: UpdateEmployeeDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<EmployeeResponseDTO>>;
+    public updateEmployee(id: number, updateEmployeeDTO: UpdateEmployeeDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<EmployeeResponseDTO>>;
+    public updateEmployee(id: number, updateEmployeeDTO: UpdateEmployeeDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateEmployee.');
         }
-        if (employeeUpdateRequest === null || employeeUpdateRequest === undefined) {
-            throw new Error('Required parameter employeeUpdateRequest was null or undefined when calling updateEmployee.');
+        if (updateEmployeeDTO === null || updateEmployeeDTO === undefined) {
+            throw new Error('Required parameter updateEmployeeDTO was null or undefined when calling updateEmployee.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -328,10 +328,10 @@ export class EmployeesService extends BaseService implements EmployeesServiceInt
 
         let localVarPath = `/api/v1/employees/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<EmployeeResponse>('patch', `${basePath}${localVarPath}`,
+        return this.httpClient.request<EmployeeResponseDTO>('patch', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: employeeUpdateRequest,
+                body: updateEmployeeDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
