@@ -1,6 +1,6 @@
-package com.cmms.lite.breakdown;
+package com.cmms.lite.breakdown.entity;
 
-import com.cmms.lite.sparePart.SparePart;
+import com.cmms.lite.sparePart.entity.SparePart;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

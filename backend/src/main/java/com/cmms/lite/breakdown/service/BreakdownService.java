@@ -1,15 +1,20 @@
-package com.cmms.lite.service;
+package com.cmms.lite.breakdown.service;
 
+import com.cmms.lite.CmmsLiteApplication;
 import com.cmms.lite.breakdown.BreakdownDTOs;
 import com.cmms.lite.breakdown.entity.Breakdown;
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
-import com.cmms.lite.machine.Machine;
-import com.cmms.lite.sparePart.SparePart;
+import com.cmms.lite.breakdown.exception.BreakdownNotFoundException;
 import com.cmms.lite.breakdown.mapper.BreakdownMapper;
-import com.cmms.lite.core.repository.BreakdownRepository;
-import com.cmms.lite.core.repository.MachineRepository;
-import com.cmms.lite.core.repository.SparePartRepository;
-import com.cmms.lite.exception.*;
+import com.cmms.lite.breakdown.repository.BreakdownRepository;
+import com.cmms.lite.machine.IllegalOperationException;
+import com.cmms.lite.machine.Machine;
+import com.cmms.lite.machine.MachineNotFoundException;
+import com.cmms.lite.machine.MachineRepository;
+import com.cmms.lite.sparePart.entity.SparePart;
+import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
+import com.cmms.lite.sparePart.exception.UsedPartNotFoundException;
+import com.cmms.lite.sparePart.repository.SparePartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

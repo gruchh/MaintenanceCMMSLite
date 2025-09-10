@@ -1,6 +1,6 @@
-package com.cmms.lite.employee;
+package com.cmms.lite.employee.entity;
 
-import com.cmms.lite.breakdown.Breakdown;
+import com.cmms.lite.breakdown.entity.Breakdown;
 import com.cmms.lite.employeeRole.EmployeeRole;
 import com.cmms.lite.security.entity.User;
 import jakarta.persistence.*;

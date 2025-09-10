@@ -1,5 +1,9 @@
-package com.cmms.lite.sparePart;
+package com.cmms.lite.sparePart.controller;
 
+import com.cmms.lite.sparePart.dto.CreateSparePartDTO;
+import com.cmms.lite.sparePart.dto.SparePartResponseDTO;
+import com.cmms.lite.sparePart.dto.UpdateSparePartDTO;
+import com.cmms.lite.sparePart.service.SparePartService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,26 +25,26 @@ public class    SparePartController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<SparePartDTOs.Response>> getAllSpareParts(Pageable pageable) {
+    public ResponseEntity<Page<SparePartResponseDTO>> getAllSpareParts(Pageable pageable) {
         return ResponseEntity.ok(sparePartService.getAllSpareParts(pageable));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<SparePartDTOs.Response> getSparePartById(@PathVariable Long id) {
+    public ResponseEntity<SparePartResponseDTO> getSparePartById(@PathVariable Long id) {
         return ResponseEntity.ok(sparePartService.getSparePartById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SparePartDTOs.Response> createSparePart(@Valid @RequestBody SparePartDTOs.CreateRequest request) {
-        SparePartDTOs.Response response = sparePartService.createSparePart(request);
+    public ResponseEntity<SparePartResponseDTO> createSparePart(@Valid @RequestBody CreateSparePartDTO request) {
+        SparePartResponseDTO response = sparePartService.createSparePart(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SparePartDTOs.Response> updateSparePart(@PathVariable Long id, @Valid @RequestBody SparePartDTOs.UpdateRequest request) {
+    public ResponseEntity<SparePartResponseDTO> updateSparePart(@PathVariable Long id, @Valid @RequestBody UpdateSparePartDTO request) {
         return ResponseEntity.ok(sparePartService.updateSparePart(id, request));
     }
 

@@ -1,6 +1,7 @@
-package com.cmms.lite.breakdown;
+package com.cmms.lite.breakdown.controller;
 
-import com.cmms.lite.service.BreakdownService;
+import com.cmms.lite.breakdown.BreakdownDTOs;
+import com.cmms.lite.breakdown.service.BreakdownService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

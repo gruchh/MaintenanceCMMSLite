@@ -1,7 +1,7 @@
-package com.cmms.lite.api.controller;
+package com.cmms.lite.shiftSchedule.controller;
 
-import com.cmms.lite.api.dto.ShiftScheduleDTOs;
-import com.cmms.lite.service.ShiftScheduleService;
+import com.cmms.lite.shiftSchedule.repository.ShiftScheduleDTOs;
+import com.cmms.lite.shiftSchedule.service.ShiftScheduleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

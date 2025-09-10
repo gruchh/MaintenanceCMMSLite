@@ -1,16 +1,20 @@
-package com.cmms.lite.service;
+package com.cmms.lite.shiftSchedule.service;
 
-import com.cmms.lite.shiftSchedule.ShiftSchedule;
-import com.cmms.lite.shiftSchedule.ShiftScheduleDTOs;
-import com.cmms.lite.core.entity.*;
-import com.cmms.lite.core.repository.ShiftEntryRepository;
-import com.cmms.lite.core.repository.ShiftScheduleRepository;
+import com.cmms.lite.shiftSchedule.entity.ShiftEntry;
+import com.cmms.lite.shiftSchedule.ShiftScheduleRepository;
+import com.cmms.lite.shiftSchedule.entity.BrigadeType;
+import com.cmms.lite.shiftSchedule.entity.ShiftSchedule;
+import com.cmms.lite.shiftSchedule.entity.ShiftType;
+import com.cmms.lite.shiftSchedule.repository.ShiftEntryRepository;
+import com.cmms.lite.shiftSchedule.repository.ShiftScheduleDTOs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

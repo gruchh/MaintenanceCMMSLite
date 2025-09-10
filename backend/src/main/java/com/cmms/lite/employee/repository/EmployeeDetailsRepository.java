@@ -1,4 +1,4 @@
-package com.cmms.lite.core.repository;
+package com.cmms.lite.employee.repository;
 
 import com.cmms.lite.employee.entity.EmployeeDetails;
 import org.springframework.data.jpa.repository.JpaRepository;

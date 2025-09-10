@@ -1,6 +1,6 @@
-package com.cmms.lite.core.entity;
+package com.cmms.lite.machine;
 
-import com.cmms.lite.breakdown.Breakdown;
+import com.cmms.lite.breakdown.entity.Breakdown;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;

@@ -1,6 +1,7 @@
-package com.cmms.lite.api.dto;
+package com.cmms.lite.breakdown;
 
-import com.cmms.lite.core.entity.BreakdownType;
+import com.cmms.lite.breakdownType.dto.BreakdownType;
+import com.cmms.lite.machine.MachineDTOs;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

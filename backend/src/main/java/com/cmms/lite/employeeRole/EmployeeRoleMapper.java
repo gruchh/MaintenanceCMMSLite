@@ -1,7 +1,5 @@
-package com.cmms.lite.core.mapper;
+package com.cmms.lite.employeeRole;
 
-import com.cmms.lite.api.dto.EmployeeRoleDTOs;
-import com.cmms.lite.core.entity.EmployeeRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

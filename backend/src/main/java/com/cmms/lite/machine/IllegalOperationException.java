@@ -1,4 +1,4 @@
-package com.cmms.lite.exception;
+package com.cmms.lite.machine;
 
 public class IllegalOperationException extends RuntimeException {
     public IllegalOperationException(String message) {

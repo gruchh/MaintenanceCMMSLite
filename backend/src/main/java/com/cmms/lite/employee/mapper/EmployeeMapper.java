@@ -1,5 +1,7 @@
-package com.cmms.lite.employee;
+package com.cmms.lite.employee.mapper;
 
+import com.cmms.lite.employee.EmployeeDTOs;
+import com.cmms.lite.employee.entity.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

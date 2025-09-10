@@ -1,17 +1,17 @@
-package com.cmms.lite.service;
+package com.cmms.lite.employee.service;
 
 import com.cmms.lite.employee.EmployeeDTOs;
 import com.cmms.lite.employee.entity.Address;
 import com.cmms.lite.employee.entity.Employee;
 import com.cmms.lite.employee.entity.EmployeeDetails;
-import com.cmms.lite.employeeRole.EmployeeRole;
+import com.cmms.lite.employee.exception.EmployeeNotFoundException;
+import com.cmms.lite.employee.exception.EmployeeRoleNotFoundException;
 import com.cmms.lite.employee.mapper.EmployeeMapper;
-import com.cmms.lite.core.repository.EmployeeRepository;
-import com.cmms.lite.core.repository.EmployeeRoleRepository;
-import com.cmms.lite.exception.EmployeeNotFoundException;
-import com.cmms.lite.exception.EmployeeRoleNotFoundException;
-import com.cmms.lite.exception.IllegalOperationException;
-import com.cmms.lite.exception.UserNotFoundException;
+import com.cmms.lite.employee.repository.EmployeeRepository;
+import com.cmms.lite.employee.repository.EmployeeRoleRepository;
+import com.cmms.lite.employeeRole.EmployeeRole;
+import com.cmms.lite.security.exception.UserNotFoundException;
+import com.cmms.lite.machine.IllegalOperationException;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.cmms.lite.sparePart;
+package com.cmms.lite.sparePart.exception;
 
 import com.cmms.lite.exception.ResourceNotFoundException;
 

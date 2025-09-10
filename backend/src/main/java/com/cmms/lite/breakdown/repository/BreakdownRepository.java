@@ -1,4 +1,4 @@
-package com.cmms.lite.core.repository;
+package com.cmms.lite.breakdown.repository;
 
 import com.cmms.lite.breakdown.entity.Breakdown;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package com.cmms.lite.sparePart;
+package com.cmms.lite.sparePart.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -1,4 +1,4 @@
-package com.cmms.lite.employee;
+package com.cmms.lite.employee.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

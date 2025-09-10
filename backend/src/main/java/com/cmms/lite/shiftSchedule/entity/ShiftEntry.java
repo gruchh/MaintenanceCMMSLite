@@ -1,6 +1,5 @@
-package com.cmms.lite.core.entity;
+package com.cmms.lite.shiftSchedule.entity;
 
-import com.cmms.lite.shiftSchedule.ShiftSchedule;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

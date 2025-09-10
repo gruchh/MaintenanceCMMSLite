@@ -1,10 +1,5 @@
-package com.cmms.lite.service;
+package com.cmms.lite.machine;
 
-import com.cmms.lite.machine.MachineDTOs;
-import com.cmms.lite.machine.Machine;
-import com.cmms.lite.machine.MachineMapper;
-import com.cmms.lite.core.repository.MachineRepository;
-import com.cmms.lite.exception.MachineNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

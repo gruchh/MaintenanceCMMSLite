@@ -1,6 +1,7 @@
-package com.cmms.lite.breakdownType;
+package com.cmms.lite.breakdownType.controller;
 
-import com.cmms.lite.service.BreakdownTypeService;
+import com.cmms.lite.breakdownType.BreakdownTypeDTOs;
+import com.cmms.lite.breakdownType.service.BreakdownTypeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

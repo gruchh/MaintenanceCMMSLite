@@ -1,7 +1,9 @@
 package com.cmms.lite.sparePart.exception;
 
-public class SparePartNotFoundException extends RuntimeException {
-  public SparePartNotFoundException(String message) {
-    super(message);
-  }
+import com.cmms.lite.exception.ResourceNotFoundException;
+
+public class SparePartNotFoundException extends ResourceNotFoundException {
+    public SparePartNotFoundException(String message) {
+        super(message);
+    }
 }

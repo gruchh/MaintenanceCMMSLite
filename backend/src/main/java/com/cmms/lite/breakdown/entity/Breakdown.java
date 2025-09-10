@@ -1,6 +1,6 @@
-package com.cmms.lite.breakdown;
+package com.cmms.lite.breakdown.entity;
 
-import com.cmms.lite.breakdownType.BreakdownType;
+import com.cmms.lite.breakdownType.dto.BreakdownType;
 import com.cmms.lite.employee.entity.Employee;
 import com.cmms.lite.machine.Machine;
 import jakarta.persistence.*;

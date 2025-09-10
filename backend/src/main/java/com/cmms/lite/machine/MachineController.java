@@ -1,7 +1,5 @@
-package com.cmms.lite.api.controller;
+package com.cmms.lite.machine;
 
-import com.cmms.lite.api.dto.MachineDTOs;
-import com.cmms.lite.service.MachineService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

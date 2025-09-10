@@ -1,10 +1,6 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.api.dto.MachineDTOs;
-import com.cmms.lite.core.entity.Machine;
-import com.cmms.lite.core.mapper.MachineMapper;
-import com.cmms.lite.core.repository.MachineRepository;
-import com.cmms.lite.exception.MachineNotFoundException;
+import com.cmms.lite.machine.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

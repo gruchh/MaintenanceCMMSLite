@@ -1,7 +1,5 @@
-package com.cmms.lite.core.mapper;
+package com.cmms.lite.machine;
 
-import com.cmms.lite.api.dto.MachineDTOs;
-import com.cmms.lite.core.entity.Machine;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

@@ -1,6 +1,7 @@
-package com.cmms.lite.employee;
+package com.cmms.lite.employee.controller;
 
-import com.cmms.lite.service.EmployeeService;
+import com.cmms.lite.employee.EmployeeDTOs;
+import com.cmms.lite.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

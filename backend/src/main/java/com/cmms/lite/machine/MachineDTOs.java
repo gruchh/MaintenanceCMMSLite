@@ -1,4 +1,4 @@
-package com.cmms.lite.api.dto;
+package com.cmms.lite.machine;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

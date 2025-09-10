@@ -1,4 +1,4 @@
-package com.cmms.lite.sparePart;
+package com.cmms.lite.sparePart.entity;
 
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
 import jakarta.persistence.*;

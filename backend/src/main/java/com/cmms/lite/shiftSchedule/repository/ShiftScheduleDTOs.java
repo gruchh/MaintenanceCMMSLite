@@ -1,7 +1,7 @@
-package com.cmms.lite.api.dto;
+package com.cmms.lite.shiftSchedule.repository;
 
-import com.cmms.lite.core.entity.BrigadeType;
-import com.cmms.lite.core.entity.ShiftType;
+import com.cmms.lite.shiftSchedule.entity.BrigadeType;
+import com.cmms.lite.shiftSchedule.entity.ShiftType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
