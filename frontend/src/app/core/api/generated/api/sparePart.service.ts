@@ -17,15 +17,15 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { PageSparePartResponse } from '../model/pageSparePartResponse';
+import { CreateSparePartDTO } from '../model/createSparePartDTO';
+// @ts-ignore
+import { PageSparePartResponseDTO } from '../model/pageSparePartResponseDTO';
 // @ts-ignore
 import { Pageable } from '../model/pageable';
 // @ts-ignore
-import { SparePartCreateRequest } from '../model/sparePartCreateRequest';
+import { SparePartResponseDTO } from '../model/sparePartResponseDTO';
 // @ts-ignore
-import { SparePartResponse } from '../model/sparePartResponse';
-// @ts-ignore
-import { SparePartUpdateRequest } from '../model/sparePartUpdateRequest';
+import { UpdateSparePartDTO } from '../model/updateSparePartDTO';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -47,16 +47,16 @@ export class SparePartService extends BaseService implements SparePartServiceInt
     }
 
     /**
-     * @param sparePartCreateRequest 
+     * @param createSparePartDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createSparePart(sparePartCreateRequest: SparePartCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SparePartResponse>;
-    public createSparePart(sparePartCreateRequest: SparePartCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SparePartResponse>>;
-    public createSparePart(sparePartCreateRequest: SparePartCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SparePartResponse>>;
-    public createSparePart(sparePartCreateRequest: SparePartCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (sparePartCreateRequest === null || sparePartCreateRequest === undefined) {
-            throw new Error('Required parameter sparePartCreateRequest was null or undefined when calling createSparePart.');
+    public createSparePart(createSparePartDTO: CreateSparePartDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SparePartResponseDTO>;
+    public createSparePart(createSparePartDTO: CreateSparePartDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SparePartResponseDTO>>;
+    public createSparePart(createSparePartDTO: CreateSparePartDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SparePartResponseDTO>>;
+    public createSparePart(createSparePartDTO: CreateSparePartDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (createSparePartDTO === null || createSparePartDTO === undefined) {
+            throw new Error('Required parameter createSparePartDTO was null or undefined when calling createSparePart.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -95,10 +95,10 @@ export class SparePartService extends BaseService implements SparePartServiceInt
 
         let localVarPath = `/api/spare-parts`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<SparePartResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<SparePartResponseDTO>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: sparePartCreateRequest,
+                body: createSparePartDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -166,9 +166,9 @@ export class SparePartService extends BaseService implements SparePartServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllSpareParts(pageable: Pageable, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageSparePartResponse>;
-    public getAllSpareParts(pageable: Pageable, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageSparePartResponse>>;
-    public getAllSpareParts(pageable: Pageable, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageSparePartResponse>>;
+    public getAllSpareParts(pageable: Pageable, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageSparePartResponseDTO>;
+    public getAllSpareParts(pageable: Pageable, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageSparePartResponseDTO>>;
+    public getAllSpareParts(pageable: Pageable, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageSparePartResponseDTO>>;
     public getAllSpareParts(pageable: Pageable, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (pageable === null || pageable === undefined) {
             throw new Error('Required parameter pageable was null or undefined when calling getAllSpareParts.');
@@ -205,7 +205,7 @@ export class SparePartService extends BaseService implements SparePartServiceInt
 
         let localVarPath = `/api/spare-parts`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<PageSparePartResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageSparePartResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -224,9 +224,9 @@ export class SparePartService extends BaseService implements SparePartServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getSparePartById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SparePartResponse>;
-    public getSparePartById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SparePartResponse>>;
-    public getSparePartById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SparePartResponse>>;
+    public getSparePartById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SparePartResponseDTO>;
+    public getSparePartById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SparePartResponseDTO>>;
+    public getSparePartById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SparePartResponseDTO>>;
     public getSparePartById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getSparePartById.');
@@ -259,7 +259,7 @@ export class SparePartService extends BaseService implements SparePartServiceInt
 
         let localVarPath = `/api/spare-parts/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<SparePartResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<SparePartResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -274,19 +274,19 @@ export class SparePartService extends BaseService implements SparePartServiceInt
 
     /**
      * @param id 
-     * @param sparePartUpdateRequest 
+     * @param updateSparePartDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateSparePart(id: number, sparePartUpdateRequest: SparePartUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SparePartResponse>;
-    public updateSparePart(id: number, sparePartUpdateRequest: SparePartUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SparePartResponse>>;
-    public updateSparePart(id: number, sparePartUpdateRequest: SparePartUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SparePartResponse>>;
-    public updateSparePart(id: number, sparePartUpdateRequest: SparePartUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public updateSparePart(id: number, updateSparePartDTO: UpdateSparePartDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<SparePartResponseDTO>;
+    public updateSparePart(id: number, updateSparePartDTO: UpdateSparePartDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<SparePartResponseDTO>>;
+    public updateSparePart(id: number, updateSparePartDTO: UpdateSparePartDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<SparePartResponseDTO>>;
+    public updateSparePart(id: number, updateSparePartDTO: UpdateSparePartDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateSparePart.');
         }
-        if (sparePartUpdateRequest === null || sparePartUpdateRequest === undefined) {
-            throw new Error('Required parameter sparePartUpdateRequest was null or undefined when calling updateSparePart.');
+        if (updateSparePartDTO === null || updateSparePartDTO === undefined) {
+            throw new Error('Required parameter updateSparePartDTO was null or undefined when calling updateSparePart.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -325,10 +325,10 @@ export class SparePartService extends BaseService implements SparePartServiceInt
 
         let localVarPath = `/api/spare-parts/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<SparePartResponse>('put', `${basePath}${localVarPath}`,
+        return this.httpClient.request<SparePartResponseDTO>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: sparePartUpdateRequest,
+                body: updateSparePartDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

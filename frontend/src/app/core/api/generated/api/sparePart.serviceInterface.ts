@@ -11,11 +11,11 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { PageSparePartResponse } from '../model/models';
+import { CreateSparePartDTO } from '../model/models';
+import { PageSparePartResponseDTO } from '../model/models';
 import { Pageable } from '../model/models';
-import { SparePartCreateRequest } from '../model/models';
-import { SparePartResponse } from '../model/models';
-import { SparePartUpdateRequest } from '../model/models';
+import { SparePartResponseDTO } from '../model/models';
+import { UpdateSparePartDTO } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -29,9 +29,9 @@ export interface SparePartServiceInterface {
     /**
      * 
      * 
-     * @param sparePartCreateRequest 
+     * @param createSparePartDTO 
      */
-    createSparePart(sparePartCreateRequest: SparePartCreateRequest, extraHttpRequestParams?: any): Observable<SparePartResponse>;
+    createSparePart(createSparePartDTO: CreateSparePartDTO, extraHttpRequestParams?: any): Observable<SparePartResponseDTO>;
 
     /**
      * 
@@ -45,21 +45,21 @@ export interface SparePartServiceInterface {
      * 
      * @param pageable 
      */
-    getAllSpareParts(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageSparePartResponse>;
+    getAllSpareParts(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageSparePartResponseDTO>;
 
     /**
      * 
      * 
      * @param id 
      */
-    getSparePartById(id: number, extraHttpRequestParams?: any): Observable<SparePartResponse>;
+    getSparePartById(id: number, extraHttpRequestParams?: any): Observable<SparePartResponseDTO>;
 
     /**
      * 
      * 
      * @param id 
-     * @param sparePartUpdateRequest 
+     * @param updateSparePartDTO 
      */
-    updateSparePart(id: number, sparePartUpdateRequest: SparePartUpdateRequest, extraHttpRequestParams?: any): Observable<SparePartResponse>;
+    updateSparePart(id: number, updateSparePartDTO: UpdateSparePartDTO, extraHttpRequestParams?: any): Observable<SparePartResponseDTO>;
 
 }

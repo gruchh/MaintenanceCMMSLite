@@ -1,7 +1,7 @@
 import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
-  BreakdownResponse,
+  BreakdownResponseDTO,
   BreakdownService,
   Pageable,
 } from '../../../core/api/generated';
@@ -24,7 +24,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class BreakdownsComponent implements OnInit {
   private breakdownService = inject(BreakdownService);
 
-  breakdowns = signal<BreakdownResponse[]>([]);
+  breakdowns = signal<BreakdownResponseDTO[]>([]);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
 
@@ -107,7 +107,7 @@ export class BreakdownsComponent implements OnInit {
     }
   }
 
-  openCloseModal(breakdown: BreakdownResponse): void {
+  openCloseModal(breakdown: BreakdownResponseDTO): void {
     this.selectedBreakdownId.set(breakdown.id ?? null);
     this.isModalOpen.set(true);
   }

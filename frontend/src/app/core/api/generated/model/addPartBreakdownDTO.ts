@@ -12,7 +12,7 @@
 /**
  * Dane wymagane do dodania części zamiennej do awarii
  */
-export interface BreakdownAddPartRequest { 
+export interface AddPartBreakdownDTO { 
     /**
      * ID części zamiennej z magazynu.
      */

@@ -12,11 +12,26 @@
 /**
  * Statystyki związane z awariami
  */
-export interface BreakdownStats { 
+export interface BreakdownStatsDTO { 
+    /**
+     * Number of days since the last breakdown
+     */
     daysSinceLastBreakdown?: number;
+    /**
+     * Number of breakdowns in the last week
+     */
     breakdownsLastWeek?: number;
+    /**
+     * Number of breakdowns in the last month
+     */
     breakdownsLastMonth?: number;
+    /**
+     * Number of breakdowns in the current year
+     */
     breakdownsCurrentYear?: number;
+    /**
+     * Average breakdown duration in minutes
+     */
     averageBreakdownDurationMinutes?: number;
 }
 

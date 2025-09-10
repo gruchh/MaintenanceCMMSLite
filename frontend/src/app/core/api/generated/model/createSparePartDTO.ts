@@ -12,7 +12,7 @@
 /**
  * Data required to create a new spare part
  */
-export interface SparePartCreateRequest { 
+export interface CreateSparePartDTO { 
     name: string;
     price: number;
     producer?: string;

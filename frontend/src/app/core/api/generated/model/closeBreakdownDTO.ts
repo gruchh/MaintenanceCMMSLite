@@ -12,7 +12,7 @@
 /**
  * Dane wymagane do zamknięcia zgłoszenia awarii
  */
-export interface BreakdownCloseRequest { 
+export interface CloseBreakdownDTO { 
     specialistComment: string;
 }
 

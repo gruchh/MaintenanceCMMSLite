@@ -10,10 +10,9 @@
 
 
 /**
- * A response object with spare part data
+ * Data required to update a spare part (all fields are optional for PATCH operations)
  */
-export interface SparePartResponse { 
-    id?: number;
+export interface UpdateSparePartDTO { 
     name?: string;
     price?: number;
     producer?: string;

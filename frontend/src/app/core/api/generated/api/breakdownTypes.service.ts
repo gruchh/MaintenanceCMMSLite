@@ -17,7 +17,7 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { BreakdownTypeResponse } from '../model/breakdownTypeResponse';
+import { BreakdownTypeResponseDTO } from '../model/breakdownTypeResponseDTO';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -42,9 +42,9 @@ export class BreakdownTypesService extends BaseService implements BreakdownTypes
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getBreakdownTypes(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<BreakdownTypeResponse>>;
-    public getBreakdownTypes(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<BreakdownTypeResponse>>>;
-    public getBreakdownTypes(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<BreakdownTypeResponse>>>;
+    public getBreakdownTypes(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<BreakdownTypeResponseDTO>>;
+    public getBreakdownTypes(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<BreakdownTypeResponseDTO>>>;
+    public getBreakdownTypes(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<BreakdownTypeResponseDTO>>>;
     public getBreakdownTypes(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -74,7 +74,7 @@ export class BreakdownTypesService extends BaseService implements BreakdownTypes
 
         let localVarPath = `/api/breakdown-types`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<BreakdownTypeResponse>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<BreakdownTypeResponseDTO>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

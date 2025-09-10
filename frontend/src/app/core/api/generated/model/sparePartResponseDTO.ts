@@ -10,13 +10,12 @@
 
 
 /**
- * Obiekt odpowiedzi dla części użytej podczas awarii
+ * A response object with spare part data
  */
-export interface BreakdownUsedPartResponse { 
+export interface SparePartResponseDTO { 
     id?: number;
-    sparePartId?: number;
-    sparePartName?: string;
-    quantity?: number;
-    pricePerUnit?: number;
+    name?: string;
+    price?: number;
+    producer?: string;
 }
 

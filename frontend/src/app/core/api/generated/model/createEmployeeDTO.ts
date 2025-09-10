@@ -12,7 +12,7 @@
 /**
  * Dane wymagane do stworzenia nowego pracownika
  */
-export interface EmployeeCreateRequest { 
+export interface CreateEmployeeDTO { 
     /**
      * ID istniejącego użytkownika, który ma zostać pracownikiem.
      */

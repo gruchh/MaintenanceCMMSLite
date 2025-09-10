@@ -11,11 +11,11 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { EmployeeCreateRequest } from '../model/models';
-import { EmployeeResponse } from '../model/models';
-import { EmployeeUpdateRequest } from '../model/models';
-import { PageEmployeeResponse } from '../model/models';
+import { CreateEmployeeDTO } from '../model/models';
+import { EmployeeResponseDTO } from '../model/models';
+import { PageEmployeeResponseDTO } from '../model/models';
 import { Pageable } from '../model/models';
+import { UpdateEmployeeDTO } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -29,9 +29,9 @@ export interface EmployeesServiceInterface {
     /**
      * 
      * 
-     * @param employeeCreateRequest 
+     * @param createEmployeeDTO 
      */
-    createEmployee(employeeCreateRequest: EmployeeCreateRequest, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
+    createEmployee(createEmployeeDTO: CreateEmployeeDTO, extraHttpRequestParams?: any): Observable<EmployeeResponseDTO>;
 
     /**
      * 
@@ -46,21 +46,21 @@ export interface EmployeesServiceInterface {
      * @param pageable 
      * @param search 
      */
-    getAllEmployees(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageEmployeeResponse>;
+    getAllEmployees(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageEmployeeResponseDTO>;
 
     /**
      * 
      * 
      * @param id 
      */
-    getEmployeeById(id: number, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
+    getEmployeeById(id: number, extraHttpRequestParams?: any): Observable<EmployeeResponseDTO>;
 
     /**
      * 
      * 
      * @param id 
-     * @param employeeUpdateRequest 
+     * @param updateEmployeeDTO 
      */
-    updateEmployee(id: number, employeeUpdateRequest: EmployeeUpdateRequest, extraHttpRequestParams?: any): Observable<EmployeeResponse>;
+    updateEmployee(id: number, updateEmployeeDTO: UpdateEmployeeDTO, extraHttpRequestParams?: any): Observable<EmployeeResponseDTO>;
 
 }

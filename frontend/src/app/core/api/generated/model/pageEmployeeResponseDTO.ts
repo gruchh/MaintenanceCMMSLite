@@ -9,14 +9,14 @@
  */
 import { PageableObject } from './pageableObject';
 import { SortObject } from './sortObject';
-import { SparePartResponse } from './sparePartResponse';
+import { EmployeeResponseDTO } from './employeeResponseDTO';
 
 
-export interface PageSparePartResponse { 
-    totalPages?: number;
+export interface PageEmployeeResponseDTO { 
     totalElements?: number;
+    totalPages?: number;
     size?: number;
-    content?: Array<SparePartResponse>;
+    content?: Array<EmployeeResponseDTO>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;

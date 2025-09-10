@@ -17,17 +17,17 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { BreakdownAddPartRequest } from '../model/breakdownAddPartRequest';
+import { AddPartBreakdownDTO } from '../model/addPartBreakdownDTO';
 // @ts-ignore
-import { BreakdownCloseRequest } from '../model/breakdownCloseRequest';
+import { BreakdownResponseDTO } from '../model/breakdownResponseDTO';
 // @ts-ignore
-import { BreakdownCreateRequest } from '../model/breakdownCreateRequest';
+import { BreakdownStatsDTO } from '../model/breakdownStatsDTO';
 // @ts-ignore
-import { BreakdownResponse } from '../model/breakdownResponse';
+import { CloseBreakdownDTO } from '../model/closeBreakdownDTO';
 // @ts-ignore
-import { BreakdownStats } from '../model/breakdownStats';
+import { CreateBreakdownDTO } from '../model/createBreakdownDTO';
 // @ts-ignore
-import { PageBreakdownResponse } from '../model/pageBreakdownResponse';
+import { PageBreakdownResponseDTO } from '../model/pageBreakdownResponseDTO';
 // @ts-ignore
 import { Pageable } from '../model/pageable';
 
@@ -52,19 +52,19 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
     /**
      * @param breakdownId 
-     * @param breakdownAddPartRequest 
+     * @param addPartBreakdownDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public addPartToBreakdown(breakdownId: number, breakdownAddPartRequest: BreakdownAddPartRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponse>;
-    public addPartToBreakdown(breakdownId: number, breakdownAddPartRequest: BreakdownAddPartRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponse>>;
-    public addPartToBreakdown(breakdownId: number, breakdownAddPartRequest: BreakdownAddPartRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponse>>;
-    public addPartToBreakdown(breakdownId: number, breakdownAddPartRequest: BreakdownAddPartRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public addPartToBreakdown(breakdownId: number, addPartBreakdownDTO: AddPartBreakdownDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponseDTO>;
+    public addPartToBreakdown(breakdownId: number, addPartBreakdownDTO: AddPartBreakdownDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponseDTO>>;
+    public addPartToBreakdown(breakdownId: number, addPartBreakdownDTO: AddPartBreakdownDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponseDTO>>;
+    public addPartToBreakdown(breakdownId: number, addPartBreakdownDTO: AddPartBreakdownDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (breakdownId === null || breakdownId === undefined) {
             throw new Error('Required parameter breakdownId was null or undefined when calling addPartToBreakdown.');
         }
-        if (breakdownAddPartRequest === null || breakdownAddPartRequest === undefined) {
-            throw new Error('Required parameter breakdownAddPartRequest was null or undefined when calling addPartToBreakdown.');
+        if (addPartBreakdownDTO === null || addPartBreakdownDTO === undefined) {
+            throw new Error('Required parameter addPartBreakdownDTO was null or undefined when calling addPartToBreakdown.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -103,10 +103,10 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/${this.configuration.encodeParam({name: "breakdownId", value: breakdownId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/parts`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownResponseDTO>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: breakdownAddPartRequest,
+                body: addPartBreakdownDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -119,19 +119,19 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
     /**
      * @param breakdownId 
-     * @param breakdownCloseRequest 
+     * @param closeBreakdownDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public closeBreakdown(breakdownId: number, breakdownCloseRequest: BreakdownCloseRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponse>;
-    public closeBreakdown(breakdownId: number, breakdownCloseRequest: BreakdownCloseRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponse>>;
-    public closeBreakdown(breakdownId: number, breakdownCloseRequest: BreakdownCloseRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponse>>;
-    public closeBreakdown(breakdownId: number, breakdownCloseRequest: BreakdownCloseRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public closeBreakdown(breakdownId: number, closeBreakdownDTO: CloseBreakdownDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponseDTO>;
+    public closeBreakdown(breakdownId: number, closeBreakdownDTO: CloseBreakdownDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponseDTO>>;
+    public closeBreakdown(breakdownId: number, closeBreakdownDTO: CloseBreakdownDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponseDTO>>;
+    public closeBreakdown(breakdownId: number, closeBreakdownDTO: CloseBreakdownDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (breakdownId === null || breakdownId === undefined) {
             throw new Error('Required parameter breakdownId was null or undefined when calling closeBreakdown.');
         }
-        if (breakdownCloseRequest === null || breakdownCloseRequest === undefined) {
-            throw new Error('Required parameter breakdownCloseRequest was null or undefined when calling closeBreakdown.');
+        if (closeBreakdownDTO === null || closeBreakdownDTO === undefined) {
+            throw new Error('Required parameter closeBreakdownDTO was null or undefined when calling closeBreakdown.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -170,10 +170,10 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/${this.configuration.encodeParam({name: "breakdownId", value: breakdownId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/close`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownResponse>('patch', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownResponseDTO>('patch', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: breakdownCloseRequest,
+                body: closeBreakdownDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -190,9 +190,9 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllBreakdowns(pageable: Pageable, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageBreakdownResponse>;
-    public getAllBreakdowns(pageable: Pageable, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageBreakdownResponse>>;
-    public getAllBreakdowns(pageable: Pageable, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageBreakdownResponse>>;
+    public getAllBreakdowns(pageable: Pageable, search?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageBreakdownResponseDTO>;
+    public getAllBreakdowns(pageable: Pageable, search?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageBreakdownResponseDTO>>;
+    public getAllBreakdowns(pageable: Pageable, search?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageBreakdownResponseDTO>>;
     public getAllBreakdowns(pageable: Pageable, search?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (pageable === null || pageable === undefined) {
             throw new Error('Required parameter pageable was null or undefined when calling getAllBreakdowns.');
@@ -231,7 +231,7 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<PageBreakdownResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageBreakdownResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -250,9 +250,9 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getBreakdownById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponse>;
-    public getBreakdownById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponse>>;
-    public getBreakdownById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponse>>;
+    public getBreakdownById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponseDTO>;
+    public getBreakdownById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponseDTO>>;
+    public getBreakdownById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponseDTO>>;
     public getBreakdownById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getBreakdownById.');
@@ -285,7 +285,7 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -302,9 +302,9 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getBreakdownStats(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownStats>;
-    public getBreakdownStats(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownStats>>;
-    public getBreakdownStats(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownStats>>;
+    public getBreakdownStats(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownStatsDTO>;
+    public getBreakdownStats(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownStatsDTO>>;
+    public getBreakdownStats(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownStatsDTO>>;
     public getBreakdownStats(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -334,7 +334,7 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/stats`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownStats>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownStatsDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -351,9 +351,9 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getLatestBreakdown(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponse>;
-    public getLatestBreakdown(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponse>>;
-    public getLatestBreakdown(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponse>>;
+    public getLatestBreakdown(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponseDTO>;
+    public getLatestBreakdown(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponseDTO>>;
+    public getLatestBreakdown(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponseDTO>>;
     public getLatestBreakdown(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -383,7 +383,7 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/latest`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -402,9 +402,9 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponse>;
-    public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponse>>;
-    public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponse>>;
+    public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponseDTO>;
+    public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponseDTO>>;
+    public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponseDTO>>;
     public removePartFromBreakdown(breakdownId: number, usedPartId: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (breakdownId === null || breakdownId === undefined) {
             throw new Error('Required parameter breakdownId was null or undefined when calling removePartFromBreakdown.');
@@ -440,7 +440,7 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/${this.configuration.encodeParam({name: "breakdownId", value: breakdownId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}/parts/${this.configuration.encodeParam({name: "usedPartId", value: usedPartId, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownResponse>('delete', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownResponseDTO>('delete', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -454,16 +454,16 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
     }
 
     /**
-     * @param breakdownCreateRequest 
+     * @param createBreakdownDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public reportBreakdown(breakdownCreateRequest: BreakdownCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponse>;
-    public reportBreakdown(breakdownCreateRequest: BreakdownCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponse>>;
-    public reportBreakdown(breakdownCreateRequest: BreakdownCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponse>>;
-    public reportBreakdown(breakdownCreateRequest: BreakdownCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (breakdownCreateRequest === null || breakdownCreateRequest === undefined) {
-            throw new Error('Required parameter breakdownCreateRequest was null or undefined when calling reportBreakdown.');
+    public reportBreakdown(createBreakdownDTO: CreateBreakdownDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<BreakdownResponseDTO>;
+    public reportBreakdown(createBreakdownDTO: CreateBreakdownDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<BreakdownResponseDTO>>;
+    public reportBreakdown(createBreakdownDTO: CreateBreakdownDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<BreakdownResponseDTO>>;
+    public reportBreakdown(createBreakdownDTO: CreateBreakdownDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (createBreakdownDTO === null || createBreakdownDTO === undefined) {
+            throw new Error('Required parameter createBreakdownDTO was null or undefined when calling reportBreakdown.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -502,10 +502,10 @@ export class BreakdownService extends BaseService implements BreakdownServiceInt
 
         let localVarPath = `/api/breakdowns/report`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<BreakdownResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<BreakdownResponseDTO>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: breakdownCreateRequest,
+                body: createBreakdownDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

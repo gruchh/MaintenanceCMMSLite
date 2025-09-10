@@ -11,12 +11,12 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { BreakdownAddPartRequest } from '../model/models';
-import { BreakdownCloseRequest } from '../model/models';
-import { BreakdownCreateRequest } from '../model/models';
-import { BreakdownResponse } from '../model/models';
-import { BreakdownStats } from '../model/models';
-import { PageBreakdownResponse } from '../model/models';
+import { AddPartBreakdownDTO } from '../model/models';
+import { BreakdownResponseDTO } from '../model/models';
+import { BreakdownStatsDTO } from '../model/models';
+import { CloseBreakdownDTO } from '../model/models';
+import { CreateBreakdownDTO } from '../model/models';
+import { PageBreakdownResponseDTO } from '../model/models';
 import { Pageable } from '../model/models';
 
 
@@ -32,17 +32,17 @@ export interface BreakdownServiceInterface {
      * 
      * 
      * @param breakdownId 
-     * @param breakdownAddPartRequest 
+     * @param addPartBreakdownDTO 
      */
-    addPartToBreakdown(breakdownId: number, breakdownAddPartRequest: BreakdownAddPartRequest, extraHttpRequestParams?: any): Observable<BreakdownResponse>;
+    addPartToBreakdown(breakdownId: number, addPartBreakdownDTO: AddPartBreakdownDTO, extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
 
     /**
      * 
      * 
      * @param breakdownId 
-     * @param breakdownCloseRequest 
+     * @param closeBreakdownDTO 
      */
-    closeBreakdown(breakdownId: number, breakdownCloseRequest: BreakdownCloseRequest, extraHttpRequestParams?: any): Observable<BreakdownResponse>;
+    closeBreakdown(breakdownId: number, closeBreakdownDTO: CloseBreakdownDTO, extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
 
     /**
      * 
@@ -50,26 +50,26 @@ export interface BreakdownServiceInterface {
      * @param pageable 
      * @param search 
      */
-    getAllBreakdowns(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageBreakdownResponse>;
+    getAllBreakdowns(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageBreakdownResponseDTO>;
 
     /**
      * 
      * 
      * @param id 
      */
-    getBreakdownById(id: number, extraHttpRequestParams?: any): Observable<BreakdownResponse>;
+    getBreakdownById(id: number, extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
 
     /**
      * 
      * 
      */
-    getBreakdownStats(extraHttpRequestParams?: any): Observable<BreakdownStats>;
+    getBreakdownStats(extraHttpRequestParams?: any): Observable<BreakdownStatsDTO>;
 
     /**
      * 
      * 
      */
-    getLatestBreakdown(extraHttpRequestParams?: any): Observable<BreakdownResponse>;
+    getLatestBreakdown(extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
 
     /**
      * 
@@ -77,13 +77,13 @@ export interface BreakdownServiceInterface {
      * @param breakdownId 
      * @param usedPartId 
      */
-    removePartFromBreakdown(breakdownId: number, usedPartId: number, extraHttpRequestParams?: any): Observable<BreakdownResponse>;
+    removePartFromBreakdown(breakdownId: number, usedPartId: number, extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
 
     /**
      * 
      * 
-     * @param breakdownCreateRequest 
+     * @param createBreakdownDTO 
      */
-    reportBreakdown(breakdownCreateRequest: BreakdownCreateRequest, extraHttpRequestParams?: any): Observable<BreakdownResponse>;
+    reportBreakdown(createBreakdownDTO: CreateBreakdownDTO, extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
 
 }

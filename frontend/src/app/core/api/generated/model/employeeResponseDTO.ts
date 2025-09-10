@@ -12,32 +12,101 @@
 /**
  * Szczegółowe dane pracownika
  */
-export interface EmployeeResponse { 
+export interface EmployeeResponseDTO { 
+    /**
+     * Unique identifier of the employee
+     */
     id?: number;
+    /**
+     * Username of the employee
+     */
     username?: string;
+    /**
+     * Last name of the employee
+     */
     lastName?: string;
+    /**
+     * First name of the employee
+     */
     firstName?: string;
+    /**
+     * Full name of the employee
+     */
     fullName?: string;
+    /**
+     * Email address
+     */
     email?: string;
+    /**
+     * Avatar URL
+     */
     avatarUrl?: string;
+    /**
+     * Employee role
+     */
     role?: string;
+    /**
+     * Phone number
+     */
     phoneNumber?: string;
+    /**
+     * Date of birth
+     */
     dateOfBirth?: string;
+    /**
+     * Hire date
+     */
     hireDate?: string;
+    /**
+     * Street address
+     */
     street?: string;
+    /**
+     * City
+     */
     city?: string;
+    /**
+     * Postal code
+     */
     postalCode?: string;
+    /**
+     * Country
+     */
     country?: string;
+    /**
+     * Contract end date
+     */
     contractEndDate?: string;
+    /**
+     * Salary
+     */
     salary?: number;
-    educationLevel?: EmployeeResponse.EducationLevelEnum;
+    /**
+     * Education level
+     */
+    educationLevel?: EmployeeResponseDTO.EducationLevelEnum;
+    /**
+     * Field of study
+     */
     fieldOfStudy?: string;
+    /**
+     * Emergency contact name
+     */
     emergencyContactName?: string;
+    /**
+     * Emergency contact phone
+     */
     emergencyContactPhone?: string;
+    /**
+     * Age in years
+     */
     age?: number;
+    /**
+     * Calculated retirement date
+     */
     retirementDate?: string;
 }
-export namespace EmployeeResponse {
+export namespace EmployeeResponseDTO {
     export const EducationLevelEnum = {
         PRIMARY: 'PRIMARY',
         SECONDARY: 'SECONDARY',

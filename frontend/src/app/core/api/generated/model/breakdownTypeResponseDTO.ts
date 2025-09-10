@@ -12,8 +12,14 @@
 /**
  * Represents a breakdown type for the frontend
  */
-export interface BreakdownTypeResponse { 
-    value: string;
-    displayName: string;
+export interface BreakdownTypeResponseDTO { 
+    /**
+     * Enum value of the breakdown type
+     */
+    value?: string;
+    /**
+     * Display name for the breakdown type
+     */
+    displayName?: string;
 }
 

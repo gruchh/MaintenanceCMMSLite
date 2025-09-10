@@ -12,12 +12,12 @@
 /**
  * Dane wymagane do utworzenia nowego zgłoszenia awarii
  */
-export interface BreakdownCreateRequest { 
+export interface CreateBreakdownDTO { 
     description: string;
     machineId: number;
-    type: BreakdownCreateRequest.TypeEnum;
+    type: CreateBreakdownDTO.TypeEnum;
 }
-export namespace BreakdownCreateRequest {
+export namespace CreateBreakdownDTO {
     export const TypeEnum = {
         MECHANICAL: 'MECHANICAL',
         AUTOMATICAL: 'AUTOMATICAL',

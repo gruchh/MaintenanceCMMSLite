@@ -12,7 +12,7 @@
 /**
  * Dane do aktualizacji adresu. Wszystkie pola są opcjonalne.
  */
-export interface AddressUpdateRequest { 
+export interface UpdateEmployeeAddressDTO { 
     /**
      * Ulica i numer
      */

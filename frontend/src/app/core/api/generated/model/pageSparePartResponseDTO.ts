@@ -8,15 +8,15 @@
  * Do not edit the class manually.
  */
 import { PageableObject } from './pageableObject';
+import { SparePartResponseDTO } from './sparePartResponseDTO';
 import { SortObject } from './sortObject';
-import { EmployeeResponse } from './employeeResponse';
 
 
-export interface PageEmployeeResponse { 
-    totalPages?: number;
+export interface PageSparePartResponseDTO { 
     totalElements?: number;
+    totalPages?: number;
     size?: number;
-    content?: Array<EmployeeResponse>;
+    content?: Array<SparePartResponseDTO>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;

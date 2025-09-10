@@ -9,14 +9,14 @@
  */
 import { PageableObject } from './pageableObject';
 import { SortObject } from './sortObject';
-import { BreakdownResponse } from './breakdownResponse';
+import { BreakdownResponseDTO } from './breakdownResponseDTO';
 
 
-export interface PageBreakdownResponse { 
-    totalPages?: number;
+export interface PageBreakdownResponseDTO { 
     totalElements?: number;
+    totalPages?: number;
     size?: number;
-    content?: Array<BreakdownResponse>;
+    content?: Array<BreakdownResponseDTO>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;

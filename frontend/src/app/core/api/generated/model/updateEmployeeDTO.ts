@@ -7,13 +7,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { AddressUpdateRequest } from './addressUpdateRequest';
+import { UpdateEmployeeAddressDTO } from './updateEmployeeAddressDTO';
 
 
 /**
  * Dane do aktualizacji pracownika. Wszystkie pola są opcjonalne.
  */
-export interface EmployeeUpdateRequest { 
+export interface UpdateEmployeeDTO { 
     /**
      * Imię pracownika.
      */
@@ -45,7 +45,7 @@ export interface EmployeeUpdateRequest {
     /**
      * Szczegóły adresu.
      */
-    address?: AddressUpdateRequest;
+    address?: UpdateEmployeeAddressDTO;
     /**
      * Data końca kontraktu (opcjonalnie).
      */
@@ -57,7 +57,7 @@ export interface EmployeeUpdateRequest {
     /**
      * Poziom wykształcenia.
      */
-    educationLevel?: EmployeeUpdateRequest.EducationLevelEnum;
+    educationLevel?: UpdateEmployeeDTO.EducationLevelEnum;
     /**
      * Kierunek studiów.
      */
@@ -71,7 +71,7 @@ export interface EmployeeUpdateRequest {
      */
     emergencyContactPhone?: string;
 }
-export namespace EmployeeUpdateRequest {
+export namespace UpdateEmployeeDTO {
     export const EducationLevelEnum = {
         PRIMARY: 'PRIMARY',
         SECONDARY: 'SECONDARY',
