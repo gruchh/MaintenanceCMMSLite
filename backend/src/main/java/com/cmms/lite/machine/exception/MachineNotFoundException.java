@@ -1,4 +1,4 @@
-package com.cmms.lite.machine;
+package com.cmms.lite.machine.exception;
 
 import com.cmms.lite.exception.ResourceNotFoundException;
 

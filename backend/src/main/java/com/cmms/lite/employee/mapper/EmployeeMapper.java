@@ -1,6 +1,7 @@
 package com.cmms.lite.employee.mapper;
 
-import com.cmms.lite.employee.EmployeeDTOs;
+import com.cmms.lite.employee.dto.EmployeeResponseDTO;
+import com.cmms.lite.employee.dto.EmployeeSummaryDTO;
 import com.cmms.lite.employee.entity.Employee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -31,11 +32,11 @@ public interface EmployeeMapper {
     @Mapping(source = "employeeDetails.address.city", target = "city")
     @Mapping(source = "employeeDetails.address.postalCode", target = "postalCode")
     @Mapping(source = "employeeDetails.address.country", target = "country")
-    EmployeeDTOs.Response toResponse(Employee employee);
+    EmployeeResponseDTO toResponse(Employee employee);
 
     @Mapping(source = "user.username", target = "username")
     @Mapping(expression = "java(employee.getFirstName() + \" \" + employee.getLastName())", target = "fullName")
     @Mapping(source = "avatarUrl", target = "avatarUrl")
     @Mapping(source = "employeeRole.name", target = "role")
-    EmployeeDTOs.SummaryResponse toSummaryResponse(Employee employee);
+    EmployeeSummaryDTO toSummaryResponse(Employee employee);
 }

@@ -1,4 +1,4 @@
-package com.cmms.lite.employeeRole;
+package com.cmms.lite.employeeRole.entity;
 
 import com.cmms.lite.employee.entity.Employee;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.cmms.lite.machine;
+package com.cmms.lite.machine.entity;
 
 import com.cmms.lite.breakdown.entity.Breakdown;
 import jakarta.persistence.*;

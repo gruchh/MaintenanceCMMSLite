@@ -1,16 +1,15 @@
 package com.cmms.lite.breakdown.service;
 
-import com.cmms.lite.CmmsLiteApplication;
-import com.cmms.lite.breakdown.BreakdownDTOs;
+import com.cmms.lite.breakdown.dto.*;
 import com.cmms.lite.breakdown.entity.Breakdown;
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
 import com.cmms.lite.breakdown.exception.BreakdownNotFoundException;
 import com.cmms.lite.breakdown.mapper.BreakdownMapper;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
-import com.cmms.lite.machine.IllegalOperationException;
-import com.cmms.lite.machine.Machine;
-import com.cmms.lite.machine.MachineNotFoundException;
-import com.cmms.lite.machine.MachineRepository;
+import com.cmms.lite.exception.IllegalOperationException;
+import com.cmms.lite.machine.entity.Machine;
+import com.cmms.lite.machine.exception.MachineNotFoundException;
+import com.cmms.lite.machine.repository.MachineRepository;
 import com.cmms.lite.sparePart.entity.SparePart;
 import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
 import com.cmms.lite.sparePart.exception.UsedPartNotFoundException;
@@ -40,13 +39,13 @@ public class BreakdownService {
     private static final String PART_NOT_FOUND = "Część zamienna o ID %d nie została znaleziona.";
 
     @Transactional
-    public BreakdownDTOs.Response createBreakdown(BreakdownDTOs.CreateRequest request) {
-        Machine machine = machineRepository.findById(request.machineId())
-                .orElseThrow(() -> new MachineNotFoundException(String.format(MACHINE_NOT_FOUND, request.machineId())));
+    public BreakdownResponseDTO createBreakdown(CreateBreakdownDTO request) {
+        Machine machine = machineRepository.findById(request.getMachineId())
+                .orElseThrow(() -> new MachineNotFoundException(String.format(MACHINE_NOT_FOUND, request.getMachineId())));
 
         Breakdown breakdown = new Breakdown();
-        breakdown.setDescription(request.description());
-        breakdown.setType(request.type());
+        breakdown.setDescription(request.getDescription());
+        breakdown.setType(request.getType());
         breakdown.setMachine(machine);
         breakdown.setReportedAt(LocalDateTime.now());
         breakdown.setOpened(true);
@@ -56,18 +55,18 @@ public class BreakdownService {
     }
 
     @Transactional(readOnly = true)
-    public BreakdownDTOs.Response getBreakdownById(Long id) {
+    public BreakdownResponseDTO getBreakdownById(Long id) {
         Breakdown breakdown = getBreakdownByIdOrThrow(id);
         return breakdownMapper.toResponse(breakdown);
     }
 
     @Transactional(readOnly = true)
-    public Page<BreakdownDTOs.Response> getAllBreakdowns(Pageable pageable) {
+    public Page<BreakdownResponseDTO> getAllBreakdowns(Pageable pageable) {
         return breakdownRepository.findAll(pageable).map(breakdownMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public Page<BreakdownDTOs.Response> searchBreakdowns(String keyword, Pageable pageable) {
+    public Page<BreakdownResponseDTO> searchBreakdowns(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return getAllBreakdowns(pageable);
         }
@@ -76,15 +75,15 @@ public class BreakdownService {
     }
 
     @Transactional
-    public BreakdownDTOs.Response addPartToBreakdown(Long breakdownId, BreakdownDTOs.AddPartRequest request) {
+    public BreakdownResponseDTO addPartToBreakdown(Long breakdownId, AddPartBreakdownDTO request) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
-        SparePart sparePart = sparePartRepository.findById(request.sparePartId())
-                .orElseThrow(() -> new SparePartNotFoundException(String.format(PART_NOT_FOUND, request.sparePartId())));
+        SparePart sparePart = sparePartRepository.findById(request.getSparePartId())
+                .orElseThrow(() -> new SparePartNotFoundException(String.format(PART_NOT_FOUND, request.getSparePartId())));
 
         BreakdownUsedParts usedPart = new BreakdownUsedParts();
         usedPart.setBreakdown(breakdown);
         usedPart.setSparePart(sparePart);
-        usedPart.setQuantity(request.quantity());
+        usedPart.setQuantity(request.getQuantity());
 
         breakdown.getUsedPartsList().add(usedPart);
         recalculateTotalCost(breakdown);
@@ -93,7 +92,7 @@ public class BreakdownService {
     }
 
     @Transactional
-    public BreakdownDTOs.Response removePartFromBreakdown(Long breakdownId, Long usedPartId) {
+    public BreakdownResponseDTO removePartFromBreakdown(Long breakdownId, Long usedPartId) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
         boolean removed = breakdown.getUsedPartsList().removeIf(part -> part.getId().equals(usedPartId));
 
@@ -106,7 +105,7 @@ public class BreakdownService {
     }
 
     @Transactional
-    public BreakdownDTOs.Response closeBreakdown(Long breakdownId, BreakdownDTOs.CloseRequest request) {
+    public BreakdownResponseDTO closeBreakdown(Long breakdownId, CloseBreakdownDTO request) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
 
         if (!breakdown.getOpened()) {
@@ -115,26 +114,26 @@ public class BreakdownService {
 
         breakdown.setOpened(false);
         breakdown.setFinishedAt(LocalDateTime.now());
-        breakdown.setSpecialistComment(request.specialistComment());
+        breakdown.setSpecialistComment(request.getSpecialistComment());
 
         return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
     }
 
     @Transactional(readOnly = true)
-    public BreakdownDTOs.Response getLatestBreakdown() {
+    public BreakdownResponseDTO getLatestBreakdown() {
         Breakdown latestBreakdown = breakdownRepository.findTopByOrderByReportedAtDesc()
                 .orElseThrow(() -> new BreakdownNotFoundException(LATEST_BREAKDOWN_NOT_FOUND));
         return breakdownMapper.toResponse(latestBreakdown);
     }
 
     @Transactional(readOnly = true)
-    public BreakdownDTOs.BreakdownStatsDTO getBreakdownStats() {
+    public BreakdownStatsDTO getBreakdownStats() {
         LocalDateTime now = LocalDateTime.now();
         Long daysSinceLast = breakdownRepository.findTopByOrderByFinishedAtDesc()
                 .map(b -> ChronoUnit.DAYS.between(b.getFinishedAt(), now))
                 .orElse(null);
 
-        return new BreakdownDTOs.BreakdownStatsDTO(
+        return new BreakdownStatsDTO(
                 daysSinceLast,
                 breakdownRepository.countByFinishedAtBetween(now.minusWeeks(1), now),
                 breakdownRepository.countByFinishedAtBetween(now.minusMonths(1), now),

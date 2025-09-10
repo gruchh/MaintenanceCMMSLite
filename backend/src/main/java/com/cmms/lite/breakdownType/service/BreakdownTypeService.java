@@ -1,7 +1,7 @@
 package com.cmms.lite.breakdownType.service;
 
-import com.cmms.lite.breakdownType.BreakdownTypeDTOs;
-import com.cmms.lite.breakdownType.dto.BreakdownType;
+import com.cmms.lite.breakdownType.dto.BreakdownTypeResponseDTO;
+import com.cmms.lite.breakdownType.entity.BreakdownType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BreakdownTypeService {
 
-    public List<BreakdownTypeDTOs.Response> getAllBreakdownTypesAsDto() {
+    public List<BreakdownTypeResponseDTO> getAllBreakdownTypesAsDto() {
         return Arrays.stream(BreakdownType.values())
-                .map(type -> new BreakdownTypeDTOs.Response(type.name(), type.getDisplayName()))
+                .map(type -> new BreakdownTypeResponseDTO(type.name(), type.getDisplayName()))
                 .collect(Collectors.toList());
     }
 }

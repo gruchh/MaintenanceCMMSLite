@@ -1,9 +1,10 @@
 package com.cmms.lite.breakdown.mapper;
 
-import com.cmms.lite.breakdown.BreakdownDTOs;
+import com.cmms.lite.breakdown.dto.BreakdownResponseDTO;
+import com.cmms.lite.breakdown.dto.UsedPartBreakdownDTO;
 import com.cmms.lite.breakdown.entity.Breakdown;
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
-import com.cmms.lite.machine.MachineMapper;
+import com.cmms.lite.machine.mapper.MachineMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -18,7 +19,7 @@ import java.util.List;
 public interface BreakdownMapper {
 
     @Mapping(source = "usedPartsList", target = "usedParts")
-    BreakdownDTOs.Response toResponse(Breakdown breakdown);
-    List<BreakdownDTOs.Response> toResponseList(List<Breakdown> breakdowns);
-    BreakdownDTOs.UsedPartResponse toUsedPartResponse(BreakdownUsedParts usedPart);
+    BreakdownResponseDTO toResponse(Breakdown breakdown);
+    List<BreakdownResponseDTO> toResponseList(List<Breakdown> breakdowns);
+    UsedPartBreakdownDTO toUsedPartResponse(BreakdownUsedParts usedPart);
 }

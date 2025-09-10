@@ -1,7 +1,10 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.CmmsLiteApplication;
+import com.cmms.lite.sparePart.dto.CreateSparePartDTO;
+import com.cmms.lite.sparePart.dto.SparePartResponseDTO;
+import com.cmms.lite.sparePart.dto.UpdateSparePartDTO;
 import com.cmms.lite.sparePart.entity.SparePart;
+import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
 import com.cmms.lite.sparePart.mapper.SparePartMapper;
 import com.cmms.lite.sparePart.repository.SparePartRepository;
 import com.cmms.lite.sparePart.service.SparePartService;
@@ -15,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -44,6 +48,8 @@ class SparePartServiceTest {
         testSparePart.setPrice(BigDecimal.TEN);
 
         responseDTO = new SparePartResponseDTO(1L, "Test Part", BigDecimal.TEN, "Producer");
+
+
         createRequest = new CreateSparePartDTO("Test Part", BigDecimal.TEN, "Producer");
         updateRequest = new UpdateSparePartDTO("Updated Part", BigDecimal.ONE, "New Producer");
     }
@@ -63,7 +69,7 @@ class SparePartServiceTest {
     void getSparePartById_shouldThrowSparePartNotFoundException_whenItDoesNotExist() {
         when(sparePartRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(CmmsLiteApplication.SparePartNotFoundException.class, () -> sparePartService.getSparePartById(1L));
+        assertThrows(SparePartNotFoundException.class, () -> sparePartService.getSparePartById(1L));
     }
 
     @Test
@@ -75,7 +81,7 @@ class SparePartServiceTest {
         SparePartResponseDTO result = sparePartService.createSparePart(createRequest);
 
         assertThat(result).isNotNull();
-        assertThat(result.name()).isEqualTo(createRequest.name());
+        assertThat(result.name()).isEqualTo(createRequest.getName());
         verify(sparePartRepository, times(1)).save(testSparePart);
     }
 
@@ -99,7 +105,7 @@ class SparePartServiceTest {
     void updateSparePart_shouldThrowSparePartNotFoundException_whenItDoesNotExist() {
         when(sparePartRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(CmmsLiteApplication.SparePartNotFoundException.class, () -> sparePartService.updateSparePart(1L, updateRequest));
+        assertThrows(SparePartNotFoundException.class, () -> sparePartService.updateSparePart(1L, updateRequest));
     }
 
     @Test
@@ -115,6 +121,6 @@ class SparePartServiceTest {
     void deleteSparePart_shouldThrowSparePartNotFoundException_whenItDoesNotExist() {
         when(sparePartRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(CmmsLiteApplication.SparePartNotFoundException.class, () -> sparePartService.deleteSparePart(1L));
+        assertThrows(SparePartNotFoundException.class, () -> sparePartService.deleteSparePart(1L));
     }
 }

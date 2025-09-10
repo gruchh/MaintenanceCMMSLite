@@ -1,6 +1,6 @@
 package com.cmms.lite.breakdown.controller;
 
-import com.cmms.lite.breakdown.BreakdownDTOs;
+import com.cmms.lite.breakdown.dto.*;
 import com.cmms.lite.breakdown.service.BreakdownService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,7 +23,7 @@ public class BreakdownController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<BreakdownDTOs.Response>> getAllBreakdowns(
+    public ResponseEntity<Page<BreakdownResponseDTO>> getAllBreakdowns(
             @RequestParam(required = false) String search,
             Pageable pageable) {
         return ResponseEntity.ok(breakdownService.searchBreakdowns(search, pageable));
@@ -31,41 +31,41 @@ public class BreakdownController {
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<BreakdownDTOs.Response> getBreakdownById(@PathVariable Long id) {
+    public ResponseEntity<BreakdownResponseDTO> getBreakdownById(@PathVariable Long id) {
         return ResponseEntity.ok(breakdownService.getBreakdownById(id));
     }
 
     @PostMapping("/report")
-    public ResponseEntity<BreakdownDTOs.Response> reportBreakdown(@Valid @RequestBody BreakdownDTOs.CreateRequest request) {
-        BreakdownDTOs.Response response = breakdownService.createBreakdown(request);
+    public ResponseEntity<BreakdownResponseDTO> reportBreakdown(@Valid @RequestBody CreateBreakdownDTO request) {
+        BreakdownResponseDTO response = breakdownService.createBreakdown(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/{breakdownId}/parts")
     @PreAuthorize("hasRole('SUBCONTRACTOR')")
-    public ResponseEntity<BreakdownDTOs.Response> addPartToBreakdown(@PathVariable Long breakdownId, @Valid @RequestBody BreakdownDTOs.AddPartRequest request) {
+    public ResponseEntity<BreakdownResponseDTO> addPartToBreakdown(@PathVariable Long breakdownId, @Valid @RequestBody AddPartBreakdownDTO request) {
         return ResponseEntity.ok(breakdownService.addPartToBreakdown(breakdownId, request));
     }
 
     @DeleteMapping("/{breakdownId}/parts/{usedPartId}")
     @PreAuthorize("hasRole('SUBCONTRACTOR')")
-    public ResponseEntity<BreakdownDTOs.Response> removePartFromBreakdown(@PathVariable Long breakdownId, @PathVariable Long usedPartId) {
+    public ResponseEntity<BreakdownResponseDTO> removePartFromBreakdown(@PathVariable Long breakdownId, @PathVariable Long usedPartId) {
         return ResponseEntity.ok(breakdownService.removePartFromBreakdown(breakdownId, usedPartId));
     }
 
     @PatchMapping("/{breakdownId}/close")
     @PreAuthorize("hasRole('TECHNICAN')")
-    public ResponseEntity<BreakdownDTOs.Response> closeBreakdown(@PathVariable Long breakdownId, @Valid @RequestBody BreakdownDTOs.CloseRequest request) {
+    public ResponseEntity<BreakdownResponseDTO> closeBreakdown(@PathVariable Long breakdownId, @Valid @RequestBody CloseBreakdownDTO request) {
         return ResponseEntity.ok(breakdownService.closeBreakdown(breakdownId, request));
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<BreakdownDTOs.Response> getLatestBreakdown() {
+    public ResponseEntity<BreakdownResponseDTO> getLatestBreakdown() {
         return ResponseEntity.ok(breakdownService.getLatestBreakdown());
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<BreakdownDTOs.BreakdownStatsDTO> getBreakdownStats() {
+    public ResponseEntity<BreakdownStatsDTO> getBreakdownStats() {
         return ResponseEntity.ok(breakdownService.getBreakdownStats());
     }
 }

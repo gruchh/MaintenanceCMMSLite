@@ -1,5 +1,9 @@
-package com.cmms.lite.machine;
+package com.cmms.lite.machine.controller;
 
+import com.cmms.lite.machine.MachineDTOs;
+import com.cmms.lite.machine.MachineUpdateRequest;
+import com.cmms.lite.machine.dto.MachineDetailsResponse;
+import com.cmms.lite.machine.service.MachineService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,34 +27,34 @@ public class MachineController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<MachineDTOs.Response>> getAllMachines(Pageable pageable) {
+    public ResponseEntity<Page<MachineDetailsResponse>> getAllMachines(Pageable pageable) {
         return ResponseEntity.ok(machineService.getAllMachines(pageable));
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<MachineDTOs.Response>> getAllMachinesAsList() {
+    public ResponseEntity<List<MachineDetailsResponse>> getAllMachinesAsList() {
         return ResponseEntity.ok(machineService.getAllMachinesAsList());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<MachineDTOs.Response> getMachineById(@PathVariable Long id) {
+    public ResponseEntity<MachineDetailsResponse> getMachineById(@PathVariable Long id) {
         return ResponseEntity.ok(machineService.getMachineById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MachineDTOs.Response> createMachine(
+    public ResponseEntity<MachineDetailsResponse> createMachine(
             @Valid @RequestBody MachineDTOs.CreateRequest createRequest) {
-        MachineDTOs.Response response = machineService.createMachine(createRequest);
+        MachineDetailsResponse response = machineService.createMachine(createRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MachineDTOs.Response> updateMachine(
+    public ResponseEntity<MachineDetailsResponse> updateMachine(
             @PathVariable Long id,
-            @Valid @RequestBody MachineDTOs.UpdateRequest updateRequest) {
+            @Valid @RequestBody MachineUpdateRequest updateRequest) {
         return ResponseEntity.ok(machineService.updateMachine(id, updateRequest));
     }
 

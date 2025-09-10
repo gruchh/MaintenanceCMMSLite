@@ -1,6 +1,5 @@
 package com.cmms.lite.sparePart.service;
 
-import com.cmms.lite.CmmsLiteApplication;
 import com.cmms.lite.sparePart.dto.CreateSparePartDTO;
 import com.cmms.lite.sparePart.dto.SparePartResponseDTO;
 import com.cmms.lite.sparePart.dto.UpdateSparePartDTO;

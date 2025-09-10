@@ -1,6 +1,8 @@
 package com.cmms.lite.employee.controller;
 
-import com.cmms.lite.employee.EmployeeDTOs;
+import com.cmms.lite.employee.dto.CreateEmployeeDTO;
+import com.cmms.lite.employee.dto.EmployeeResponseDTO;
+import com.cmms.lite.employee.dto.UpdateEmployeeDTO;
 import com.cmms.lite.employee.service.EmployeeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,28 +24,28 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<EmployeeDTOs.Response> createEmployee(@Valid @RequestBody EmployeeDTOs.CreateRequest request) {
-        EmployeeDTOs.Response createdEmployee = employeeService.createEmployee(request);
+    public ResponseEntity<EmployeeResponseDTO> createEmployee(@Valid @RequestBody CreateEmployeeDTO request) {
+        EmployeeResponseDTO createdEmployee = employeeService.createEmployee(request);
         return new ResponseEntity<>(createdEmployee, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDTOs.Response> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<EmployeeDTOs.Response>> getAllEmployees(
+    public ResponseEntity<Page<EmployeeResponseDTO>> getAllEmployees(
             @RequestParam(required = false) String search,
             Pageable pageable) {
         return ResponseEntity.ok(employeeService.searchEmployees(search, pageable));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<EmployeeDTOs.Response> updateEmployee(
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(
             @PathVariable Long id,
-            @Valid @RequestBody EmployeeDTOs.UpdateRequest request
+            @Valid @RequestBody UpdateEmployeeDTO request
     ) {
         return ResponseEntity.ok(employeeService.updateEmployee(id, request));
     }

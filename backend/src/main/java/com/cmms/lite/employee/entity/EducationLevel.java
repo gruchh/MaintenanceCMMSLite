@@ -1,4 +1,4 @@
-package com.cmms.lite.employee;
+package com.cmms.lite.employee.entity;
 
 public enum EducationLevel {
     PRIMARY,

@@ -1,7 +1,6 @@
 package com.cmms.lite.exception;
 
 import com.cmms.lite.exception.model.ErrorResponse;
-import com.cmms.lite.machine.IllegalOperationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

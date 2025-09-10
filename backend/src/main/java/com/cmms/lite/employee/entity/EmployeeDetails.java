@@ -1,6 +1,5 @@
 package com.cmms.lite.employee.entity;
 
-import com.cmms.lite.employee.EducationLevel;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

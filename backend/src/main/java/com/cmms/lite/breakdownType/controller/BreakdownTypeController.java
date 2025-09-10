@@ -1,6 +1,6 @@
 package com.cmms.lite.breakdownType.controller;
 
-import com.cmms.lite.breakdownType.BreakdownTypeDTOs;
+import com.cmms.lite.breakdownType.dto.BreakdownTypeResponseDTO;
 import com.cmms.lite.breakdownType.service.BreakdownTypeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class BreakdownTypeController {
     private final BreakdownTypeService breakdownTypeService;
 
     @GetMapping
-    public ResponseEntity<List<BreakdownTypeDTOs.Response>> getBreakdownTypes() {
-        List<BreakdownTypeDTOs.Response> types = breakdownTypeService.getAllBreakdownTypesAsDto();
+    public ResponseEntity<List<BreakdownTypeResponseDTO>> getBreakdownTypes() {
+        List<BreakdownTypeResponseDTO> types = breakdownTypeService.getAllBreakdownTypesAsDto();
         return ResponseEntity.ok(types);
     }
 }
