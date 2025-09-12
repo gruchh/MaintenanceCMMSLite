@@ -8,7 +8,7 @@ import { SparePartsComponent } from './features/dashboard/spare-parts/spare-part
 import { BreakdownsComponent } from './features/dashboard/breakdowns/breakdowns.component';
 import { authGuard } from './core/guards/auth-guard';
 import { BreakdownFormComponent } from './features/breakdowns/breakdown-form.component';
-import { WorkScheduleComponent } from './features/dashboard/work-schedule/work-schedule';
+import { WorkScheduleComponent } from './features/dashboard/work-schedule/work-schedule.component';
 
 export const routes: Routes = [
   {
