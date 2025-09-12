@@ -17,9 +17,9 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { ShiftScheduleGenerateRequest } from '../model/shiftScheduleGenerateRequest';
+import { GenerateShiftScheduleDTO } from '../model/generateShiftScheduleDTO';
 // @ts-ignore
-import { ShiftScheduleResponse } from '../model/shiftScheduleResponse';
+import { ShiftScheduleResponseDTO } from '../model/shiftScheduleResponseDTO';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -41,16 +41,16 @@ export class ShiftScheduleService extends BaseService implements ShiftScheduleSe
     }
 
     /**
-     * @param shiftScheduleGenerateRequest 
+     * @param generateShiftScheduleDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public generate(shiftScheduleGenerateRequest: ShiftScheduleGenerateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ShiftScheduleResponse>;
-    public generate(shiftScheduleGenerateRequest: ShiftScheduleGenerateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShiftScheduleResponse>>;
-    public generate(shiftScheduleGenerateRequest: ShiftScheduleGenerateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShiftScheduleResponse>>;
-    public generate(shiftScheduleGenerateRequest: ShiftScheduleGenerateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (shiftScheduleGenerateRequest === null || shiftScheduleGenerateRequest === undefined) {
-            throw new Error('Required parameter shiftScheduleGenerateRequest was null or undefined when calling generate.');
+    public createShiftSchedule(generateShiftScheduleDTO: GenerateShiftScheduleDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ShiftScheduleResponseDTO>;
+    public createShiftSchedule(generateShiftScheduleDTO: GenerateShiftScheduleDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShiftScheduleResponseDTO>>;
+    public createShiftSchedule(generateShiftScheduleDTO: GenerateShiftScheduleDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShiftScheduleResponseDTO>>;
+    public createShiftSchedule(generateShiftScheduleDTO: GenerateShiftScheduleDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (generateShiftScheduleDTO === null || generateShiftScheduleDTO === undefined) {
+            throw new Error('Required parameter generateShiftScheduleDTO was null or undefined when calling createShiftSchedule.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -89,10 +89,10 @@ export class ShiftScheduleService extends BaseService implements ShiftScheduleSe
 
         let localVarPath = `/api/schedules/generate`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<ShiftScheduleResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<ShiftScheduleResponseDTO>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: shiftScheduleGenerateRequest,
+                body: generateShiftScheduleDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -108,12 +108,12 @@ export class ShiftScheduleService extends BaseService implements ShiftScheduleSe
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ShiftScheduleResponse>;
-    public getById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShiftScheduleResponse>>;
-    public getById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShiftScheduleResponse>>;
-    public getById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public getShiftScheduleById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<ShiftScheduleResponseDTO>;
+    public getShiftScheduleById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<ShiftScheduleResponseDTO>>;
+    public getShiftScheduleById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<ShiftScheduleResponseDTO>>;
+    public getShiftScheduleById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getById.');
+            throw new Error('Required parameter id was null or undefined when calling getShiftScheduleById.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -143,7 +143,7 @@ export class ShiftScheduleService extends BaseService implements ShiftScheduleSe
 
         let localVarPath = `/api/schedules/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<ShiftScheduleResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<ShiftScheduleResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,

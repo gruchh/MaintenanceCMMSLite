@@ -12,7 +12,7 @@
 /**
  * Basic machine information (for lists and nested objects)
  */
-export interface MachineSummaryResponse { 
+export interface MachineSummaryDTO { 
     id?: number;
     code?: string;
     fullName?: string;

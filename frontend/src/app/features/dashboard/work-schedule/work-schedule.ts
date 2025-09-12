@@ -1,7 +1,7 @@
+import { GenerateShiftScheduleDTO } from './../../../core/api/generated/model/generateShiftScheduleDTO';
 import { Component, inject, signal } from '@angular/core';
 import {
-  ShiftScheduleGenerateRequest,
-  ShiftScheduleResponse,
+  ShiftScheduleResponseDTO,
   ShiftScheduleService,
 } from '../../../core/api/generated';
 
@@ -13,19 +13,19 @@ import {
 export class WorkScheduleComponent {
   private shiftScheduleService = inject(ShiftScheduleService);
 
-  schedule = signal<ShiftScheduleResponse | null>(null);
+  schedule = signal<ShiftScheduleResponseDTO | null>(null);
 
   private getTodayFormatted(): string {
     return new Date().toISOString().slice(0, 10);
   }
 
-  payload: ShiftScheduleGenerateRequest = {
+  payload: GenerateShiftScheduleDTO = {
     startDate: this.getTodayFormatted(),
     days: 28,
   };
 
   createSchedule(): void {
-    this.shiftScheduleService.generate(this.payload).subscribe({
+    this.shiftScheduleService.createShiftSchedule(this.payload).subscribe({
       next: (response) => {
         console.log('Schedule created successfully:', response);
         this.schedule.set(response);

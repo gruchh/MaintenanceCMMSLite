@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
-@Schema(name = "ShiftEntryResponse", description = "Pojedynczy wpis w harmonogramie")
+@Schema(name = "ShiftEntryResponseDTO", description = "Pojedynczy wpis w harmonogramie")
 public record ShiftEntryResponseDTO(
         Long id,
         LocalDate date,

@@ -12,7 +12,7 @@
 /**
  * Data required to update an existing machine
  */
-export interface MachineUpdateRequest { 
+export interface UpdateMachineDTO { 
     code: string;
     fullName: string;
     serialNumber?: string;

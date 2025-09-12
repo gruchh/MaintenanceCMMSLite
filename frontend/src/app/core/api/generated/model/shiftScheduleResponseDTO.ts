@@ -7,16 +7,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ShiftEntryResponse } from './shiftEntryResponse';
+import { ShiftEntryResponseDTO } from './shiftEntryResponseDTO';
 
 
 /**
  * Wygenerowany harmonogram z wpisami
  */
-export interface ShiftScheduleResponse { 
+export interface ShiftScheduleResponseDTO { 
     id?: number;
     startDate?: string;
     endDate?: string;
-    entries?: Array<ShiftEntryResponse>;
+    entries?: Array<ShiftEntryResponseDTO>;
 }
 

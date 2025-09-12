@@ -1,12 +1,12 @@
 package com.cmms.lite.shiftSchedule.service;
 
-import com.cmms.lite.shiftSchedule.dto.GenerateShiftScheduleRequest;
-import com.cmms.lite.shiftSchedule.dto.ShiftEntryResponseDTO;
+import com.cmms.lite.shiftSchedule.dto.GenerateShiftScheduleDTO;
 import com.cmms.lite.shiftSchedule.dto.ShiftScheduleResponseDTO;
 import com.cmms.lite.shiftSchedule.entity.BrigadeType;
 import com.cmms.lite.shiftSchedule.entity.ShiftEntry;
 import com.cmms.lite.shiftSchedule.entity.ShiftSchedule;
 import com.cmms.lite.shiftSchedule.entity.ShiftType;
+import com.cmms.lite.shiftSchedule.mapper.ShiftScheduleMapper; // Import mappera
 import com.cmms.lite.shiftSchedule.repository.ShiftEntryRepository;
 import com.cmms.lite.shiftSchedule.repository.ShiftScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ public class ShiftScheduleService {
 
     private final ShiftScheduleRepository scheduleRepository;
     private final ShiftEntryRepository entryRepository;
+    private final ShiftScheduleMapper shiftScheduleMapper;
 
     private static final String[] BASE_PATTERN = new String[]{
             "DDWWDDD",
@@ -46,7 +47,7 @@ public class ShiftScheduleService {
     );
 
     @Transactional
-    public ShiftScheduleResponseDTO generate(GenerateShiftScheduleRequest req) {
+    public ShiftScheduleResponseDTO createShiftSchedule(GenerateShiftScheduleDTO req) {
         int days = (req.getDays() == null ? 28 : req.getDays());
         LocalDate start = req.getStartDate();
         LocalDate end = start.plusDays(days - 1);
@@ -84,31 +85,14 @@ public class ShiftScheduleService {
         entryRepository.saveAll(batch);
         schedule.getEntries().addAll(batch);
 
-        return toResponse(schedule);
+        return shiftScheduleMapper.toResponse(schedule);
     }
 
     @Transactional(readOnly = true)
-    public ShiftScheduleResponseDTO getById(Long id) {
+    public ShiftScheduleResponseDTO getShiftScheduleById(Long id) {
         ShiftSchedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Harmonogram o ID %d nie istnieje.".formatted(id)));
-        return toResponse(schedule);
-    }
 
-    private ShiftScheduleResponseDTO toResponse(ShiftSchedule s) {
-        var entries = s.getEntries().stream()
-                .map(e -> new ShiftEntryResponseDTO(
-                        e.getId(),
-                        e.getWorkDate(),
-                        e.getBrigadeType(),
-                        e.getShiftType()
-                ))
-                .toList();
-
-        return new ShiftScheduleResponseDTO(
-                s.getId(),
-                s.getStartDate(),
-                s.getEndDate(),
-                entries
-        );
+        return shiftScheduleMapper.toResponse(schedule);
     }
 }

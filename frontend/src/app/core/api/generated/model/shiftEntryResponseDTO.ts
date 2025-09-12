@@ -12,13 +12,13 @@
 /**
  * Pojedynczy wpis w harmonogramie
  */
-export interface ShiftEntryResponse { 
+export interface ShiftEntryResponseDTO { 
     id?: number;
     date?: string;
-    brigade?: ShiftEntryResponse.BrigadeEnum;
-    shift?: ShiftEntryResponse.ShiftEnum;
+    brigade?: ShiftEntryResponseDTO.BrigadeEnum;
+    shift?: ShiftEntryResponseDTO.ShiftEnum;
 }
-export namespace ShiftEntryResponse {
+export namespace ShiftEntryResponseDTO {
     export const BrigadeEnum = {
         A: 'A',
         B: 'B',

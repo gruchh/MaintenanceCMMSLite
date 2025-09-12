@@ -1,6 +1,6 @@
 package com.cmms.lite.shiftSchedule.controller;
 
-import com.cmms.lite.shiftSchedule.dto.GenerateShiftScheduleRequest;
+import com.cmms.lite.shiftSchedule.dto.GenerateShiftScheduleDTO;
 import com.cmms.lite.shiftSchedule.dto.ShiftScheduleResponseDTO;
 import com.cmms.lite.shiftSchedule.service.ShiftScheduleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,15 +22,15 @@ public class ShiftScheduleController {
 
     @PostMapping("/generate")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ShiftScheduleResponseDTO> generate(
-            @Valid @RequestBody GenerateShiftScheduleRequest request) {
-        ShiftScheduleResponseDTO response = service.generate(request);
+    public ResponseEntity<ShiftScheduleResponseDTO> createShiftSchedule(
+            @Valid @RequestBody GenerateShiftScheduleDTO request) {
+        ShiftScheduleResponseDTO response = service.createShiftSchedule(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ShiftScheduleResponseDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+    public ResponseEntity<ShiftScheduleResponseDTO> getShiftScheduleById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getShiftScheduleById(id));
     }
 }

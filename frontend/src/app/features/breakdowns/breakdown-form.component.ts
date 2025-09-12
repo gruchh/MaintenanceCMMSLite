@@ -13,7 +13,7 @@ import {
   BreakdownTypeResponseDTO,
   BreakdownTypesService,
   CreateBreakdownDTO,
-  MachineDetailsResponse,
+  MachineResponseDTO,
   MachineService,
 } from '../../core/api/generated';
 import { CommonModule } from '@angular/common';
@@ -32,7 +32,7 @@ export class BreakdownFormComponent {
   private breakdownService = inject(BreakdownService);
 
   breakdownForm: FormGroup;
-  machines$: Observable<MachineDetailsResponse[]>;
+  machines$: Observable<MachineResponseDTO[]>;
   breakdownTypes$: Observable<BreakdownTypeResponseDTO[]>;
   isSubmitting = false;
 

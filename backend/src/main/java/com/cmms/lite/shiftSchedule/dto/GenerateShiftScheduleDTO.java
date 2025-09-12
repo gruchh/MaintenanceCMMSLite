@@ -13,9 +13,9 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "ShiftScheduleGenerateRequest",
+@Schema(name = "GenerateShiftScheduleDTO",
         description = "Dane potrzebne do wygenerowania harmonogramu zmian")
-public class GenerateShiftScheduleRequest {
+public class GenerateShiftScheduleDTO {
 
     @Schema(description = "Data rozpoczęcia harmonogramu (dzień 1 cyklu).")
     @NotNull

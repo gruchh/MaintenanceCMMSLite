@@ -11,8 +11,8 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { ShiftScheduleGenerateRequest } from '../model/models';
-import { ShiftScheduleResponse } from '../model/models';
+import { GenerateShiftScheduleDTO } from '../model/models';
+import { ShiftScheduleResponseDTO } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -26,15 +26,15 @@ export interface ShiftScheduleServiceInterface {
     /**
      * 
      * 
-     * @param shiftScheduleGenerateRequest 
+     * @param generateShiftScheduleDTO 
      */
-    generate(shiftScheduleGenerateRequest: ShiftScheduleGenerateRequest, extraHttpRequestParams?: any): Observable<ShiftScheduleResponse>;
+    createShiftSchedule(generateShiftScheduleDTO: GenerateShiftScheduleDTO, extraHttpRequestParams?: any): Observable<ShiftScheduleResponseDTO>;
 
     /**
      * 
      * 
      * @param id 
      */
-    getById(id: number, extraHttpRequestParams?: any): Observable<ShiftScheduleResponse>;
+    getShiftScheduleById(id: number, extraHttpRequestParams?: any): Observable<ShiftScheduleResponseDTO>;
 
 }

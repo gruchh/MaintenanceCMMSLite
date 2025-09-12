@@ -12,7 +12,7 @@
 /**
  * A detailed response object with machine data
  */
-export interface MachineDetailsResponse { 
+export interface MachineResponseDTO { 
     id?: number;
     code?: string;
     fullName?: string;

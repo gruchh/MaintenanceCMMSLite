@@ -12,7 +12,7 @@
 /**
  * Data required to create a new machine
  */
-export interface MachineCreateRequest { 
+export interface CreateMachineDTO { 
     code: string;
     fullName: string;
     serialNumber?: string;

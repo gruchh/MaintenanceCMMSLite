@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "EmployeeRoleCreateRequest", description = "Data required to create a new employee role")
-public class EmployeeRoleCreateRequest {
+@Schema(name = "CreateEmployeeRoleDTO", description = "Data required to create a new employee role")
+public class CreateEmployeeRoleDTO {
 
     @NotBlank(message = "Role name cannot be blank.")
     @Size(max = 50, message = "Role name cannot be longer than 50 characters.")

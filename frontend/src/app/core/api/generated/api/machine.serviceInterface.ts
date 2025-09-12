@@ -11,11 +11,11 @@ import { HttpHeaders }                                       from '@angular/comm
 
 import { Observable }                                        from 'rxjs';
 
-import { MachineCreateRequest } from '../model/models';
-import { MachineDetailsResponse } from '../model/models';
-import { MachineUpdateRequest } from '../model/models';
-import { PageMachineDetailsResponse } from '../model/models';
+import { CreateMachineDTO } from '../model/models';
+import { MachineResponseDTO } from '../model/models';
+import { PageMachineResponseDTO } from '../model/models';
 import { Pageable } from '../model/models';
+import { UpdateMachineDTO } from '../model/models';
 
 
 import { Configuration }                                     from '../configuration';
@@ -29,9 +29,9 @@ export interface MachineServiceInterface {
     /**
      * 
      * 
-     * @param machineCreateRequest 
+     * @param createMachineDTO 
      */
-    createMachine(machineCreateRequest: MachineCreateRequest, extraHttpRequestParams?: any): Observable<MachineDetailsResponse>;
+    createMachine(createMachineDTO: CreateMachineDTO, extraHttpRequestParams?: any): Observable<MachineResponseDTO>;
 
     /**
      * 
@@ -45,27 +45,27 @@ export interface MachineServiceInterface {
      * 
      * @param pageable 
      */
-    getAllMachines(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageMachineDetailsResponse>;
+    getAllMachines(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageMachineResponseDTO>;
 
     /**
      * 
      * 
      */
-    getAllMachinesAsList(extraHttpRequestParams?: any): Observable<Array<MachineDetailsResponse>>;
-
-    /**
-     * 
-     * 
-     * @param id 
-     */
-    getMachineById(id: number, extraHttpRequestParams?: any): Observable<MachineDetailsResponse>;
+    getAllMachinesAsList(extraHttpRequestParams?: any): Observable<Array<MachineResponseDTO>>;
 
     /**
      * 
      * 
      * @param id 
-     * @param machineUpdateRequest 
      */
-    updateMachine(id: number, machineUpdateRequest: MachineUpdateRequest, extraHttpRequestParams?: any): Observable<MachineDetailsResponse>;
+    getMachineById(id: number, extraHttpRequestParams?: any): Observable<MachineResponseDTO>;
+
+    /**
+     * 
+     * 
+     * @param id 
+     * @param updateMachineDTO 
+     */
+    updateMachine(id: number, updateMachineDTO: UpdateMachineDTO, extraHttpRequestParams?: any): Observable<MachineResponseDTO>;
 
 }

@@ -17,15 +17,15 @@ import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
 // @ts-ignore
-import { MachineCreateRequest } from '../model/machineCreateRequest';
+import { CreateMachineDTO } from '../model/createMachineDTO';
 // @ts-ignore
-import { MachineDetailsResponse } from '../model/machineDetailsResponse';
+import { MachineResponseDTO } from '../model/machineResponseDTO';
 // @ts-ignore
-import { MachineUpdateRequest } from '../model/machineUpdateRequest';
-// @ts-ignore
-import { PageMachineDetailsResponse } from '../model/pageMachineDetailsResponse';
+import { PageMachineResponseDTO } from '../model/pageMachineResponseDTO';
 // @ts-ignore
 import { Pageable } from '../model/pageable';
+// @ts-ignore
+import { UpdateMachineDTO } from '../model/updateMachineDTO';
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -47,16 +47,16 @@ export class MachineService extends BaseService implements MachineServiceInterfa
     }
 
     /**
-     * @param machineCreateRequest 
+     * @param createMachineDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public createMachine(machineCreateRequest: MachineCreateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MachineDetailsResponse>;
-    public createMachine(machineCreateRequest: MachineCreateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MachineDetailsResponse>>;
-    public createMachine(machineCreateRequest: MachineCreateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MachineDetailsResponse>>;
-    public createMachine(machineCreateRequest: MachineCreateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
-        if (machineCreateRequest === null || machineCreateRequest === undefined) {
-            throw new Error('Required parameter machineCreateRequest was null or undefined when calling createMachine.');
+    public createMachine(createMachineDTO: CreateMachineDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MachineResponseDTO>;
+    public createMachine(createMachineDTO: CreateMachineDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MachineResponseDTO>>;
+    public createMachine(createMachineDTO: CreateMachineDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MachineResponseDTO>>;
+    public createMachine(createMachineDTO: CreateMachineDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+        if (createMachineDTO === null || createMachineDTO === undefined) {
+            throw new Error('Required parameter createMachineDTO was null or undefined when calling createMachine.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -95,10 +95,10 @@ export class MachineService extends BaseService implements MachineServiceInterfa
 
         let localVarPath = `/api/machines`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<MachineDetailsResponse>('post', `${basePath}${localVarPath}`,
+        return this.httpClient.request<MachineResponseDTO>('post', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: machineCreateRequest,
+                body: createMachineDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,
@@ -166,9 +166,9 @@ export class MachineService extends BaseService implements MachineServiceInterfa
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllMachines(pageable: Pageable, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageMachineDetailsResponse>;
-    public getAllMachines(pageable: Pageable, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageMachineDetailsResponse>>;
-    public getAllMachines(pageable: Pageable, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageMachineDetailsResponse>>;
+    public getAllMachines(pageable: Pageable, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<PageMachineResponseDTO>;
+    public getAllMachines(pageable: Pageable, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<PageMachineResponseDTO>>;
+    public getAllMachines(pageable: Pageable, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<PageMachineResponseDTO>>;
     public getAllMachines(pageable: Pageable, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (pageable === null || pageable === undefined) {
             throw new Error('Required parameter pageable was null or undefined when calling getAllMachines.');
@@ -205,7 +205,7 @@ export class MachineService extends BaseService implements MachineServiceInterfa
 
         let localVarPath = `/api/machines`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<PageMachineDetailsResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<PageMachineResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 params: localVarQueryParameters,
@@ -223,9 +223,9 @@ export class MachineService extends BaseService implements MachineServiceInterfa
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getAllMachinesAsList(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<MachineDetailsResponse>>;
-    public getAllMachinesAsList(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<MachineDetailsResponse>>>;
-    public getAllMachinesAsList(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<MachineDetailsResponse>>>;
+    public getAllMachinesAsList(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<MachineResponseDTO>>;
+    public getAllMachinesAsList(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<MachineResponseDTO>>>;
+    public getAllMachinesAsList(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<MachineResponseDTO>>>;
     public getAllMachinesAsList(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarHeaders = this.defaultHeaders;
@@ -255,7 +255,7 @@ export class MachineService extends BaseService implements MachineServiceInterfa
 
         let localVarPath = `/api/machines/list`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<Array<MachineDetailsResponse>>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<Array<MachineResponseDTO>>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -273,9 +273,9 @@ export class MachineService extends BaseService implements MachineServiceInterfa
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getMachineById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MachineDetailsResponse>;
-    public getMachineById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MachineDetailsResponse>>;
-    public getMachineById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MachineDetailsResponse>>;
+    public getMachineById(id: number, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MachineResponseDTO>;
+    public getMachineById(id: number, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MachineResponseDTO>>;
+    public getMachineById(id: number, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MachineResponseDTO>>;
     public getMachineById(id: number, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling getMachineById.');
@@ -308,7 +308,7 @@ export class MachineService extends BaseService implements MachineServiceInterfa
 
         let localVarPath = `/api/machines/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<MachineDetailsResponse>('get', `${basePath}${localVarPath}`,
+        return this.httpClient.request<MachineResponseDTO>('get', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
                 responseType: <any>responseType_,
@@ -323,19 +323,19 @@ export class MachineService extends BaseService implements MachineServiceInterfa
 
     /**
      * @param id 
-     * @param machineUpdateRequest 
+     * @param updateMachineDTO 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public updateMachine(id: number, machineUpdateRequest: MachineUpdateRequest, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MachineDetailsResponse>;
-    public updateMachine(id: number, machineUpdateRequest: MachineUpdateRequest, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MachineDetailsResponse>>;
-    public updateMachine(id: number, machineUpdateRequest: MachineUpdateRequest, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MachineDetailsResponse>>;
-    public updateMachine(id: number, machineUpdateRequest: MachineUpdateRequest, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public updateMachine(id: number, updateMachineDTO: UpdateMachineDTO, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<MachineResponseDTO>;
+    public updateMachine(id: number, updateMachineDTO: UpdateMachineDTO, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<MachineResponseDTO>>;
+    public updateMachine(id: number, updateMachineDTO: UpdateMachineDTO, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<MachineResponseDTO>>;
+    public updateMachine(id: number, updateMachineDTO: UpdateMachineDTO, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
         if (id === null || id === undefined) {
             throw new Error('Required parameter id was null or undefined when calling updateMachine.');
         }
-        if (machineUpdateRequest === null || machineUpdateRequest === undefined) {
-            throw new Error('Required parameter machineUpdateRequest was null or undefined when calling updateMachine.');
+        if (updateMachineDTO === null || updateMachineDTO === undefined) {
+            throw new Error('Required parameter updateMachineDTO was null or undefined when calling updateMachine.');
         }
 
         let localVarHeaders = this.defaultHeaders;
@@ -374,10 +374,10 @@ export class MachineService extends BaseService implements MachineServiceInterfa
 
         let localVarPath = `/api/machines/${this.configuration.encodeParam({name: "id", value: id, in: "path", style: "simple", explode: false, dataType: "number", dataFormat: "int64"})}`;
         const { basePath, withCredentials } = this.configuration;
-        return this.httpClient.request<MachineDetailsResponse>('put', `${basePath}${localVarPath}`,
+        return this.httpClient.request<MachineResponseDTO>('put', `${basePath}${localVarPath}`,
             {
                 context: localVarHttpContext,
-                body: machineUpdateRequest,
+                body: updateMachineDTO,
                 responseType: <any>responseType_,
                 ...(withCredentials ? { withCredentials } : {}),
                 headers: localVarHeaders,

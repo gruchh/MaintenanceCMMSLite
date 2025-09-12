@@ -7,8 +7,8 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { MachineSummaryDTO } from './machineSummaryDTO';
 import { UsedPartBreakdownDTO } from './usedPartBreakdownDTO';
-import { MachineSummaryResponse } from './machineSummaryResponse';
 
 
 /**
@@ -54,7 +54,7 @@ export interface BreakdownResponseDTO {
     /**
      * Machine affected by the breakdown
      */
-    machine?: MachineSummaryResponse;
+    machine?: MachineSummaryDTO;
     /**
      * List of spare parts used during repair
      */

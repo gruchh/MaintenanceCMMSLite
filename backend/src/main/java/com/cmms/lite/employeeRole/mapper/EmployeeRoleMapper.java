@@ -1,8 +1,8 @@
 package com.cmms.lite.employeeRole.mapper;
 
-import com.cmms.lite.employeeRole.dto.EmployeeRoleCreateRequest;
-import com.cmms.lite.employeeRole.dto.EmployeeRoleResponse;
-import com.cmms.lite.employeeRole.dto.EmployeeRoleUpdateRequest;
+import com.cmms.lite.employeeRole.dto.CreateEmployeeRoleDTO;
+import com.cmms.lite.employeeRole.dto.EmployeeRoleResponseDTO;
+import com.cmms.lite.employeeRole.dto.UpdateEmployeeRoleDTO;
 import com.cmms.lite.employeeRole.entity.EmployeeRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,13 +19,13 @@ public interface EmployeeRoleMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "employees", ignore = true)
-    EmployeeRole toEntity(EmployeeRoleCreateRequest request);
+    EmployeeRole toEntity(CreateEmployeeRoleDTO request);
 
-    EmployeeRoleResponse toResponse(EmployeeRole role);
+    EmployeeRoleResponseDTO toResponse(EmployeeRole role);
 
-    List<EmployeeRoleResponse> toResponseList(List<EmployeeRole> roles);
+    List<EmployeeRoleResponseDTO> toResponseList(List<EmployeeRole> roles);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "employees", ignore = true)
-    void updateEntityFromRequest(EmployeeRoleUpdateRequest request, @MappingTarget EmployeeRole role);
+    void updateEntityFromRequest(UpdateEmployeeRoleDTO request, @MappingTarget EmployeeRole role);
 }

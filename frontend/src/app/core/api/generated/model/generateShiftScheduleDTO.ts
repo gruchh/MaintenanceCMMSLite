@@ -12,7 +12,7 @@
 /**
  * Dane potrzebne do wygenerowania harmonogramu zmian
  */
-export interface ShiftScheduleGenerateRequest { 
+export interface GenerateShiftScheduleDTO { 
     /**
      * Data rozpoczęcia harmonogramu (dzień 1 cyklu).
      */
