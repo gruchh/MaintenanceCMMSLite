@@ -1,7 +1,7 @@
 package com.cmms.lite.breakdown.dto;
 
 import com.cmms.lite.breakdownType.entity.BreakdownType;
-import com.cmms.lite.machine.dto.MachineSummaryResponse;
+import com.cmms.lite.machine.dto.MachineSummaryDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
@@ -38,7 +38,7 @@ public record BreakdownResponseDTO(
         BigDecimal totalCost,
 
         @Schema(description = "Machine affected by the breakdown")
-        MachineSummaryResponse machine,
+        MachineSummaryDTO machine,
 
         @Schema(description = "List of spare parts used during repair")
         List<UsedPartBreakdownDTO> usedParts

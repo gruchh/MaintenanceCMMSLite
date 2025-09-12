@@ -9,7 +9,7 @@ import com.cmms.lite.breakdown.repository.BreakdownRepository;
 import com.cmms.lite.breakdown.service.BreakdownService;
 import com.cmms.lite.breakdownType.entity.BreakdownType;
 import com.cmms.lite.exception.IllegalOperationException;
-import com.cmms.lite.machine.dto.MachineSummaryResponse;
+import com.cmms.lite.machine.dto.MachineSummaryDTO;
 import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.exception.MachineNotFoundException;
 import com.cmms.lite.machine.repository.MachineRepository;
@@ -88,7 +88,7 @@ class BreakdownServiceTest {
                 null,
                 BreakdownType.MECHANICAL,
                 BigDecimal.ZERO,
-                new MachineSummaryResponse(1L, "M-001", "Test Machine"),
+                new MachineSummaryDTO(1L, "M-001", "Test Machine"),
                 List.of()
         );
     }
@@ -158,7 +158,7 @@ class BreakdownServiceTest {
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenAnswer(invocation -> {
             Breakdown savedBreakdown = invocation.getArgument(0);
             Machine machine = savedBreakdown.getMachine();
-            MachineSummaryResponse machineSummary = new MachineSummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
+            MachineSummaryDTO machineSummary = new MachineSummaryDTO(machine.getId(), machine.getCode(), machine.getFullName());
             return new BreakdownResponseDTO(
                     savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(), null, null,
                     savedBreakdown.getOpened(), null, savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
@@ -185,7 +185,7 @@ class BreakdownServiceTest {
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenAnswer(invocation -> {
             Breakdown savedBreakdown = invocation.getArgument(0);
             Machine machine = savedBreakdown.getMachine();
-            MachineSummaryResponse machineSummary = new MachineSummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
+            MachineSummaryDTO machineSummary = new MachineSummaryDTO(machine.getId(), machine.getCode(), machine.getFullName());
             return new BreakdownResponseDTO(
                     savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(), null, null,
                     savedBreakdown.getOpened(), null, savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
@@ -213,7 +213,7 @@ class BreakdownServiceTest {
         when(breakdownMapper.toResponse(any(Breakdown.class))).thenAnswer(invocation -> {
             Breakdown savedBreakdown = invocation.getArgument(0);
             Machine machine = savedBreakdown.getMachine();
-            MachineSummaryResponse machineSummary = new MachineSummaryResponse(machine.getId(), machine.getCode(), machine.getFullName());
+            MachineSummaryDTO machineSummary = new MachineSummaryDTO(machine.getId(), machine.getCode(), machine.getFullName());
             return new BreakdownResponseDTO(
                     savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(),
                     savedBreakdown.getStartedAt(), savedBreakdown.getFinishedAt(), savedBreakdown.getOpened(),

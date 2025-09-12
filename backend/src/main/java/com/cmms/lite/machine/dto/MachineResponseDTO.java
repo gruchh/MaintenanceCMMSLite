@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
-@Schema(name = "MachineDetailsResponse", description = "A detailed response object with machine data")
-public record MachineDetailsResponse(
+@Schema(name = "MachineResponseDTO", description = "A detailed response object with machine data")
+public record MachineResponseDTO(
         Long id,
         String code,
         String fullName,

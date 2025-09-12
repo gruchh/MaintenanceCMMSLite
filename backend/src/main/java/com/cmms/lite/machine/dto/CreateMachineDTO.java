@@ -1,4 +1,4 @@
-package com.cmms.lite.machine;
+package com.cmms.lite.machine.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "MachineUpdateRequest", description = "Data required to update an existing machine")
-public class MachineUpdateRequest {
+@Schema(name = "CreateMachineDTO", description = "Data required to create a new machine")
+public class CreateMachineDTO {
 
     @NotBlank(message = "Machine code cannot be blank.")
     @Size(min = 2, max = 50)

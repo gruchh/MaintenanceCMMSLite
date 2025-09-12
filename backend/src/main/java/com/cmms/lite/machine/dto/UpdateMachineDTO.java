@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(name = "MachineCreateRequest", description = "Data required to create a new machine")
-public class MachineCreateRequest {
+@Schema(name = "UpdateMachineDTO", description = "Data required to update an existing machine")
+public class UpdateMachineDTO {
 
     @NotBlank(message = "Machine code cannot be blank.")
     @Size(min = 2, max = 50)

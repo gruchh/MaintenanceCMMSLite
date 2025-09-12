@@ -1,8 +1,7 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.machine.MachineDTOs;
-import com.cmms.lite.machine.MachineUpdateRequest;
-import com.cmms.lite.machine.dto.MachineDetailsResponse;
+import com.cmms.lite.machine.UpdateMachineDTO;
+import com.cmms.lite.machine.dto.MachineResponseDTO;
 import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.exception.MachineNotFoundException;
 import com.cmms.lite.machine.mapper.MachineMapper;
@@ -39,9 +38,9 @@ class MachineServiceTest {
     private MachineService machineService;
 
     private Machine testMachine;
-    private MachineDetailsResponse responseDTO;
-    private MachineDTOs.CreateRequest createRequest;
-    private MachineUpdateRequest updateRequest;
+    private MachineResponseDTO responseDTO;
+    private CreateMachineDTO createRequest;
+    private UpdateMachineDTO updateRequest;
 
 
     @BeforeEach
@@ -51,9 +50,9 @@ class MachineServiceTest {
         testMachine.setCode("M-001");
         testMachine.setFullName("Test Machine");
 
-        responseDTO = new MachineDetailsResponse(1L, "M-001", "Test Machine", "SN123", "Manufacturer", LocalDate.now(), "Desc");
-        createRequest = new MachineDTOs.CreateRequest("M-001", "Test Machine", "SN123", "Manufacturer", LocalDate.now(), "Desc");
-        updateRequest = new MachineUpdateRequest("M-002", "Updated Machine", "SN124", "New Manufacturer", LocalDate.now(), "Updated Desc");
+        responseDTO = new MachineResponseDTO(1L, "M-001", "Test Machine", "SN123", "Manufacturer", LocalDate.now(), "Desc");
+        createRequest = new CreateMachineDTO("M-001", "Test Machine", "SN123", "Manufacturer", LocalDate.now(), "Desc");
+        updateRequest = new UpdateMachineDTO("M-002", "Updated Machine", "SN124", "New Manufacturer", LocalDate.now(), "Updated Desc");
     }
 
     @Test
@@ -61,7 +60,7 @@ class MachineServiceTest {
         when(machineRepository.findById(1L)).thenReturn(Optional.of(testMachine));
         when(machineMapper.toResponse(testMachine)).thenReturn(responseDTO);
 
-        MachineDetailsResponse result = machineService.getMachineById(1L);
+        MachineResponseDTO result = machineService.getMachineById(1L);
 
         assertThat(result).isNotNull();
         assertEquals(1L, result.id());
@@ -81,7 +80,7 @@ class MachineServiceTest {
         when(machineRepository.findAll(pageable)).thenReturn(machinePage);
         when(machineMapper.toResponse(any(Machine.class))).thenReturn(responseDTO);
 
-        Page<MachineDetailsResponse> result = machineService.getAllMachines(pageable);
+        Page<MachineResponseDTO> result = machineService.getAllMachines(pageable);
 
         assertThat(result).isNotNull();
         assertEquals(1, result.getTotalElements());
@@ -94,7 +93,7 @@ class MachineServiceTest {
         when(machineRepository.save(testMachine)).thenReturn(testMachine);
         when(machineMapper.toResponse(testMachine)).thenReturn(responseDTO);
 
-        MachineDetailsResponse result = machineService.createMachine(createRequest);
+        MachineResponseDTO result = machineService.createMachine(createRequest);
 
         assertThat(result).isNotNull();
         assertEquals(createRequest.code(), result.code());
@@ -110,7 +109,7 @@ class MachineServiceTest {
         when(machineRepository.save(testMachine)).thenReturn(updatedMachine);
         when(machineMapper.toResponse(updatedMachine)).thenReturn(responseDTO);
 
-        MachineDetailsResponse result = machineService.updateMachine(1L, updateRequest);
+        MachineResponseDTO result = machineService.updateMachine(1L, updateRequest);
 
         assertThat(result).isNotNull();
         verify(machineMapper, times(1)).updateEntityFromRequest(updateRequest, testMachine);

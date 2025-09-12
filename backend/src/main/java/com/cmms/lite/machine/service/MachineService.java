@@ -1,8 +1,8 @@
 package com.cmms.lite.machine.service;
 
-import com.cmms.lite.machine.MachineDTOs;
-import com.cmms.lite.machine.MachineUpdateRequest;
-import com.cmms.lite.machine.dto.MachineDetailsResponse;
+import com.cmms.lite.machine.dto.CreateMachineDTO;
+import com.cmms.lite.machine.dto.MachineResponseDTO;
+import com.cmms.lite.machine.dto.UpdateMachineDTO;
 import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.exception.MachineNotFoundException;
 import com.cmms.lite.machine.mapper.MachineMapper;
@@ -25,29 +25,29 @@ public class MachineService {
     private static final String NOT_FOUND_MESSAGE = "Maszyna o ID %d nie została znaleziona.";
 
     @Transactional(readOnly = true)
-    public Page<MachineDetailsResponse> getAllMachines(Pageable pageable) {
+    public Page<MachineResponseDTO> getAllMachines(Pageable pageable) {
         return machineRepository.findAll(pageable).map(machineMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public List<MachineDetailsResponse> getAllMachinesAsList() {
+    public List<MachineResponseDTO> getAllMachinesAsList() {
         return machineRepository.findAll().stream().map(machineMapper::toResponse).toList();
     }
 
     @Transactional(readOnly = true)
-    public MachineDetailsResponse getMachineById(Long id) {
+    public MachineResponseDTO getMachineById(Long id) {
         Machine machine = getMachineByIdOrThrow(id);
         return machineMapper.toResponse(machine);
     }
 
     @Transactional
-    public MachineDetailsResponse createMachine(MachineDTOs.CreateRequest request) {
+    public MachineResponseDTO createMachine(CreateMachineDTO request) {
         Machine machine = machineMapper.toEntity(request);
         return machineMapper.toResponse(machineRepository.save(machine));
     }
 
     @Transactional
-    public MachineDetailsResponse updateMachine(Long id, MachineUpdateRequest request) {
+    public MachineResponseDTO updateMachine(Long id, UpdateMachineDTO request) {
         Machine machine = getMachineByIdOrThrow(id);
         machineMapper.updateEntityFromRequest(request, machine);
         return machineMapper.toResponse(machineRepository.save(machine));

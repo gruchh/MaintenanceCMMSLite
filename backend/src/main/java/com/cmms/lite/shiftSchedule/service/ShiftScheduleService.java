@@ -1,11 +1,13 @@
 package com.cmms.lite.shiftSchedule.service;
 
+import com.cmms.lite.shiftSchedule.dto.GenerateShiftScheduleRequest;
+import com.cmms.lite.shiftSchedule.dto.ShiftEntryResponseDTO;
+import com.cmms.lite.shiftSchedule.dto.ShiftScheduleResponseDTO;
 import com.cmms.lite.shiftSchedule.entity.BrigadeType;
 import com.cmms.lite.shiftSchedule.entity.ShiftEntry;
 import com.cmms.lite.shiftSchedule.entity.ShiftSchedule;
 import com.cmms.lite.shiftSchedule.entity.ShiftType;
 import com.cmms.lite.shiftSchedule.repository.ShiftEntryRepository;
-import com.cmms.lite.shiftSchedule.repository.ShiftScheduleDTOs;
 import com.cmms.lite.shiftSchedule.repository.ShiftScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,9 +46,9 @@ public class ShiftScheduleService {
     );
 
     @Transactional
-    public ShiftScheduleDTOs.ScheduleResponse generate(ShiftScheduleDTOs.GenerateRequest req) {
-        int days = (req.days() == null ? 28 : req.days());
-        LocalDate start = req.startDate();
+    public ShiftScheduleResponseDTO generate(GenerateShiftScheduleRequest req) {
+        int days = (req.getDays() == null ? 28 : req.getDays());
+        LocalDate start = req.getStartDate();
         LocalDate end = start.plusDays(days - 1);
 
         ShiftSchedule schedule = ShiftSchedule.builder()
@@ -86,15 +88,15 @@ public class ShiftScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public ShiftScheduleDTOs.ScheduleResponse getById(Long id) {
+    public ShiftScheduleResponseDTO getById(Long id) {
         ShiftSchedule schedule = scheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Harmonogram o ID %d nie istnieje.".formatted(id)));
         return toResponse(schedule);
     }
 
-    private ShiftScheduleDTOs.ScheduleResponse toResponse(ShiftSchedule s) {
+    private ShiftScheduleResponseDTO toResponse(ShiftSchedule s) {
         var entries = s.getEntries().stream()
-                .map(e -> new ShiftScheduleDTOs.EntryResponse(
+                .map(e -> new ShiftEntryResponseDTO(
                         e.getId(),
                         e.getWorkDate(),
                         e.getBrigadeType(),
@@ -102,7 +104,7 @@ public class ShiftScheduleService {
                 ))
                 .toList();
 
-        return new ShiftScheduleDTOs.ScheduleResponse(
+        return new ShiftScheduleResponseDTO(
                 s.getId(),
                 s.getStartDate(),
                 s.getEndDate(),

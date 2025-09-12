@@ -1,9 +1,9 @@
 package com.cmms.lite.machine.mapper;
 
-import com.cmms.lite.machine.MachineDTOs;
-import com.cmms.lite.machine.MachineUpdateRequest;
-import com.cmms.lite.machine.dto.MachineDetailsResponse;
-import com.cmms.lite.machine.dto.MachineSummaryResponse;
+import com.cmms.lite.machine.dto.CreateMachineDTO;
+import com.cmms.lite.machine.dto.MachineResponseDTO;
+import com.cmms.lite.machine.dto.MachineSummaryDTO;
+import com.cmms.lite.machine.dto.UpdateMachineDTO;
 import com.cmms.lite.machine.entity.Machine;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,15 +16,15 @@ public interface MachineMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "breakdownsList", ignore = true)
-    Machine toEntity(MachineDTOs.CreateRequest request);
+    Machine toEntity(CreateMachineDTO request);
 
-    MachineDetailsResponse toResponse(Machine machine);
+    MachineResponseDTO toResponse(Machine machine);
 
-    List<MachineDetailsResponse> toResponseList(List<Machine> machines);
+    List<MachineResponseDTO> toResponseList(List<Machine> machines);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "breakdownsList", ignore = true)
-    void updateEntityFromRequest(MachineUpdateRequest request, @MappingTarget Machine machine);
+    void updateEntityFromRequest(UpdateMachineDTO request, @MappingTarget Machine machine);
 
-    MachineSummaryResponse toSummaryResponse(Machine machine);
+    MachineSummaryDTO toSummaryResponse(Machine machine);
 }

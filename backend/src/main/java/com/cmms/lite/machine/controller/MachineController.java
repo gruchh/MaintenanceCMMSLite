@@ -1,8 +1,8 @@
 package com.cmms.lite.machine.controller;
 
-import com.cmms.lite.machine.MachineDTOs;
-import com.cmms.lite.machine.MachineUpdateRequest;
-import com.cmms.lite.machine.dto.MachineDetailsResponse;
+import com.cmms.lite.machine.dto.CreateMachineDTO;
+import com.cmms.lite.machine.dto.MachineResponseDTO;
+import com.cmms.lite.machine.dto.UpdateMachineDTO;
 import com.cmms.lite.machine.service.MachineService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,34 +27,34 @@ public class MachineController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<MachineDetailsResponse>> getAllMachines(Pageable pageable) {
+    public ResponseEntity<Page<MachineResponseDTO>> getAllMachines(Pageable pageable) {
         return ResponseEntity.ok(machineService.getAllMachines(pageable));
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<MachineDetailsResponse>> getAllMachinesAsList() {
+    public ResponseEntity<List<MachineResponseDTO>> getAllMachinesAsList() {
         return ResponseEntity.ok(machineService.getAllMachinesAsList());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<MachineDetailsResponse> getMachineById(@PathVariable Long id) {
+    public ResponseEntity<MachineResponseDTO> getMachineById(@PathVariable Long id) {
         return ResponseEntity.ok(machineService.getMachineById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MachineDetailsResponse> createMachine(
-            @Valid @RequestBody MachineDTOs.CreateRequest createRequest) {
-        MachineDetailsResponse response = machineService.createMachine(createRequest);
+    public ResponseEntity<MachineResponseDTO> createMachine(
+            @Valid @RequestBody CreateMachineDTO createRequest) {
+        MachineResponseDTO response = machineService.createMachine(createRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MachineDetailsResponse> updateMachine(
+    public ResponseEntity<MachineResponseDTO> updateMachine(
             @PathVariable Long id,
-            @Valid @RequestBody MachineUpdateRequest updateRequest) {
+            @Valid @RequestBody UpdateMachineDTO updateRequest) {
         return ResponseEntity.ok(machineService.updateMachine(id, updateRequest));
     }
 
