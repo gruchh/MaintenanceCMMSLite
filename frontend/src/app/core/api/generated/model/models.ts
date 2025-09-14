@@ -1,4 +1,5 @@
 export * from './addPartBreakdownDTO';
+export * from './breakdownPerformanceIndicatorDTO';
 export * from './breakdownResponseDTO';
 export * from './breakdownStatsDTO';
 export * from './breakdownTypeResponseDTO';

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/spare-parts", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Tag(name = "Spare Part", description = "API for managing spare parts inventory")
-public class    SparePartController {
+public class SparePartController {
 
     private final SparePartService sparePartService;
 

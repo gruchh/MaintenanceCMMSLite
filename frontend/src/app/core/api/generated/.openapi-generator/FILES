@@ -23,6 +23,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/addPartBreakdownDTO.ts
+model/breakdownPerformanceIndicatorDTO.ts
 model/breakdownResponseDTO.ts
 model/breakdownStatsDTO.ts
 model/breakdownTypeResponseDTO.ts

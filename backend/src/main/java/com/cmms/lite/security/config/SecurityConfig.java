@@ -62,9 +62,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/h2-console/**",
-                                "/api/breakdowns/stats",
+                                "/api/breakdowns/performance/**",
                                 "/api/breakdowns/report",
-                                "/api/breakdowns/latest",
                                 "/api/breakdown-types",
                                 "/api/machines/list"
                         ).permitAll()

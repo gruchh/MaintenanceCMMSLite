@@ -12,6 +12,7 @@ import { HttpHeaders }                                       from '@angular/comm
 import { Observable }                                        from 'rxjs';
 
 import { AddPartBreakdownDTO } from '../model/models';
+import { BreakdownPerformanceIndicatorDTO } from '../model/models';
 import { BreakdownResponseDTO } from '../model/models';
 import { BreakdownStatsDTO } from '../model/models';
 import { CloseBreakdownDTO } from '../model/models';
@@ -70,6 +71,12 @@ export interface BreakdownServiceInterface {
      * 
      */
     getLatestBreakdown(extraHttpRequestParams?: any): Observable<BreakdownResponseDTO>;
+
+    /**
+     * 
+     * 
+     */
+    getWeeklyPerformance(extraHttpRequestParams?: any): Observable<Array<BreakdownPerformanceIndicatorDTO>>;
 
     /**
      * 

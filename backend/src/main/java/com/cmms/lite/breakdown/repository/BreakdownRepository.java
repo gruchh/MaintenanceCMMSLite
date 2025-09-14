@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,4 +30,7 @@ public interface BreakdownRepository extends JpaRepository<Breakdown, Long> {
                     "WHERE lower(b.description) LIKE lower(concat('%', :keyword, '%')) " +
                     "OR lower(m.fullName) LIKE lower(concat('%', :keyword, '%'))")
     Page<Breakdown> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT b FROM Breakdown b WHERE b.startedAt <= :end AND (b.finishedAt IS NULL OR b.finishedAt >= :start)")
+    List<Breakdown> findBreakdownsAffectingPeriod(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

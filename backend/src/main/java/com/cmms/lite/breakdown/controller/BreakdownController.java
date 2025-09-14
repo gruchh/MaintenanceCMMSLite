@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/breakdowns", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -59,13 +61,18 @@ public class BreakdownController {
         return ResponseEntity.ok(breakdownService.closeBreakdown(breakdownId, request));
     }
 
-    @GetMapping("/latest")
+    @GetMapping("/performance/latest")
     public ResponseEntity<BreakdownResponseDTO> getLatestBreakdown() {
         return ResponseEntity.ok(breakdownService.getLatestBreakdown());
     }
 
-    @GetMapping("/stats")
+    @GetMapping("/performance/stats")
     public ResponseEntity<BreakdownStatsDTO> getBreakdownStats() {
         return ResponseEntity.ok(breakdownService.getBreakdownStats());
+    }
+
+    @GetMapping("/performance/weekly")
+    public ResponseEntity<List<BreakdownPerformanceIndicatorDTO>> getWeeklyPerformance() {
+        return ResponseEntity.ok(breakdownService.getWeeklyPerformance());
     }
 }
