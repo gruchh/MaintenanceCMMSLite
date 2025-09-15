@@ -15,6 +15,7 @@ import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
 import com.cmms.lite.sparePart.exception.UsedPartNotFoundException;
 import com.cmms.lite.sparePart.repository.SparePartRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class BreakdownService {
 
@@ -168,66 +170,72 @@ public class BreakdownService {
 
     @Transactional(readOnly = true)
     public List<BreakdownPerformanceIndicatorDTO> getWeeklyPerformance() {
-        List<BreakdownPerformanceIndicatorDTO> performanceData = new ArrayList<>();
+        long totalMachines = machineRepository.count();
+        List<LocalDate> lastSevenDays = getLastSevenDays();
+
+        if (totalMachines == 0) {
+            return lastSevenDays.stream()
+                    .map(day -> new BreakdownPerformanceIndicatorDTO(day, 100.0))
+                    .collect(Collectors.toList());
+        }
+
+        return lastSevenDays.stream()
+                .map(day -> {
+                    double downtime = calculateDowntimeForDay(day);
+                    double performance = calculatePerformance(downtime, totalMachines);
+                    return new BreakdownPerformanceIndicatorDTO(day, performance);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<LocalDate> getLastSevenDays() {
         LocalDate today = LocalDate.now();
-        List<LocalDate> lastSevenDays = IntStream.range(1, 8)
+        return IntStream.range(1, 8)
                 .mapToObj(today::minusDays)
                 .collect(Collectors.toList());
+    }
 
-        // Pobierz całkowitą liczbę maszyn
-        long totalMachines = machineRepository.count();
-        if (totalMachines == 0) {
-            // Jeśli nie ma maszyn, zwróć puste dane lub 100% wydajność
-            for (LocalDate day : lastSevenDays) {
-                performanceData.add(new BreakdownPerformanceIndicatorDTO(day, 100));
+    private double calculateDowntimeForDay(LocalDate day) {
+        LocalDateTime startOfDay = day.atStartOfDay();
+        LocalDateTime endOfDay = day.atTime(LocalTime.MAX);
+
+        List<Breakdown> breakdowns = breakdownRepository.findBreakdownsAffectingPeriod(startOfDay, endOfDay);
+
+        long totalDowntimeMinutes = 0;
+
+        for (Breakdown breakdown : breakdowns) {
+            LocalDateTime breakdownStart = breakdown.getStartedAt();
+            LocalDateTime breakdownFinish = breakdown.getFinishedAt() != null
+                    ? breakdown.getFinishedAt()
+                    : LocalDateTime.now();
+
+            LocalDateTime effectiveStart = breakdownStart.isAfter(startOfDay) ? breakdownStart : startOfDay;
+            LocalDateTime effectiveEnd = breakdownFinish.isBefore(endOfDay) ? breakdownFinish : endOfDay;
+
+            if (effectiveStart.isBefore(effectiveEnd)) {
+                long minutes = Duration.between(effectiveStart, effectiveEnd).toMinutes();
+                totalDowntimeMinutes += minutes;
+
+                log.debug("Awaria maszyny ID: {} ({}), czas w tym dniu: {} minut",
+                        breakdown.getMachine().getId(),
+                        breakdown.getMachine().getCode(),
+                        minutes);
             }
-            return performanceData;
         }
 
-        int totalPossibleMinutesPerDay = (int) (totalMachines * MINUTES_IN_DAY);
+        log.info("Dzień {} – łączny czas awarii: {} minut", day, totalDowntimeMinutes);
+        return (double) totalDowntimeMinutes;
+    }
 
-        System.out.println("Liczba maszyn: " + totalMachines);
-        System.out.println("Całkowity możliwy czas pracy na dobę: " + totalPossibleMinutesPerDay + " minut");
+    private double calculatePerformance(double downtimeMinutes, long totalMachines) {
+        double totalPossibleMinutes = totalMachines * MINUTES_IN_DAY;
+        double performance = 100.0 - (downtimeMinutes * 100.0 / totalPossibleMinutes);
 
-        for (LocalDate day : lastSevenDays) {
-            LocalDateTime startOfDay = day.atStartOfDay();
-            LocalDateTime endOfDay = day.atTime(LocalTime.MAX);
+        double rounded = Math.round(performance * 10.0) / 10.0;
 
-            List<Breakdown> breakdowns = breakdownRepository.findBreakdownsAffectingPeriod(startOfDay, endOfDay);
+        log.info("Wydajność: {}% (maszyny: {}, downtime: {} min)", rounded, totalMachines, downtimeMinutes);
 
-            System.out.println("=== Dzień: " + day + " ===");
-            System.out.println("Znalezionych awarii: " + breakdowns.size());
-
-            int totalDowntimeMinutes = 0;
-            for (Breakdown breakdown : breakdowns) {
-                LocalDateTime breakdownStart = breakdown.getStartedAt();
-                LocalDateTime breakdownFinish = breakdown.getFinishedAt() != null ?
-                        breakdown.getFinishedAt() : LocalDateTime.now();
-
-                LocalDateTime effectiveStart = breakdownStart.isAfter(startOfDay) ? breakdownStart : startOfDay;
-                LocalDateTime effectiveEnd = breakdownFinish.isBefore(endOfDay) ? breakdownFinish : endOfDay;
-
-                if (effectiveStart.isBefore(effectiveEnd)) {
-                    long minutesForThisBreakdown = Duration.between(effectiveStart, effectiveEnd).toMinutes();
-                    totalDowntimeMinutes += (int) minutesForThisBreakdown;
-
-                    System.out.println("Awaria maszyny ID: " + breakdown.getMachine().getId() +
-                            " (" + breakdown.getMachine().getCode() + ")");
-                    System.out.println("  Czas awarii w tym dniu: " + minutesForThisBreakdown + " minut");
-                }
-            }
-
-            double performanceDouble = 100.0 - ((double) totalDowntimeMinutes * 100.0 / totalPossibleMinutesPerDay);
-            int performance = (int) Math.round(performanceDouble);
-
-            System.out.println("Łączny czas awarii: " + totalDowntimeMinutes + " minut");
-            System.out.println("Wydajność: " + String.format("%.2f", performanceDouble) + "% (zaokrąglone: " + performance + "%)");
-            System.out.println();
-
-            performanceData.add(new BreakdownPerformanceIndicatorDTO(day, Math.max(0, performance)));
-        }
-
-        return performanceData;
+        return Math.max(0.0, rounded);
     }
 
 }
