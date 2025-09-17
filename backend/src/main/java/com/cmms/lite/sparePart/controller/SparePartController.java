@@ -25,8 +25,10 @@ public class SparePartController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Page<SparePartResponseDTO>> getAllSpareParts(Pageable pageable) {
-        return ResponseEntity.ok(sparePartService.getAllSpareParts(pageable));
+    public ResponseEntity<Page<SparePartResponseDTO>> getAllSpareParts(
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.ok(sparePartService.getAllSpareParts(search, pageable));
     }
 
     @GetMapping("/{id}")

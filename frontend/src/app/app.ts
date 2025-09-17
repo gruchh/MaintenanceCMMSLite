@@ -1,11 +1,13 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { LoginModalComponent } from './shared/components/login-modal/login-modal.component';
 import { RegisterModalComponent } from './shared/components/register-modal/register-modal.component';
 import { ModalService, ModalType } from './core/api/services/modal.service';
 import { AuthService } from './core/api/services/auth.service';
+import localePl from '@angular/common/locales/pl';
 
+registerLocaleData(localePl, 'pl-PL');
 
 @Component({
   selector: 'app-root',

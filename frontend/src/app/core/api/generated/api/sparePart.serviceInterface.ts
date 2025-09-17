@@ -44,8 +44,9 @@ export interface SparePartServiceInterface {
      * 
      * 
      * @param pageable 
+     * @param search 
      */
-    getAllSpareParts(pageable: Pageable, extraHttpRequestParams?: any): Observable<PageSparePartResponseDTO>;
+    getAllSpareParts(pageable: Pageable, search?: string, extraHttpRequestParams?: any): Observable<PageSparePartResponseDTO>;
 
     /**
      * 

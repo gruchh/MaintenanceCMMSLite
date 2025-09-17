@@ -13,8 +13,8 @@ import { EmployeeResponseDTO } from './employeeResponseDTO';
 
 
 export interface PageEmployeeResponseDTO { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
     size?: number;

@@ -13,8 +13,8 @@ import { MachineResponseDTO } from './machineResponseDTO';
 
 
 export interface PageMachineResponseDTO { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
     size?: number;

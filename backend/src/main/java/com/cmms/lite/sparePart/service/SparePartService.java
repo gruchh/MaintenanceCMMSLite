@@ -23,8 +23,12 @@ public class SparePartService {
     private static final String NOT_FOUND = "Część zamienna o ID %d nie została znaleziona.";
 
     @Transactional(readOnly = true)
-    public Page<SparePartResponseDTO> getAllSpareParts(Pageable pageable) {
-        return sparePartRepository.findAll(pageable)
+    public Page<SparePartResponseDTO> getAllSpareParts(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return sparePartRepository.findAll(pageable)
+                    .map(sparePartMapper::toResponse);
+        }
+        return sparePartRepository.searchByKeyword(keyword, pageable)
                 .map(sparePartMapper::toResponse);
     }
 
