@@ -1,7 +1,8 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.machine.UpdateMachineDTO;
+import com.cmms.lite.machine.dto.CreateMachineDTO;
 import com.cmms.lite.machine.dto.MachineResponseDTO;
+import com.cmms.lite.machine.dto.UpdateMachineDTO;
 import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.exception.MachineNotFoundException;
 import com.cmms.lite.machine.mapper.MachineMapper;
@@ -96,7 +97,7 @@ class MachineServiceTest {
         MachineResponseDTO result = machineService.createMachine(createRequest);
 
         assertThat(result).isNotNull();
-        assertEquals(createRequest.code(), result.code());
+        assertEquals(createRequest.getCode(), result.code());
         verify(machineRepository, times(1)).save(testMachine);
     }
 

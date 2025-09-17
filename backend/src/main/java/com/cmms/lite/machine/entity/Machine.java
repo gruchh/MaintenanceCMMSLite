@@ -46,7 +46,6 @@ public class Machine {
     @Column(name = "production_date")
     private LocalDate productionDate;
 
-    @Lob
     private String description;
 
     @Builder.Default
