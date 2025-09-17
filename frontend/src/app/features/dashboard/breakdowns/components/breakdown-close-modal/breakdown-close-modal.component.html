@@ -1,11 +1,10 @@
-@if (isOpen) {
+@if (isOpen()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
     <div class="relative w-full max-w-lg animate-scale-in rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 text-slate-800 shadow-2xl ring-1 ring-black/5">
-
       <div class="flex items-start justify-between rounded-t p-6">
         <div>
           <h3 class="bg-gradient-to-r from-indigo-600 to-slate-800 bg-clip-text text-2xl font-bold text-transparent">
-            Zamknij awarię #{{ breakdownId }}
+            Zamknij awarię #{{ breakdownId() }}
           </h3>
           <p class="mt-1 text-sm text-slate-500">Dodaj notatki serwisowe, aby zamknąć zgłoszenie.</p>
         </div>
@@ -15,9 +14,9 @@
       </div>
       <form [formGroup]="closeForm" (ngSubmit)="onSubmit()">
         <div class="space-y-6 p-6">
-          @if (errorMessage) {
+          @if (errorMessage()) {
             <div class="rounded-lg bg-red-100/50 p-3 text-center text-sm text-red-600" role="alert">
-              {{ errorMessage }}
+              {{ errorMessage() }}
             </div>
           }
           <div>
@@ -38,9 +37,9 @@
         <div class="flex items-center justify-end space-x-4 rounded-b-2xl bg-slate-50/50 p-6">
           <button (click)="onClose()" type="button" class="transform-gpu rounded-lg border border-slate-300 bg-white/80 px-5 py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 ease-in-out hover:bg-slate-100 focus:z-10 focus:outline-none focus:ring-4 focus:ring-indigo-500/50">
             Anuluj
-          </button>*
-          <button [disabled]="closeForm.invalid || isLoading" type="submit" class="transform-gpu rounded-lg border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-center text-sm font-medium text-white shadow-lg shadow-indigo-500/40 transition-all duration-300 ease-in-out hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:from-slate-400 disabled:to-slate-500 disabled:shadow-none disabled:cursor-not-allowed">
-            @if (isLoading) {
+          </button>
+          <button [disabled]="closeForm.invalid || isLoading()" type="submit" class="transform-gpu rounded-lg border border-transparent bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2.5 text-center text-sm font-medium text-white shadow-lg shadow-indigo-500/40 transition-all duration-300 ease-in-out hover:from-indigo-700 hover:to-purple-700 hover:shadow-xl hover:shadow-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:from-slate-400 disabled:to-slate-500 disabled:shadow-none disabled:cursor-not-allowed">
+            @if (isLoading()) {
               <span>Zamykanie...</span>
             } @else {
               <span>Zapisz i zamknij</span>

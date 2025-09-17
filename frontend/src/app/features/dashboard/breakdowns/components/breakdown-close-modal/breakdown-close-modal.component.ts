@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { input, output } from '@angular/core';
 import { BreakdownService, CloseBreakdownDTO } from '../../../../../core/api/generated';
 
 @Component({
@@ -9,32 +10,36 @@ import { BreakdownService, CloseBreakdownDTO } from '../../../../../core/api/gen
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './breakdown-close-modal.component.html',
 })
-export class BreakdownCloseModalComponent implements OnChanges {
+export class BreakdownCloseModalComponent {
+  isOpen = input<boolean>(false);
+  breakdownId = input<number | null>(null);
+  closeModal = output<void>();
+  breakdownClosed = output<void>();
 
-  @Input() isOpen = false;
-  @Input() breakdownId: number | null = null;
-  @Output() closeModal = new EventEmitter<void>();
-  @Output() breakdownClosed = new EventEmitter<void>();
-
-  closeForm: FormGroup;
-  isLoading = false;
-  errorMessage: string | null = null;
+  closeForm: FormGroup<{
+    closingNotes: import('@angular/forms').FormControl<string>;
+  }>;
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
 
   constructor(
     private fb: FormBuilder,
     private breakdownService: BreakdownService
   ) {
     this.closeForm = this.fb.group({
-      closingNotes: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+      closingNotes: this.fb.control<string>('', {
+        validators: [Validators.required, Validators.minLength(10), Validators.maxLength(500)],
+        nonNullable: true,
+      }),
     });
-  }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['isOpen'] && this.isOpen) {
-      this.closeForm.reset();
-      this.errorMessage = null;
-      this.isLoading = false;
-    }
+    effect(() => {
+      if (this.isOpen()) {
+        this.closeForm.reset();
+        this.errorMessage.set(null);
+        this.isLoading.set(false);
+      }
+    });
   }
 
   onClose(): void {
@@ -42,26 +47,26 @@ export class BreakdownCloseModalComponent implements OnChanges {
   }
 
   onSubmit(): void {
-    if (this.closeForm.invalid || !this.breakdownId) {
+    if (this.closeForm.invalid || !this.breakdownId()) {
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = null;
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
     const request: CloseBreakdownDTO = {
-      specialistComment: this.closeForm.value.closingNotes,
+      specialistComment: this.closeForm.value.closingNotes!,
     };
 
-    this.breakdownService.closeBreakdown(this.breakdownId, request).subscribe({
+    this.breakdownService.closeBreakdown(this.breakdownId()!, request).subscribe({
       next: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
         this.breakdownClosed.emit();
       },
       error: (err) => {
-        this.isLoading = false;
-        this.errorMessage = 'Wystąpił nieoczekiwany błąd. Spróbuj ponownie.';
-        console.error("Błąd podczas zamykania awarii:", err);
+        this.isLoading.set(false);
+        this.errorMessage.set('Wystąpił nieoczekiwany błąd. Spróbuj ponownie.');
+        console.error('Błąd podczas zamykania awarii:', err);
       },
     });
   }
