@@ -12,6 +12,7 @@ import {
   BreakdownService,
   CloseBreakdownDTO,
 } from '../../../../../core/api/generated';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-breakdown-close-modal',
@@ -22,6 +23,7 @@ import {
 export class BreakdownCloseModalComponent {
   private fb = inject(FormBuilder);
   private breakdownService = inject(BreakdownService);
+    private toastr = inject(ToastrService);
 
   isOpen = input<boolean>(false);
   breakdownId = input<number | null>(null);
@@ -89,11 +91,13 @@ export class BreakdownCloseModalComponent {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
+          this.toastr.success('Awaria została zamknięta pomyślnie!');
           this.breakdownClosed.emit();
           this.resetForm();
         },
         error: (err) => {
           this.isLoading.set(false);
+          this.toastr.error("Nie udało się zamknąć awarii. Spróbuj ponownie.");
           this.errorMessage.set(
             'Wystąpił nieoczekiwany błąd. Spróbuj ponownie.'
           );

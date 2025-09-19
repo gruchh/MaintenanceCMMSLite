@@ -1,71 +1,144 @@
 <div class="mx-auto max-w-screen-xl p-4">
-  <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
-    <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+  <div
+    class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden"
+  >
+    <div
+      class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
+    >
       <div class="w-full md:w-1/2">
         <form class="flex items-center">
           <label for="simple-search" class="sr-only">Szukaj</label>
           <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            <div
+              class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+            >
+              <svg
+                aria-hidden="true"
+                class="w-5 h-5 text-gray-500 dark:text-gray-400"
+                fill="currentColor"
+                viewbox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </div>
             <input
               type="text"
               id="simple-search"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Szukaj pracownika"
-              (input)="onSearch($event)">
+              placeholder="Szukaj pracownika..."
+              [(ngModel)]="searchTerm"
+              (ngModelChange)="onSearchChange()"
+              [ngModelOptions]="{ standalone: true }"
+            />
+            <!-- <<--- DODANA LINIA -->
           </div>
         </form>
       </div>
     </div>
+
+    @if (isLoading()) {
+    <div class="flex justify-center items-center p-8">
+      <div class="text-lg text-gray-500 dark:text-gray-400">
+        Ładowanie pracowników...
+      </div>
+    </div>
+    } @if (errorMessage()) {
+    <div class="p-8 text-center text-red-600 dark:text-red-500">
+      <p>{{ errorMessage() }}</p>
+      <button
+        (click)="loadEmployees()"
+        class="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+      >
+        Spróbuj ponownie
+      </button>
+    </div>
+    } @if (!isLoading() && !errorMessage()) {
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <thead
+          class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+        >
           <tr>
             <th scope="col" class="px-6 py-3">Pracownik</th>
             <th scope="col" class="px-6 py-3">Stanowisko</th>
             @if (isAdmin) {
-              <th scope="col" class="px-6 py-3">Akcja</th>
+            <th scope="col" class="px-6 py-3">Akcja</th>
             }
           </tr>
         </thead>
         <tbody>
-          @for (employee of employees; track employee.id) {
-            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <th scope="row" class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                <img class="w-10 h-10 rounded-full" [src]="employee.avatarUrl" [alt]="employee.fullName + ' profile image'">
-                <div class="pl-3">
-                  <div class="text-base font-semibold">{{ employee.fullName }}</div>
-                  <div class="font-normal text-gray-500">{{ employee.username }}</div>
+          @for (employee of employees(); track employee.id) {
+          <tr
+            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+          >
+            <th
+              scope="row"
+              class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
+            >
+              <img
+                class="w-10 h-10 rounded-full object-cover"
+                [src]="employee.avatarUrl || 'assets/images/default-avatar.png'"
+                [alt]="employee.fullName + ' profile image'"
+              />
+              <div class="pl-3">
+                <div class="text-base font-semibold">
+                  {{ employee.fullName }}
                 </div>
-              </th>
-              <td class="px-6 py-4">{{ employee.role }}</td>
-              @if (isAdmin) {
-                <td class="px-6 py-4">
-                  <a (click)="openEditModal(employee)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">
-                    Edytuj pracownika
-                  </a>
-                </td>
-              }
-            </tr>
+                <div class="font-normal text-gray-500">
+                  {{ employee.username }}
+                </div>
+              </div>
+            </th>
+            <td class="px-6 py-4">{{ employee.role }}</td>
+            @if (isAdmin) {
+            <td class="px-6 py-4">
+              <a
+                (click)="openEditModal(employee)"
+                class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
+              >
+                Edytuj pracownika
+              </a>
+            </td>
+            }
+          </tr>
           } @empty {
-            <tr>
-              <td [attr.colspan]="isAdmin ? 3 : 2" class="px-6 py-4 text-center text-gray-500">
-                Nie znaleziono pracowników.
-              </td>
-            </tr>
+          <tr>
+            <td
+              [attr.colspan]="isAdmin ? 3 : 2"
+              class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+            >
+              Nie znaleziono pracowników spełniających kryteria.
+            </td>
+          </tr>
           }
         </tbody>
       </table>
     </div>
-    <nav class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
+
+    <nav
+      class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+      aria-label="Table navigation"
+    >
       <div class="flex items-center space-x-3">
-        <label for="records-per-page" class="text-sm font-medium text-gray-900 dark:text-white">Rekordów na stronie:</label>
-        <select id="records-per-page" (change)="onPageSizeChange($event)" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+        <label
+          for="records-per-page"
+          class="text-sm font-medium text-gray-900 dark:text-white"
+          >Rekordów na stronie:</label
+        >
+        <select
+          id="records-per-page"
+          (change)="onPageSizeChange($event)"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        >
           @for (size of pageSizes; track size) {
-            <option [value]="size" [selected]="size === pageSize">{{ size }}</option>
+          <option [value]="size" [selected]="size === pageSize()">
+            {{ size }}
+          </option>
           }
         </select>
       </div>
@@ -73,27 +146,43 @@
       <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
         Wyświetlanie
         <span class="font-semibold text-gray-900 dark:text-white">
-          {{ totalElements > 0 ? (currentPage * pageSize) + 1 : 0 }}-{{ (currentPage + 1) * pageSize > totalElements ? totalElements : (currentPage + 1) * pageSize }}
+          {{ totalElements() > 0 ? currentPage() * pageSize() + 1 : 0 }}-{{
+            (currentPage() + 1) * pageSize() > totalElements()
+              ? totalElements()
+              : (currentPage() + 1) * pageSize()
+          }}
         </span>
         z
-        <span class="font-semibold text-gray-900 dark:text-white">{{ totalElements }}</span>
+        <span class="font-semibold text-gray-900 dark:text-white">{{
+          totalElements()
+        }}</span>
       </span>
 
       <div class="inline-flex items-center -space-x-px">
-        <button (click)="previousPage()" [disabled]="currentPage === 0" class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          (click)="previousPage()"
+          [disabled]="currentPage() === 0"
+          class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Poprzednia
         </button>
-        <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1" class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage() >= totalPages() - 1"
+          class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Następna
         </button>
       </div>
     </nav>
+    }
   </div>
 </div>
 
 <app-employee-edit-modal
-  [isOpen]="isModalOpen"
-  [employeeId]="selectedEmployeeId"
+  [isOpen]="isModalOpen()"
+  [employeeId]="selectedEmployeeId()"
   (closeModal)="closeEditModal()"
-  (employeeUpdated)="handleEmployeeUpdate()">
+  (employeeUpdated)="handleEmployeeUpdate()"
+>
 </app-employee-edit-modal>

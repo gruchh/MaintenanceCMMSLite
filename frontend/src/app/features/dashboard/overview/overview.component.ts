@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ToastrService } from 'ngx-toastr';
 
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
@@ -42,15 +43,18 @@ import { BreakdownPerformanceIndicatorDTO, BreakdownService } from '../../../cor
   ]
 })
 export class OverviewComponent implements OnInit {
-  private readonly breakdownService = inject(BreakdownService);
-  private readonly destroyRef = inject(DestroyRef);
+  private breakdownService = inject(BreakdownService);
+  private destroyRef = inject(DestroyRef);
+  private toastr = inject(ToastrService);
 
-  readonly isLoading = signal(true);
-  readonly error = signal<string | null>(null);
-  readonly performanceData = signal<number[]>([]);
-  readonly days = signal<string[]>([]);
-  readonly performanceSpotlightDate = signal('');
-  readonly performanceSpotlightValue = signal(0);
+  isLoading = signal(true);
+  error = signal<string | null>(null);
+  performanceData = signal<number[]>([]);
+  days = signal<string[]>([]);
+  performanceSpotlightDate = signal('');
+  performanceSpotlightValue = signal(0);
+  performancePath = signal('');
+  performanceDotCoords = signal<{ x: number; y: number; value: number }[]>([]);
 
   readonly avgPerformance = computed(() => {
     const data = this.performanceData();
@@ -58,9 +62,6 @@ export class OverviewComponent implements OnInit {
     const sum = data.reduce((a, b) => a + b, 0);
     return Math.round(sum / data.length);
   });
-
-  readonly performancePath = signal('');
-  readonly performanceDotCoords = signal<{ x: number; y: number; value: number }[]>([]);
 
   readonly employeeProfile = {
     name: 'Adam Kowalski',
@@ -92,16 +93,16 @@ export class OverviewComponent implements OnInit {
     },
   ];
 
-  readonly mtbfYear = '250 godzin';
-  readonly mtbfMonth = '22 godziny';
-  readonly mttrYear = '1.5 godziny';
-  readonly mttrMonth = '0.9 godziny';
+  mtbfYear = '250 godzin';
+  mtbfMonth = '22 godziny';
+  mttrYear = '1.5 godziny';
+  mttrMonth = '0.9 godziny';
 
-  readonly viewBoxWidth = 400;
-  readonly viewBoxHeight = 200; // Zwiększone żeby zmieścić etykiety z procentami
-  readonly paddingX = 30;
-  readonly paddingTop = 25;
-  readonly paddingBottom = 30; // Zwiększone dla dat na osi X
+  viewBoxWidth = 400;
+  viewBoxHeight = 200;
+  paddingX = 30;
+  paddingTop = 25;
+  paddingBottom = 30;
 
   ngOnInit(): void {
     this.loadWeeklyPerformance();
@@ -119,12 +120,17 @@ export class OverviewComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (error) => {
-          console.error('Error loading weekly performance:', error);
-          this.error.set('Nie udało się załadować danych wydajności');
+          console.error('Błąd podczas ładowania danych wydajności:', error);
+          this.error.set('Nie udało się załadować danych wydajności.');
+          this.toastr.error('Nie udało się załadować danych wydajności.', 'Błąd');
           this.isLoading.set(false);
           this.setFallbackData();
         }
       });
+  }
+
+  refreshData(): void {
+    this.loadWeeklyPerformance();
   }
 
   private processApiData(data: BreakdownPerformanceIndicatorDTO[]): void {
@@ -139,7 +145,6 @@ export class OverviewComponent implements OnInit {
       return dateA - dateB;
     });
 
-    // Formatuj daty jako "dd.MM" zamiast dni tygodnia
     const processedDays = sortedData.map(item => this.formatDateShort(item.date || ''));
     const processedPerformanceData = sortedData.map(item => item.performance || 0);
 
@@ -154,6 +159,61 @@ export class OverviewComponent implements OnInit {
     this.performanceSpotlightDate.set(this.formatSpotlightDate(maxPerformanceItem.date || ''));
 
     this.rebuildChart();
+  }
+
+  private setFallbackData(): void {
+    const today = new Date();
+    const fallbackDays = [];
+    const fallbackData = [85, 90, 78, 88, 92, 95, 80];
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      fallbackDays.push(this.formatDateShort(date.toISOString()));
+    }
+
+    this.days.set(fallbackDays);
+    this.performanceData.set(fallbackData);
+    this.performanceSpotlightDate.set('18 Gru, 2024'); // Przykładowa data
+    this.performanceSpotlightValue.set(95);
+    this.rebuildChart();
+  }
+
+  private rebuildChart(): void {
+    const data = this.performanceData();
+
+    if (!data?.length) {
+      this.performancePath.set('');
+      this.performanceDotCoords.set([]);
+      return;
+    }
+
+    const n = data.length;
+    const minVal = 0; // Oś Y zawsze od 0%
+    const maxVal = 100; // Oś Y zawsze do 100%
+    const innerWidth = this.viewBoxWidth - this.paddingX * 2;
+    const innerHeight = this.viewBoxHeight - this.paddingTop - this.paddingBottom;
+
+    const toY = (v: number) => {
+      const t = (v - minVal) / (maxVal - minVal);
+      return this.paddingTop + (1 - t) * innerHeight;
+    };
+    const toX = (i: number) => this.paddingX + i * (innerWidth / (n - 1 || 1));
+
+    const points = data.map((v, i) => [toX(i), toY(v)] as [number, number]);
+
+    const path = points
+      .map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `L${x} ${y}`))
+      .join(' ');
+
+    const dotCoords = points.map(([x, y], i) => ({
+      x,
+      y,
+      value: data[i]
+    }));
+
+    this.performancePath.set(path);
+    this.performanceDotCoords.set(dotCoords);
   }
 
   private formatDateShort(dateString: string): string {
@@ -171,70 +231,6 @@ export class OverviewComponent implements OnInit {
       'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze',
       'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'
     ];
-
     return `${date.getDate()} ${monthNames[date.getMonth()]}, ${date.getFullYear()}`;
-  }
-
-  private setFallbackData(): void {
-    // Fallback data z datami z ostatnich 7 dni
-    const today = new Date();
-    const fallbackDays = [];
-    const fallbackData = [85, 90, 78, 88, 92, 95, 80];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      fallbackDays.push(this.formatDateShort(date.toISOString()));
-    }
-
-    this.days.set(fallbackDays);
-    this.performanceData.set(fallbackData);
-    this.performanceSpotlightDate.set('18 Gru, 2024');
-    this.performanceSpotlightValue.set(95);
-    this.rebuildChart();
-  }
-
-  private rebuildChart(): void {
-    const data = this.performanceData();
-
-    if (!data?.length) {
-      this.performancePath.set('');
-      this.performanceDotCoords.set([]);
-      return;
-    }
-
-    const n = data.length;
-    // Stałe wartości min/max dla osi Y (0-100%)
-    const minVal = 0;
-    const maxVal = 100;
-    const innerWidth = this.viewBoxWidth - this.paddingX * 2;
-    const innerHeight = this.viewBoxHeight - this.paddingTop - this.paddingBottom;
-
-    const toY = (v: number) => {
-      const t = (v - minVal) / (maxVal - minVal);
-      return this.paddingTop + (1 - t) * innerHeight;
-    };
-    const toX = (i: number) => this.paddingX + i * xStep;
-
-    const xStep = innerWidth / (n - 1 || 1);
-    const points = data.map((v, i) => [toX(i), toY(v)] as [number, number]);
-
-    const path = points
-      .map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `L${x} ${y}`))
-      .join(' ');
-
-    // Dodaj wartość do każdego punktu
-    const dotCoords = points.map(([x, y], i) => ({
-      x,
-      y,
-      value: data[i]
-    }));
-
-    this.performancePath.set(path);
-    this.performanceDotCoords.set(dotCoords);
-  }
-
-  refreshData(): void {
-    this.loadWeeklyPerformance();
   }
 }

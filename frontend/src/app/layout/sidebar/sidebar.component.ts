@@ -12,7 +12,7 @@ import {
   heroArrowLeftOnRectangle,
   heroBars3,
   heroXMark,
-  heroCalendar,
+  heroCube,
   heroCalendarDateRange,
 } from '@ng-icons/heroicons/outline';
 import { CommonModule, NgClass } from '@angular/common';
@@ -56,7 +56,7 @@ interface ActionItem {
 })
 export class SidebarComponent {
   private breakpointObserver = inject(BreakpointObserver);
-  private readonly destroyRef = inject(DestroyRef);
+  private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -81,6 +81,11 @@ export class SidebarComponent {
 
   readonly menuItems: MenuItem[] = [
     { path: '/', iconName: 'heroHome', label: 'Strona Główna' },
+    {
+      path: '/dashboard',
+      iconName: 'heroCog6Tooth',
+      label: 'Dashboard',
+    },
     {
       path: '/dashboard/breakdowns',
       iconName: 'heroCog6Tooth',

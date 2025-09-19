@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 import {
   EmployeeResponseDTO,
@@ -11,31 +12,36 @@ import {
 } from '../../../core/api/generated';
 
 import { EmployeeEditModalComponent } from '../../../shared/components/employee-edit-modal/employee-edit-modal.component';
+import { FormsModule } from '@angular/forms'; // Dodano import dla ngModel
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, EmployeeEditModalComponent],
+  imports: [CommonModule, EmployeeEditModalComponent, FormsModule], // Dodano FormsModule
   templateUrl: './employee.component.html',
 })
 export class EmployeesComponent implements OnInit, OnDestroy {
   private employeeService = inject(EmployeesService);
+  private toastr = inject(ToastrService);
+
+  employees = signal<EmployeeResponseDTO[]>([]);
+  isLoading = signal(true);
+  errorMessage = signal<string | null>(null);
+
+  currentPage = signal(0);
+  pageSize = signal(10);
+  totalElements = signal(0);
+  totalPages = signal(0);
+  pageSizes: number[] = [5, 10, 25, 50, 100];
+
+  isModalOpen = signal(false);
+  selectedEmployeeId = signal<number | null>(null);
+
+  searchTerm = model('');
   private searchSubject = new Subject<string>();
   private searchSubscription!: Subscription;
 
-  public isAdmin: boolean = true;
-  public employees: EmployeeResponseDTO[] = [];
-  public searchTerm: string = '';
-
-  public currentPage: number = 0;
-  public pageSize: number = 10;
-  public totalElements: number = 0;
-  public totalPages: number = 0;
-
-  public pageSizes: number[] = [5, 10, 25, 50, 100];
-
-  public isModalOpen = false;
-  public selectedEmployeeId: number | null = null;
+  isAdmin: boolean = true;
 
   ngOnInit(): void {
     this.loadEmployees();
@@ -44,9 +50,8 @@ export class EmployeesComponent implements OnInit, OnDestroy {
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(term => {
-      this.searchTerm = term;
-      this.currentPage = 0;
-      this.loadEmployees();
+      this.currentPage.set(0);
+      this.loadEmployees(term);
     });
   }
 
@@ -56,63 +61,70 @@ export class EmployeesComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadEmployees(): void {
+  // 8. Metody publiczne i obsługa zdarzeń
+  loadEmployees(search: string = this.searchTerm()): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
     const pageable: Pageable = {
-      page: this.currentPage,
-      size: this.pageSize,
+      page: this.currentPage(),
+      size: this.pageSize(),
     };
 
-    this.employeeService.getAllEmployees(pageable, this.searchTerm).subscribe({
+    this.employeeService.getAllEmployees(pageable, search).subscribe({
       next: (page: PageEmployeeResponseDTO) => {
-        this.employees = page.content ?? [];
-        this.totalElements = page.totalElements ?? 0;
-        this.totalPages = page.totalPages ?? 0;
+        this.employees.set(page.content ?? []);
+        this.totalElements.set(page.totalElements ?? 0);
+        this.totalPages.set(page.totalPages ?? 0);
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Błąd podczas ładowania pracowników', err);
-        this.employees = [];
-        this.totalElements = 0;
-        this.totalPages = 0;
+        this.errorMessage.set('Nie udało się załadować danych o pracownikach.');
+        this.toastr.error('Nie udało się załadować pracowników.', 'Błąd');
+        this.employees.set([]);
+        this.totalElements.set(0);
+        this.totalPages.set(0);
+        this.isLoading.set(false);
       }
     });
   }
 
-  onSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.searchSubject.next(value);
+  onSearchChange(): void {
+    this.searchSubject.next(this.searchTerm());
   }
 
   nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
+    if (this.currentPage() < this.totalPages() - 1) {
+      this.currentPage.update(page => page + 1);
       this.loadEmployees();
     }
   }
 
   previousPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
+    if (this.currentPage() > 0) {
+      this.currentPage.update(page => page - 1);
       this.loadEmployees();
     }
   }
 
   onPageSizeChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    this.pageSize = +target.value;
-    this.currentPage = 0;
+    this.pageSize.set(+target.value);
+    this.currentPage.set(0);
     this.loadEmployees();
   }
 
   openEditModal(employee: EmployeeResponseDTO): void {
-    this.selectedEmployeeId = employee.id ?? null;
-    if (this.selectedEmployeeId) {
-      this.isModalOpen = true;
+    this.selectedEmployeeId.set(employee.id ?? null);
+    if (this.selectedEmployeeId()) {
+      this.isModalOpen.set(true);
     }
   }
 
   closeEditModal(): void {
-    this.isModalOpen = false;
-    this.selectedEmployeeId = null;
+    this.isModalOpen.set(false);
+    this.selectedEmployeeId.set(null);
   }
 
   handleEmployeeUpdate(): void {

@@ -9,6 +9,13 @@ import { BreakdownCloseModalComponent } from './components/breakdown-close-modal
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
+
+interface PageableRequest {
+  page: number;
+  size: number;
+  sort: string;
+}
 
 @Component({
   selector: 'app-breakdowns',
@@ -23,6 +30,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 })
 export class BreakdownsComponent implements OnInit {
   private breakdownService = inject(BreakdownService);
+  private toastr = inject(ToastrService);
 
   breakdowns = signal<BreakdownResponseDTO[]>([]);
   isLoading = signal(true);
@@ -37,10 +45,10 @@ export class BreakdownsComponent implements OnInit {
   isModalOpen = signal(false);
   selectedBreakdownId = signal<number | null>(null);
 
-  isAdmin = true;
-
   searchTerm = model('');
   private searchSubject = new Subject<string>();
+
+  isAdmin = true;
 
   ngOnInit(): void {
     this.fetchBreakdowns();
@@ -53,6 +61,7 @@ export class BreakdownsComponent implements OnInit {
       });
   }
 
+  // 8. Metody publiczne i obsługa zdarzeń
   fetchBreakdowns(search: string = ''): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
@@ -75,6 +84,10 @@ export class BreakdownsComponent implements OnInit {
         error: (err) => {
           this.errorMessage.set(
             'Nie udało się załadować danych o awariach. Spróbuj ponownie później.'
+          );
+          this.toastr.error(
+            'Nie udało się załadować danych o awariach.',
+            'Błąd'
           );
           this.isLoading.set(false);
           console.error(err);
