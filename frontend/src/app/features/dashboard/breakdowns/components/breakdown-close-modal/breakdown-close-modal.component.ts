@@ -1,8 +1,17 @@
-import { Component, effect, signal } from '@angular/core';
+import { Component, effect, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { input, output } from '@angular/core';
-import { BreakdownService, CloseBreakdownDTO } from '../../../../../core/api/generated';
+import {
+  BreakdownService,
+  CloseBreakdownDTO,
+} from '../../../../../core/api/generated';
 
 @Component({
   selector: 'app-breakdown-close-modal',
@@ -11,35 +20,51 @@ import { BreakdownService, CloseBreakdownDTO } from '../../../../../core/api/gen
   templateUrl: './breakdown-close-modal.component.html',
 })
 export class BreakdownCloseModalComponent {
+  private fb = inject(FormBuilder);
+  private breakdownService = inject(BreakdownService);
+
   isOpen = input<boolean>(false);
   breakdownId = input<number | null>(null);
   closeModal = output<void>();
   breakdownClosed = output<void>();
 
   closeForm: FormGroup<{
-    closingNotes: import('@angular/forms').FormControl<string>;
+    closingNotes: FormControl<string>;
   }>;
+
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
-  constructor(
-    private fb: FormBuilder,
-    private breakdownService: BreakdownService
-  ) {
+  canSubmit = computed(
+    () =>
+      this.closeForm?.valid && this.breakdownId() !== null && !this.isLoading()
+  );
+
+  hasError = computed(() => this.errorMessage() !== null);
+
+  constructor() {
     this.closeForm = this.fb.group({
       closingNotes: this.fb.control<string>('', {
-        validators: [Validators.required, Validators.minLength(10), Validators.maxLength(500)],
+        validators: [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(500),
+        ],
         nonNullable: true,
       }),
     });
 
     effect(() => {
       if (this.isOpen()) {
-        this.closeForm.reset();
-        this.errorMessage.set(null);
-        this.isLoading.set(false);
+        this.resetForm();
       }
     });
+  }
+
+  private resetForm(): void {
+    this.closeForm.reset();
+    this.errorMessage.set(null);
+    this.isLoading.set(false);
   }
 
   onClose(): void {
@@ -47,7 +72,8 @@ export class BreakdownCloseModalComponent {
   }
 
   onSubmit(): void {
-    if (this.closeForm.invalid || !this.breakdownId()) {
+    if (!this.canSubmit()) {
+      this.closeForm.markAllAsTouched();
       return;
     }
 
@@ -58,16 +84,37 @@ export class BreakdownCloseModalComponent {
       specialistComment: this.closeForm.value.closingNotes!,
     };
 
-    this.breakdownService.closeBreakdown(this.breakdownId()!, request).subscribe({
-      next: () => {
-        this.isLoading.set(false);
-        this.breakdownClosed.emit();
-      },
-      error: (err) => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Wystąpił nieoczekiwany błąd. Spróbuj ponownie.');
-        console.error('Błąd podczas zamykania awarii:', err);
-      },
-    });
+    this.breakdownService
+      .closeBreakdown(this.breakdownId()!, request)
+      .subscribe({
+        next: () => {
+          this.isLoading.set(false);
+          this.breakdownClosed.emit();
+          this.resetForm();
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(
+            'Wystąpił nieoczekiwany błąd. Spróbuj ponownie.'
+          );
+          console.error('Błąd podczas zamykania awarii:', err);
+        },
+      });
+  }
+
+  get closingNotesControl() {
+    return this.closeForm.get('closingNotes');
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const control = this.closeForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) return 'To pole jest wymagane';
+      if (control.errors['minlength'])
+        return `Minimum ${control.errors['minlength'].requiredLength} znaków`;
+      if (control.errors['maxlength'])
+        return `Maksimum ${control.errors['maxlength'].requiredLength} znaków`;
+    }
+    return null;
   }
 }

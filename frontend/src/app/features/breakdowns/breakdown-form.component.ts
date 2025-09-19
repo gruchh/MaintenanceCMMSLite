@@ -1,13 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  FormControl,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import {
   BreakdownService,
   BreakdownTypeResponseDTO,
@@ -15,8 +16,10 @@ import {
   CreateBreakdownDTO,
   MachineResponseDTO,
   MachineService,
+  BreakdownResponseDTO,
 } from '../../core/api/generated';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-breakdown-form',
@@ -30,29 +33,42 @@ export class BreakdownFormComponent {
   private machineService = inject(MachineService);
   private breakdownTypesService = inject(BreakdownTypesService);
   private breakdownService = inject(BreakdownService);
+  private toastr = inject(ToastrService);
 
-  breakdownForm: FormGroup;
+  breakdownForm: FormGroup<{
+    machineId: FormControl<number | null>;
+    type: FormControl<string | null>;
+    description: FormControl<string>;
+  }>;
+
   machines$: Observable<MachineResponseDTO[]>;
   breakdownTypes$: Observable<BreakdownTypeResponseDTO[]>;
-  isSubmitting = false;
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
+
+  canSubmit(): boolean {
+    return this.breakdownForm.valid && !this.isLoading();
+  }
+
+  hasError = computed(() => this.errorMessage() !== null);
 
   constructor() {
     this.breakdownForm = this.fb.group({
-      machineId: [null, [Validators.required]],
-      type: [null, [Validators.required]],
-      description: [
-        '',
-        [
+      machineId: this.fb.control<number | null>(null, Validators.required),
+      type: this.fb.control<string | null>(null, Validators.required),
+      description: this.fb.control<string>('', {
+        validators: [
           Validators.required,
           Validators.minLength(10),
           Validators.maxLength(1000),
         ],
-      ],
+        nonNullable: true,
+      }),
     });
 
     this.machines$ = this.machineService.getAllMachinesAsList();
     this.breakdownTypes$ = this.breakdownTypesService.getBreakdownTypes().pipe(
-      tap(types => {
+      tap((types) => {
         if (types && types.length > 0) {
           this.breakdownForm.patchValue({ type: types[0].value });
         }
@@ -60,36 +76,55 @@ export class BreakdownFormComponent {
     );
   }
 
-  get f() {
-    return this.breakdownForm.controls;
-  }
-
   onSubmit(): void {
-    if (this.breakdownForm.invalid) {
+    if (!this.canSubmit()) {
       this.breakdownForm.markAllAsTouched();
       return;
     }
 
-    this.isSubmitting = true;
-    const request: CreateBreakdownDTO = this.breakdownForm.value;
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-    this.breakdownService
-      .reportBreakdown(request)
-      .pipe(finalize(() => (this.isSubmitting = false)))
-      .subscribe({
-        next: () => {
-          console.log('Awaria zgłoszona pomyślnie!');
-          this.router.navigate(['/']);
-        },
-        error: (err) => {
-          console.error('Wystąpił błąd podczas zgłaszania awarii', err);
-        },
-      });
+    const formValue = this.breakdownForm.getRawValue();
+
+    const request: CreateBreakdownDTO = {
+      machineId: formValue.machineId!,
+      description: formValue.description,
+      type: formValue.type as CreateBreakdownDTO.TypeEnum,
+    };
+
+    this.breakdownService.reportBreakdown(request).subscribe({
+      next: (response: BreakdownResponseDTO) => {
+        this.isLoading.set(false);
+        this.toastr.success('Awaria została zgłoszona pomyślnie!');
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(
+          'Wystąpił nieoczekiwany błąd podczas zgłaszania awarii. Spróbuj ponowie.'
+        );
+        this.toastr.error('Nie udało się zgłosić awarii. Spróbuj ponownie.');
+        console.error('Wystąpił błąd podczas zgłaszania awarii', err);
+      },
+    });
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const control = this.breakdownForm.get(fieldName);
+    if (control?.errors && (control.touched || control.dirty)) {
+      if (control.errors['required']) return 'To pole jest wymagane.';
+      if (control.errors['minlength'])
+        return `Pole musi mieć minimum ${control.errors['minlength'].requiredLength} znaków.`;
+      if (control.errors['maxlength'])
+        return `Pole może mieć maksimum ${control.errors['maxlength'].requiredLength} znaków.`;
+    }
+    return null;
   }
 
   getSliderStyle(
-    types: BreakdownTypeResponseDTO[],
-    selectedValue: string
+    types: BreakdownTypeResponseDTO[] | null,
+    selectedValue: string | null | undefined
   ): { [key: string]: string } {
     if (!types || types.length === 0 || !selectedValue) {
       return { opacity: '0' };
