@@ -1,8 +1,9 @@
 import { Component, inject, DestroyRef, signal, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs/operators';
 import {
   heroHome,
   heroCog6Tooth,
@@ -14,26 +15,11 @@ import {
   heroXMark,
   heroCube,
   heroCalendarDateRange,
+  heroCake,
 } from '@ng-icons/heroicons/outline';
 import { CommonModule, NgClass } from '@angular/common';
 import { AuthService } from '../../core/api/services/auth.service';
-
-const CUSTOM_BREAKPOINTS = {
-  mobile: '(max-width: 767.98px)',
-  tablet: '(min-width: 768px) and (max-width: 1023.98px)',
-  desktop: '(min-width: 1024px)',
-};
-
-interface MenuItem {
-  path: string;
-  iconName: string;
-  label: string;
-}
-interface ActionItem {
-  action: () => void;
-  iconName: string;
-  label: string;
-}
+import { ActionItem, MENU_ITEMS, MenuItem, SIDEBAR_ICONS } from './sidebar.constants';
 
 @Component({
   selector: 'app-sidebar',
@@ -41,19 +27,10 @@ interface ActionItem {
   imports: [RouterModule, NgIconComponent, CommonModule, NgClass],
   templateUrl: './sidebar.component.html',
   providers: [
-    provideIcons({
-      heroHome,
-      heroCog6Tooth,
-      heroCubeTransparent,
-      heroUsers,
-      heroLifebuoy,
-      heroArrowLeftOnRectangle,
-      heroBars3,
-      heroXMark,
-      heroCalendarDateRange
-    }),
+    provideIcons(SIDEBAR_ICONS),
   ],
 })
+
 export class SidebarComponent {
   private breakpointObserver = inject(BreakpointObserver);
   private destroyRef = inject(DestroyRef);
@@ -61,9 +38,16 @@ export class SidebarComponent {
   private router = inject(Router);
 
   isSidebarOpen = signal(false);
-  isMobile = signal(false);
-  isTablet = signal(false);
-  isDesktop = signal(false);
+
+  private breakpointState = signal({
+    isMobile: false,
+    isTablet: false,
+    isDesktop: false,
+  });
+
+  isMobile = computed(() => this.breakpointState().isMobile);
+  isTablet = computed(() => this.breakpointState().isTablet);
+  isDesktop = computed(() => this.breakpointState().isDesktop);
 
   sidebarClasses = computed(() => {
     const mobile = this.isMobile();
@@ -79,34 +63,7 @@ export class SidebarComponent {
     };
   });
 
-  readonly menuItems: MenuItem[] = [
-    { path: '/', iconName: 'heroHome', label: 'Strona Główna' },
-    {
-      path: '/dashboard',
-      iconName: 'heroCog6Tooth',
-      label: 'Dashboard',
-    },
-    {
-      path: '/dashboard/breakdowns',
-      iconName: 'heroCog6Tooth',
-      label: 'Awarie',
-    },
-    {
-      path: '/dashboard/spare-parts',
-      iconName: 'heroCubeTransparent',
-      label: 'Części zamienne',
-    },
-    {
-      path: '/dashboard/employees',
-      iconName: 'heroUsers',
-      label: 'Pracownicy',
-    },
-    {
-      path: '/dashboard/work-schedule',
-      iconName: 'heroCalendarDateRange',
-      label: 'Harmonogram',
-    }
-  ];
+  readonly menuItems: MenuItem[] = MENU_ITEMS;
 
   readonly bottomItems: ActionItem[] = [
     {
@@ -124,15 +81,25 @@ export class SidebarComponent {
   constructor() {
     this.breakpointObserver
       .observe([
-        CUSTOM_BREAKPOINTS.mobile,
-        CUSTOM_BREAKPOINTS.tablet,
-        CUSTOM_BREAKPOINTS.desktop,
+        Breakpoints.XSmall,
+        Breakpoints.Small,
+        Breakpoints.Medium,
+        Breakpoints.Large,
+        Breakpoints.XLarge,
       ])
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        map((state) => ({
+          isMobile: state.breakpoints[Breakpoints.XSmall],
+          isTablet: state.breakpoints[Breakpoints.Small],
+          isDesktop:
+            state.breakpoints[Breakpoints.Medium] ||
+            state.breakpoints[Breakpoints.Large] ||
+            state.breakpoints[Breakpoints.XLarge],
+        }))
+      )
       .subscribe((state) => {
-        this.isMobile.set(state.breakpoints[CUSTOM_BREAKPOINTS.mobile]);
-        this.isTablet.set(state.breakpoints[CUSTOM_BREAKPOINTS.tablet]);
-        this.isDesktop.set(state.breakpoints[CUSTOM_BREAKPOINTS.desktop]);
+        this.breakpointState.set(state);
 
         if (!this.isMobile() && this.isSidebarOpen()) {
           this.isSidebarOpen.set(false);
@@ -140,7 +107,7 @@ export class SidebarComponent {
       });
   }
 
-    toggleSidebar(): void {
+  toggleSidebar(): void {
     if (this.isMobile()) {
       this.isSidebarOpen.update((isOpen) => !isOpen);
     }
@@ -153,13 +120,12 @@ export class SidebarComponent {
   }
 
   showSupport(): void {
-    console.log('Otwieranie okna wsparcia...');
     this.onNavClick();
   }
 
-logout(): void {
-  this.authService.logout();
-  this.router.navigate(['/']);
-  this.onNavClick();
-}
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
+    this.onNavClick();
+  }
 }

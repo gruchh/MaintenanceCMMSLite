@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ModalService } from '../../core/api/services/modal.service';
 import { AuthService } from '../../core/api/services/auth.service';
+import { NAV_LINKS } from './navbar.constants';
 
 @Component({
   selector: 'app-navbar',
@@ -23,10 +24,7 @@ export class NavbarComponent {
   currentUser = this.authService.currentUser;
   isMobileMenuOpen = signal(false);
 
-  public navLinks = [
-    { path: '/report-breakdown', label: 'Zgłoś awarię' },
-    { path: '/dashboard', label: 'Dashboard' },
-  ];
+  navLinks = NAV_LINKS;
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update(v => !v);

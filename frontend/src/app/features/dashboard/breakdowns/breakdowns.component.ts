@@ -61,7 +61,6 @@ export class BreakdownsComponent implements OnInit {
       });
   }
 
-  // 8. Metody publiczne i obsługa zdarzeń
   fetchBreakdowns(search: string = ''): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
