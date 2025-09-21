@@ -3,7 +3,6 @@ package com.cmms.lite.dashboard.service;
 import com.cmms.lite.breakdown.dto.BreakdownPerformanceIndicatorDTO;
 import com.cmms.lite.breakdown.entity.Breakdown;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
-import com.cmms.lite.dashboard.dto.DashboardDTO;
 import com.cmms.lite.machine.repository.MachineRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +25,10 @@ public class DashboardService {
     private final BreakdownRepository breakdownRepository;
     private final MachineRepository machineRepository;
 
+    private static final int MINUTES_IN_DAY = 24 * 60;
+
     @Transactional(readOnly = true)
-    public List<DashboardDTO.FactoryStatsDTO> getWeeklyPerformance() {
+    public List<BreakdownPerformanceIndicatorDTO> getWeeklyPerformance() {
         long totalMachines = machineRepository.count();
         List<LocalDate> lastSevenDays = getLastSevenDays();
 
@@ -95,5 +96,4 @@ public class DashboardService {
 
         return Math.max(0.0, rounded);
     }
-
 }
