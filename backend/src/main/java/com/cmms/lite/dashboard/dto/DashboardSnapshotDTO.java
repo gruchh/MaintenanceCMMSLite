@@ -1,33 +1,34 @@
 package com.cmms.lite.dashboard.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Schema(name = "DashboardSnapshotDTO", description = "Migawka danych i statystyk na potrzeby dashboardu")
-public class DashboardSnapshotDTO {
+public record DashboardSnapshotDTO(
+        @Schema(description = "Data i czas wygenerowania statystyk", example = "2025-09-20T10:30:00")
+        LocalDateTime generatedAt,
 
-    @Schema(description = "Data i czas wygenerowania statystyk", example = "2025-09-20T10:30:00")
-    @Builder.Default
-    private LocalDateTime generatedAt = LocalDateTime.now();
+        @Schema(description = "Statystyki dotyczące wydajności fabryki z ostatnich 7 dni")
+        List<DashboardPerformanceInditatorDTO> weeklyPerformance,
 
-    @Schema(description = "Statystyki dotyczące wydajności fabryki")
-    private DashboardPerformanceInditatorDTO performance;
+        @Schema(description = "Ogólne statystyki OEE")
+        DashboardOeeStatsOverallDTO oeeStatsOverall,
 
-    @Schema(description = "Ogólne statystyki OEE")
-    private DashboardOeeStatsOverallDTO oeeStatsOverall;
+        @Schema(description = "Informacje o zalogowanym użytkowniku")
+        DashboardInfoAboutUser userInfo,
 
-    @Schema(description = "Informacje o zalogowanym użytkowniku")
-    private DashboardInfoAboutUser userInfo;
+        @Schema(description = "Ranking pracowników wg liczby obsłużonych awarii")
+        DashboardRatingByBreakdownsDTO employeeBreakdownRanking
+) {
 
-    @Schema(description = "Ranking pracowników wg liczby obsłużonych awarii")
-    private DashboardRatingByBreakdownsDTO employeeBreakdownRanking;
+    public DashboardSnapshotDTO(
+            List<DashboardPerformanceInditatorDTO> weeklyPerformance,
+            DashboardOeeStatsOverallDTO oeeStatsOverall,
+            DashboardInfoAboutUser userInfo,
+            DashboardRatingByBreakdownsDTO employeeBreakdownRanking
+    ) {
+        this(LocalDateTime.now(), weeklyPerformance, oeeStatsOverall, userInfo, employeeBreakdownRanking);
+    }
 }

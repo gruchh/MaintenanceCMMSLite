@@ -1,6 +1,7 @@
 package com.cmms.lite.dashboard.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDate;
 
 @Schema(name = "EmployeeSummaryDTO", description = "Podstawowe informacje o pracowniku, w tym liczba awarii i data emerytury.")

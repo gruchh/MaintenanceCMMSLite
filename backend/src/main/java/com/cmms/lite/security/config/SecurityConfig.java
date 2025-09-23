@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 "/api/breakdowns/performance/**",
                                 "/api/breakdowns/report",
                                 "/api/breakdown-types",
-                                "/api/machines/list"
+                                "/api/machines/list",
+                                "/api/dashboard"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
