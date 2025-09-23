@@ -4,24 +4,104 @@ A lightweight Computerized Maintenance Management System (CMMS) designed to stre
 
 ## ✨ Features
 
-- 🛠 **Maintenance Management**: Efficiently manage assets, maintenance schedules, and work orders
-- 📖 **API Documentation**: Automatically generated API documentation with SpringDoc OpenAPI
-- 🔒 **Secure Authentication**: Implements JWT-based authentication with Spring Security
-- 📱 **Responsive UI**: Built with Angular and styled using Tailwind CSS for a modern, responsive interface
-- 🗄 **Database Support**: Supports both H2 (for development) and PostgreSQL (for production) databases
-- 🐳 **Containerized Deployment**: Uses Docker and Docker Compose for simplified setup and deployment
+-   🛠️ **Comprehensive Maintenance Management**:
+    -   **Work Orders**: Report, track, and manage the entire lifecycle of machinery breakdowns, from initial report to resolution.
+    -   **Asset Management**: Full CRUD (Create, Read, Update, Delete) for machines and equipment.
+    -   **Personnel Management**: Manage detailed employee profiles, roles (e.g., *Mechanic, Manager*), contact information, and professional details.
+    -   **Inventory Control**: Full CRUD for spare parts. Automatically logs parts used for repairs and calculates total breakdown cost.
+    -   **Shift Scheduling**: Generate and manage multi-brigade work schedules for maintenance teams.
+-   📊 **Performance Analytics**: API endpoints for key performance indicators, including breakdown statistics and weekly performance reports.
+-   📖 **API Documentation**: Automatically generated and interactive API documentation with SpringDoc OpenAPI.
+-   🔒 **Secure Authentication & Authorization**:
+    -   Implements JWT-based authentication with Spring Security.
+    -   Features Role-Based Access Control (RBAC) with distinct roles (`ADMIN`, `TECHNICAN`, `SUBCONTRACTOR`) protecting API endpoints.
+-   📱 **Responsive UI**: Built with Angular and styled using Tailwind CSS for a modern, responsive interface.
+-   🗄️ **Database Support**: Supports both H2 (for development) and PostgreSQL (for production), with database migrations managed by Flyway.
+-   🌱 **Sample Data Seeding**: Includes a `DataInitializer` for the `dev` profile that uses JavaFaker to populate the database with realistic sample data for a rich development experience.
+-   ⚙️ **Robust Error Handling**: Centralized exception handling provides consistent and meaningful API error responses.
+-   🐳 **Containerized Deployment**: Uses Docker and Docker Compose for simplified setup and deployment.
 
-## 🛠 Prerequisites
+## 🏛️ Architecture Overview
 
-To run this project, ensure you have the following installed:
+### Backend Architecture
 
-- ☕ **Java 17** or later (for the backend)
-- 🌐 **Node.js 18.x** or later (for the Angular frontend)
-- 🐳 **Docker** and **Docker Compose** (for containerized deployment)
-- 🛠 **Maven** (for building the Spring Boot backend)
-- 📂 **Git** (for cloning the repository)
+The backend follows a modular, feature-oriented architecture. Each core domain has its own dedicated package containing its entities, repositories, services, and controllers.
+
+```
+com.cmms.lite
+├── CmmsLiteApplication.java
+├── breakdown         # Core logic for breakdowns; links machines, employees, and parts.
+├── breakdownType     # Defines breakdown categories (e.g., MECHANICAL, AUTOMATICAL).
+├── config            # Application configuration, including the dev data initializer.
+├── employee          # Manages employee data, details, and profiles.
+├── employeeRole      # Defines employee roles (e.g., Mechanic, Automation Engineer).
+├── exception         # Global exception handling and custom exceptions.
+├── machine           # Manages machine and equipment data.
+├── security          # Handles JWT authentication, user management, and authorization.
+├── shiftSchedule     # Logic for generating and managing team work schedules.
+└── sparePart         # Manages the spare parts inventory.
+```
+
+### Frontend Architecture
+
+The frontend is built using Angular and follows a scalable, modular architecture that separates concerns into four main categories: `core`, `features`, `layout`, and `shared`.
+
+```
+/src/app
+├── core/           # Core services, guards, and interceptors. Singleton logic.
+│   ├── api/        # Generated API client and related models.
+│   ├── guards/     # Route guards for authentication and authorization.
+│   └── interceptors/ # HTTP interceptors (e.g., for adding JWT tokens).
+│
+├── features/       # Individual application features or business modules.
+│   ├── dashboard/  # Main dashboard with sub-modules (overview, employees, etc.).
+│   └── home/       # The public-facing home page.
+│
+├── layout/         # Reusable layout components (e.g., navbars, sidebars).
+│   ├── dashboard-layout/ # Layout for the authenticated user area.
+│   └── default-layout/   # Layout for public pages.
+│
+└── shared/         # Reusable components, pipes, and directives.
+    └── components/ # Shared UI components (modals, buttons, etc.).
+```
+
+-   **Core**: Contains singleton services, interceptors, and guards that are loaded once at the application's root. The `api` sub-directory holds the TypeScript client generated by `openapi-generator-cli`, ensuring type safety when communicating with the backend.
+-   **Features**: Represents the different "pages" or business domains of the application. Each feature is a self-contained module, making the application easier to maintain and scale.
+-   **Layout**: Defines the main structural components of the application's UI, such as headers, footers, and sidebars. This allows for consistent layouts across different feature modules.
+-   **Shared**: A collection of reusable "dumb" components, pipes, and directives that are used across multiple feature modules. This promotes code reuse and a consistent look and feel.
+
+## 🔗 API Endpoints Overview
+
+The backend exposes a comprehensive RESTful API for interacting with the system.
+
+| Endpoint | Method | Description | Authorization |
+| :--- | :--- | :--- | :--- |
+| `/api/auth/register` | `POST` | Registers a new user. | Permit All |
+| `/api/auth/login` | `POST` | Authenticates a user and returns a JWT. | Permit All |
+| `/api/breakdowns` | `GET` | Retrieves a paginated list of breakdowns. | Authenticated |
+| `/api/breakdowns/report` | `POST` | Reports a new breakdown. | Permit All |
+| `/api/breakdowns/{id}` | `GET` | Gets details of a specific breakdown. | Authenticated |
+| `/api/breakdowns/{id}/close` | `PATCH` | Closes an open breakdown. | `TECHNICAN` |
+| `/api/breakdowns/{id}/parts`| `POST` | Adds a spare part to a breakdown. | `SUBCONTRACTOR` |
+| `/api/machines` | `GET` | Retrieves a paginated list of machines. | Authenticated |
+| `/api/machines` | `POST` | Creates a new machine. | `ADMIN` |
+| `/api/machines/{id}` | `PUT`/`DELETE` | Updates or deletes a machine. | `ADMIN` |
+| `/api/employees` | `GET` | Retrieves a paginated list of employees. | Authenticated |
+| `/api/employees` | `POST`/`PATCH` | Creates or updates an employee. | Authenticated |
+| `/api/spare-parts` | `GET` | Retrieves a paginated list of spare parts. | Authenticated |
+| `/api/spare-parts` | `POST` | Creates a new spare part. | `ADMIN` |
+| `/api/spare-parts/{id}` | `PUT`/`DELETE` | Updates or deletes a spare part. | `ADMIN` |
+| `/api/schedules/generate` | `POST` | Generates a new shift schedule. | Authenticated |
 
 ## 🚀 Getting Started
+
+### 🛠 Prerequisites
+
+-   ☕ **Java 17** or later
+-   🌐 **Node.js 18.x** or later
+-   🐳 **Docker** and **Docker Compose**
+-   🛠 **Maven**
+-   📂 **Git**
 
 ### 📥 Clone the Repository
 
@@ -30,9 +110,9 @@ git clone https://github.com/your-username/cmms-lite.git
 cd cmms-lite
 ```
 
-## 🐳 Running with Docker
+### 🐳 Running with Docker
 
-1. Ensure Docker and Docker Compose are installed
+1. Ensure Docker and Docker Compose are installed.
 2. Build and run the application using Docker Compose:
 
 ```bash
@@ -44,122 +124,52 @@ docker-compose up --build
    - 🔗 **Backend API**: http://localhost:8080
    - 📄 **API Documentation**: http://localhost:8080/swagger-ui-custom.html
 
-## 🖥 Running Without Docker
+### 🖥 Running Without Docker
 
-### Backend
+#### Backend
 
-1. Navigate to the backend directory:
-```bash
-cd backend
-```
+1. Navigate to the backend directory: `cd backend`
+2. Run the application: `./mvnw spring-boot:run`
 
-2. Build and run the Spring Boot application:
-```bash
-./mvnw spring-boot:run
-```
+#### Frontend
 
-### Frontend
+1. Navigate to the frontend directory: `cd frontend`
+2. Install dependencies: `npm install`
+3. Start the development server: `npm start`
+4. Access at http://localhost:4200
 
-1. Navigate to the frontend directory:
-```bash
-cd frontend
-```
+### Frontend Scripts
 
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Start the Angular development server:
-```bash
-ng serve
-```
-
-4. Access the frontend at http://localhost:4200
-
-## 🐳 Docker Setup
-
-The project includes a `docker-compose.yml` file that defines services for the backend, frontend, and PostgreSQL database.
-
-### Docker Compose Configuration
-
-- 🔧 **Backend**: Spring Boot application running on port 8080
-- 🌐 **Frontend**: Angular application running on port 4200
-- 🗄 **Database**: PostgreSQL database with persistent storage
-
-To customize the Docker setup, modify the `docker-compose.yml` file or the respective Dockerfile in the backend and frontend directories.
-
-## ⚙️ Configuration
-
-### Backend
-
-- 📝 **Application Properties**: Configure database settings, JWT secret, and other properties in `backend/src/main/resources/application.yml`
-- 🗄 **Database**: By default, the application uses PostgreSQL in production and H2 in development. Update the database configuration in `application.yml` as needed
-
-### Frontend
-
-- 🌍 **Environment Variables**: Configure API endpoints and other settings in:
-  - `frontend/src/environments/environment.ts` (for development)
-  - `frontend/src/environments/environment.prod.ts` (for production)
-- 🎨 **Tailwind CSS**: Tailwind configuration is located in `frontend/tailwind.config.js`
+- `npm start`: Runs the app in development mode.
+- `npm run build`: Builds the app for production.
+- `npm test`: Runs unit tests.
+- `npm run api:generate:dev`: Generates the Angular API client from the local backend.
+- `npm run api:generate:docker`: Generates the API client from the backend running in Docker.
 
 ## 📦 Dependencies
 
 ### Backend
 
 - ☕ Spring Boot 3.5.4
-- 🗄 Spring Data JPA
-- 🔒 Spring Security
-- 🗄 PostgreSQL and H2 databases
-- 🔑 JWT (io.jsonwebtoken:jjwt-api, jjwt-impl, jjwt-jackson v0.12.6)
-- 🛠 Lombok
-- 🔄 MapStruct 1.6.3
+- 🗄️ Spring Data JPA & Spring Security
+- 🗄️ PostgreSQL & H2
+- 🔑 JWT (io.jsonwebtoken) v0.12.6
+- 🛠️ Lombok & MapStruct
 - 📖 SpringDoc OpenAPI 2.8.9
-- ✅ Javax Validation 2.0.1
+- 🗃️ Flyway Core & 🎭 JavaFaker
 
 ### Frontend
 
-- 🌐 Angular 20.x
-- 🎨 Tailwind CSS 4.x
-- 🌍 Node.js 18.x or later
-
-## 🏗 Building for Production
-
-### Backend
-
-```bash
-cd backend
-./mvnw clean package
-```
-
-The executable JAR will be generated in `backend/target`.
-
-### Frontend
-
-```bash
-cd frontend
-ng build --prod
-```
-
-The production-ready files will be generated in `frontend/dist`.
-
-### Docker Production Build
-
-Use Docker Compose to deploy the production build:
-
-```bash
-docker-compose -f docker-compose.prod.yml up --build
-```
+- 🌐 Angular: ~20.2.1
+- 🎨 Tailwind CSS: ~4.1.11
+- 🍞 ngx-toastr: ~19.0.0
+- 🗓️ FullCalendar: ~6.1.19
+- 🖼️ ng-icons: ~32.1.0
+- 🛠️ OpenAPI Generator CLI: ~2.21.4
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. 🍴 Fork the repository
-2. 🌿 Create a new branch (`git checkout -b feature/your-feature`)
-3. 💾 Commit your changes (`git commit -m "Add your feature"`)
-4. 🚀 Push to the branch (`git push origin feature/your-feature`)
-5. 📬 Create a pull request
+Contributions are welcome! Please fork the repository and create a pull request.
 
 ## 📜 License
 
