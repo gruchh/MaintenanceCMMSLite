@@ -33,4 +33,6 @@ public interface BreakdownRepository extends JpaRepository<Breakdown, Long> {
 
     @Query("SELECT b FROM Breakdown b WHERE b.startedAt <= :end AND (b.finishedAt IS NULL OR b.finishedAt >= :start)")
     List<Breakdown> findBreakdownsAffectingPeriod(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    List<Breakdown> findAllByFinishedAtBetween(LocalDateTime start, LocalDateTime end);
 }
