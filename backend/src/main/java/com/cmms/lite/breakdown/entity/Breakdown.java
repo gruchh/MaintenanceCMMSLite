@@ -33,6 +33,9 @@ public class Breakdown {
     @Column(nullable = false, length = 1000)
     private String description;
 
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
+
     @NotNull(message = "The report date cannot be null.")
     @PastOrPresent(message = "The report date cannot be in the future.")
     @Column(name = "reported_at", nullable = false)

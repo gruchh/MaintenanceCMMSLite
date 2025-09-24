@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
-@Schema(name = "EmployeeSummaryDTO", description = "Podstawowe informacje o pracowniku, w tym liczba awarii i data emerytury.")
+@Schema(name = "DashboardInfoAboutUser", description = "Podstawowe informacje o pracowniku, w tym liczba awarii i data emerytury.")
 public record DashboardInfoAboutUser(
         @Schema(description = "First name of the employee", example = "Jan")
         String firstName,

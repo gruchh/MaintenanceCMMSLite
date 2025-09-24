@@ -1,5 +1,6 @@
 package com.cmms.lite.dashboard.controller;
 
+import com.cmms.lite.dashboard.dto.DashboardFactoryStatsDTO;
 import com.cmms.lite.dashboard.dto.DashboardSnapshotDTO;
 import com.cmms.lite.dashboard.service.DashboardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,5 +23,11 @@ public class DashboardController {
     public ResponseEntity<DashboardSnapshotDTO> getDashboardSnapshot() {
         DashboardSnapshotDTO snapshot = dashboardService.getDashboardSnapshot();
         return ResponseEntity.ok(snapshot);
+    }
+
+    @GetMapping("/factory-stats")
+    public ResponseEntity<DashboardFactoryStatsDTO> getFactoryStats() {
+        DashboardFactoryStatsDTO factoryStats = dashboardService.getDashboardFactoryStats();
+        return ResponseEntity.ok(factoryStats);
     }
 }

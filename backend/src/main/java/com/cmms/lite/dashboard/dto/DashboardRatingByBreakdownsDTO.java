@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
+@Schema(name = "DashboardRatingByBreakdownsDTO", description = "Statystyki związane z uczestnictwem w awariach przez poszczególnych pracowników")
 public record DashboardRatingByBreakdownsDTO(
         @Schema(
                 description = "List of workers with their breakdown counts and details",

@@ -2,6 +2,7 @@ package com.cmms.lite.dashboard.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(name = "DashboardFactoryStatsDTO", description = "Podstawowe informacje o liczbie awarii w ostatnim czasie")
 public record DashboardFactoryStatsDTO(
         @Schema(description = "Number of days since the last breakdown", example = "5")
         Long daysSinceLastBreakdown,

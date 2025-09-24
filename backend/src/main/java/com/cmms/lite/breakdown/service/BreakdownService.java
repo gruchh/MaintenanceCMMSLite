@@ -128,22 +128,6 @@ public class BreakdownService {
         return breakdownMapper.toResponse(latestBreakdown);
     }
 
-    @Transactional(readOnly = true)
-    public BreakdownStatsDTO getBreakdownStats() {
-        LocalDateTime now = LocalDateTime.now();
-        Long daysSinceLast = breakdownRepository.findTopByOrderByFinishedAtDesc()
-                .map(b -> ChronoUnit.DAYS.between(b.getFinishedAt(), now))
-                .orElse(null);
-
-        return new BreakdownStatsDTO(
-                daysSinceLast,
-                breakdownRepository.countByFinishedAtBetween(now.minusWeeks(1), now),
-                breakdownRepository.countByFinishedAtBetween(now.minusMonths(1), now),
-                breakdownRepository.countByFinishedAtBetween(now.withDayOfYear(1), now),
-                breakdownRepository.getAverageBreakdownDurationInMinutes()
-        );
-    }
-
     private Breakdown getBreakdownByIdOrThrow(Long id) {
         return breakdownRepository.findById(id)
                 .orElseThrow(() -> new BreakdownNotFoundException(String.format(BREAKDOWN_NOT_FOUND, id)));

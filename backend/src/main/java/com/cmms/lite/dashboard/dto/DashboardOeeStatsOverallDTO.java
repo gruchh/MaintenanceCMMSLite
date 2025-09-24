@@ -2,6 +2,7 @@ package com.cmms.lite.dashboard.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(name = "DashboardOeeStatsOverallDTO", description = "Informacje na temat wydajności fabryki w kontekście OEE (Overall Equipment Effectiveness)")
 public record DashboardOeeStatsOverallDTO(
         @Schema(description = "Overall Equipment Effectiveness percentage", example = "85.5")
         Double oeePercentage,
