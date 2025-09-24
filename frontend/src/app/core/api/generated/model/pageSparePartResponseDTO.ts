@@ -13,16 +13,16 @@ import { SortObject } from './sortObject';
 
 
 export interface PageSparePartResponseDTO { 
-    totalPages?: number;
     totalElements?: number;
-    first?: boolean;
-    last?: boolean;
+    totalPages?: number;
     size?: number;
     content?: Array<SparePartResponseDTO>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 }
 

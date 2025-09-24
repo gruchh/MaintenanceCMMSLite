@@ -2,7 +2,6 @@ import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
-
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
 import {
   heroBuildingOffice,
@@ -16,9 +15,13 @@ import {
   heroUsers,
   heroArrowsUpDown,
   heroExclamationTriangle,
-  heroArrowPath
+  heroArrowPath,
 } from '@ng-icons/heroicons/outline';
-import { BreakdownPerformanceIndicatorDTO, BreakdownService } from '../../../core/api/generated';
+import {
+  DashboardService,
+  DashboardSnapshotDTO,
+  DashboardPerformanceInditatorDTO,
+} from '../../../core/api/generated';
 
 @Component({
   selector: 'app-overview',
@@ -38,23 +41,50 @@ import { BreakdownPerformanceIndicatorDTO, BreakdownService } from '../../../cor
       heroUsers,
       heroArrowsUpDown,
       heroExclamationTriangle,
-      heroArrowPath
-    })
-  ]
+      heroArrowPath,
+    }),
+  ],
 })
 export class OverviewComponent implements OnInit {
-  private breakdownService = inject(BreakdownService);
+  private dashboardService = inject(DashboardService);
   private destroyRef = inject(DestroyRef);
   private toastr = inject(ToastrService);
 
   isLoading = signal(true);
   error = signal<string | null>(null);
+
   performanceData = signal<number[]>([]);
   days = signal<string[]>([]);
   performanceSpotlightDate = signal('');
   performanceSpotlightValue = signal(0);
   performancePath = signal('');
   performanceDotCoords = signal<{ x: number; y: number; value: number }[]>([]);
+
+  oeePercentage = signal<number | null>(null);
+  mtbfYear = signal<number | null>(null);
+  mtbfMonth = signal<number | null>(null);
+  mttrYear = signal<number | null>(null);
+  mttrMonth = signal<number | null>(null);
+
+  employeesByFailures = signal<
+    { name: string; avatar?: string; failures: number; area?: string; role?: string }[]
+  >([]);
+
+  employeeProfile = signal<{
+    name: string;
+    avatar: string;
+    position: string;
+    remainingLeave: number;
+    openWorkOrders: number;
+    nextTraining: string;
+  }>({
+    name: 'Nieznany',
+    avatar: 'https://placehold.co/128x128',
+    position: 'Pracownik',
+    remainingLeave: 0,
+    openWorkOrders: 0,
+    nextTraining: 'Brak danych',
+  });
 
   readonly avgPerformance = computed(() => {
     const data = this.performanceData();
@@ -63,93 +93,96 @@ export class OverviewComponent implements OnInit {
     return Math.round(sum / data.length);
   });
 
-  readonly employeeProfile = {
-    name: 'Adam Kowalski',
-    position: 'Technik Utrzymania Ruchu',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop',
-    remainingLeave: 14,
-    openWorkOrders: 3,
-    nextTraining: 'Certyfikacja SEP G1 - 20.10.2025',
-  };
-
-  readonly employeesByFailures = [
-    {
-      name: 'Robert Malinowski',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1974&auto=format&fit=crop',
-      failures: 21,
-      area: 'Linia Montażowa A',
-    },
-    {
-      name: 'Ewa Nowak',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop',
-      failures: 18,
-      area: 'Magazyn Wysokiego Składowania',
-    },
-    {
-      name: 'Piotr Zieliński',
-      avatar: 'https://images.unsplash.com/photo-1557862921-37829c790f19?q=80&w=2071&auto=format&fit=crop',
-      failures: 15,
-      area: 'Spawalnia',
-    },
-  ];
-
-  mtbfYear = '250 godzin';
-  mtbfMonth = '22 godziny';
-  mttrYear = '1.5 godziny';
-  mttrMonth = '0.9 godziny';
-
   viewBoxWidth = 400;
-  viewBoxHeight = 200;
-  paddingX = 30;
-  paddingTop = 25;
+  viewBoxHeight = 150; // zmniejszona wysokość wykresu
+  paddingX = 40;
+  paddingTop = 20;
   paddingBottom = 30;
 
   ngOnInit(): void {
-    this.loadWeeklyPerformance();
-  }
-
-  loadWeeklyPerformance(): void {
-    this.isLoading.set(true);
-    this.error.set(null);
-
-    this.breakdownService.getWeeklyPerformance()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data: BreakdownPerformanceIndicatorDTO[]) => {
-          this.processApiData(data);
-          this.isLoading.set(false);
-        },
-        error: (error) => {
-          console.error('Błąd podczas ładowania danych wydajności:', error);
-          this.error.set('Nie udało się załadować danych wydajności.');
-          this.toastr.error('Nie udało się załadować danych wydajności.', 'Błąd');
-          this.isLoading.set(false);
-          this.setFallbackData();
-        }
-      });
+    this.loadDashboardData();
   }
 
   refreshData(): void {
-    this.loadWeeklyPerformance();
+    this.loadDashboardData();
   }
 
-  private processApiData(data: BreakdownPerformanceIndicatorDTO[]): void {
-    if (!data || data.length === 0) {
+  private loadDashboardData(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    this.dashboardService
+      .getDashboardSnapshot()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (snapshot: DashboardSnapshotDTO) => {
+          this.processApiData(snapshot.weeklyPerformance || []);
+
+          if (snapshot.oeeStatsOverall) {
+            this.oeePercentage.set(snapshot.oeeStatsOverall.oeePercentage ?? null);
+            this.mtbfYear.set(snapshot.oeeStatsOverall.mtbfYear ?? null);
+            this.mtbfMonth.set(snapshot.oeeStatsOverall.mtbfMonth ?? null);
+            this.mttrYear.set(snapshot.oeeStatsOverall.mttrYear ?? null);
+            this.mttrMonth.set(snapshot.oeeStatsOverall.mttrMonth ?? null);
+          } else {
+            this.setFallbackOee();
+          }
+
+          if (snapshot.employeeBreakdownRanking?.workers) {
+            const mapped = snapshot.employeeBreakdownRanking.workers.map((w) => ({
+              name: w.fullName ?? 'Nieznany',
+              avatar: w.avatarUrl ?? 'https://placehold.co/64x64',
+              failures: w.breakdownCount ?? 0,
+              area: snapshot.employeeBreakdownRanking?.associatedArea,
+              role: w.role,
+            }));
+            this.employeesByFailures.set(mapped);
+          } else {
+            this.setFallbackEmployees();
+          }
+
+          if (snapshot.userInfo) {
+            this.employeeProfile.set({
+              name:
+                `${snapshot.userInfo.firstName || ''} ${snapshot.userInfo.lastName || ''}`.trim() ||
+                'Nieznany',
+              avatar: snapshot.userInfo.avatarUrl ?? 'https://placehold.co/128x128',
+              openWorkOrders: snapshot.userInfo.breakdownCount ?? 0,
+              position: 'Pracownik',
+              remainingLeave: 0,
+              nextTraining: 'Brak danych',
+            });
+          } else {
+            this.setFallbackEmployeeProfile();
+          }
+
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Błąd podczas ładowania danych dashboard:', error);
+          this.error.set('Nie udało się załadować danych z dashboardu.');
+          this.toastr.error('Nie udało się załadować danych.', 'Błąd');
+          this.isLoading.set(false);
+          this.setFallbackData();
+          this.setFallbackOee();
+          this.setFallbackEmployees();
+          this.setFallbackEmployeeProfile();
+        },
+      });
+  }
+
+  private processApiData(data: DashboardPerformanceInditatorDTO[]): void {
+    if (!data?.length) {
       this.setFallbackData();
       return;
     }
 
-    const sortedData = [...data].sort((a, b) => {
-      const dateA = new Date(a.date || '').getTime();
-      const dateB = new Date(b.date || '').getTime();
-      return dateA - dateB;
-    });
+    const sortedData = [...data].sort(
+      (a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime()
+    );
 
-    const processedDays = sortedData.map(item => this.formatDateShort(item.date || ''));
-    const processedPerformanceData = sortedData.map(item => item.performance || 0);
-
-    this.days.set(processedDays);
-    this.performanceData.set(processedPerformanceData);
+    this.days.set(sortedData.map((item) => this.formatDateShort(item.date || '')));
+    this.performanceData.set(sortedData.map((item) => item.performance || 0));
 
     const maxPerformanceItem = sortedData.reduce((prev, current) =>
       (current.performance || 0) > (prev.performance || 0) ? current : prev
@@ -163,7 +196,7 @@ export class OverviewComponent implements OnInit {
 
   private setFallbackData(): void {
     const today = new Date();
-    const fallbackDays = [];
+    const fallbackDays: string[] = [];
     const fallbackData = [85, 90, 78, 88, 92, 95, 80];
 
     for (let i = 6; i >= 0; i--) {
@@ -174,14 +207,40 @@ export class OverviewComponent implements OnInit {
 
     this.days.set(fallbackDays);
     this.performanceData.set(fallbackData);
-    this.performanceSpotlightDate.set('18 Gru, 2024'); // Przykładowa data
+    this.performanceSpotlightDate.set('18 Gru, 2024');
     this.performanceSpotlightValue.set(95);
     this.rebuildChart();
   }
 
+  private setFallbackOee(): void {
+    this.oeePercentage.set(85);
+    this.mtbfYear.set(250);
+    this.mtbfMonth.set(22);
+    this.mttrYear.set(1.5);
+    this.mttrMonth.set(0.9);
+  }
+
+  private setFallbackEmployees(): void {
+    this.employeesByFailures.set([
+      { name: 'Jan Kowalski', failures: 10, area: 'Linia A', avatar: 'https://placehold.co/64x64' },
+      { name: 'Anna Nowak', failures: 8, area: 'Magazyn', avatar: 'https://placehold.co/64x64' },
+      { name: 'Piotr Zieliński', failures: 6, area: 'Spawalnia', avatar: 'https://placehold.co/64x64' },
+    ]);
+  }
+
+  private setFallbackEmployeeProfile(): void {
+    this.employeeProfile.set({
+      name: 'Nieznany',
+      avatar: 'https://placehold.co/128x128',
+      position: 'Pracownik',
+      remainingLeave: 0,
+      openWorkOrders: 0,
+      nextTraining: 'Brak danych',
+    });
+  }
+
   private rebuildChart(): void {
     const data = this.performanceData();
-
     if (!data?.length) {
       this.performancePath.set('');
       this.performanceDotCoords.set([]);
@@ -189,48 +248,35 @@ export class OverviewComponent implements OnInit {
     }
 
     const n = data.length;
-    const minVal = 0; // Oś Y zawsze od 0%
-    const maxVal = 100; // Oś Y zawsze do 100%
+    const minVal = 0;
+    const maxVal = 100;
     const innerWidth = this.viewBoxWidth - this.paddingX * 2;
     const innerHeight = this.viewBoxHeight - this.paddingTop - this.paddingBottom;
 
-    const toY = (v: number) => {
-      const t = (v - minVal) / (maxVal - minVal);
-      return this.paddingTop + (1 - t) * innerHeight;
-    };
+    const toY = (v: number) =>
+      this.paddingTop + (1 - (v - minVal) / (maxVal - minVal)) * innerHeight;
     const toX = (i: number) => this.paddingX + i * (innerWidth / (n - 1 || 1));
 
     const points = data.map((v, i) => [toX(i), toY(v)] as [number, number]);
 
-    const path = points
-      .map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `L${x} ${y}`))
-      .join(' ');
-
-    const dotCoords = points.map(([x, y], i) => ({
-      x,
-      y,
-      value: data[i]
-    }));
+    const path = points.map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `L${x} ${y}`)).join(' ');
 
     this.performancePath.set(path);
-    this.performanceDotCoords.set(dotCoords);
+    this.performanceDotCoords.set(points.map(([x, y], i) => ({ x, y, value: data[i] })));
   }
 
   private formatDateShort(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    return `${day}.${month}`;
+    return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}`;
   }
 
   private formatSpotlightDate(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    const monthNames = [
-      'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze',
-      'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'
-    ];
+    const monthNames = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'];
     return `${date.getDate()} ${monthNames[date.getMonth()]}, ${date.getFullYear()}`;
   }
 }

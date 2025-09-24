@@ -1,37 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
-
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
-import {
-  BreakdownResponseDTO,
-  BreakdownService,
-  BreakdownStatsDTO
-} from '../../core/api/generated';
-
-type StatCardData = {
-  icon: 'heroCalendar' | 'heroExclamationTriangle' | 'heroClock';
-  value: string | number;
-  label: string;
-  color: string;
-};
-
-type LastFailureData = {
-  title: string;
-  imageUrl: string;
-  description: string;
-};
-
-type HomeData = {
-  stats: StatCardData[];
-  lastFailure: LastFailureData;
-};
-
-type ComponentState = {
-  data: HomeData | null;
-  status: 'loading' | 'success' | 'error';
-  error?: unknown;
-};
+import { DashboardService, DashboardFactoryStatsDTO } from '../../core/api/generated';
+import { BreakdownService, BreakdownResponseDTO } from '../../core/api/generated';
 
 @Component({
   selector: 'app-home',
@@ -40,102 +11,62 @@ type ComponentState = {
   templateUrl: './home.component.html',
 })
 export class HomeComponent {
+  private dashboardService = inject(DashboardService);
   private breakdownService = inject(BreakdownService);
 
-  private state = signal<ComponentState>({
-    data: null,
-    status: 'loading',
+  private state = signal({
+    stats: [] as Array<any>,
+    status: 'loading' as 'loading' | 'success' | 'error',
+    lastBreakdown: null as BreakdownResponseDTO | null,
+    error: null as unknown,
   });
 
-  public stats = computed(() => this.state().data?.stats);
-  public lastFailure = computed(() => this.state().data?.lastFailure);
+  public stats = computed(() => this.state().stats);
   public status = computed(() => this.state().status);
+  public lastBreakdown = computed(() => this.state().lastBreakdown);
 
   constructor() {
     this.loadData();
+    this.loadLastBreakdown();
   }
 
-  private loadData(): void {
-    forkJoin({
-      stats: this.breakdownService.getBreakdownStats(),
-      latestFailure: this.breakdownService.getLatestBreakdown(),
-    }).subscribe({
-      next: ({ stats, latestFailure }) => {
-        const mappedData: HomeData = {
-          stats: this.mapStatsToCardData(stats),
-          lastFailure: this.mapLatestBreakdownToData(latestFailure),
-        };
-        this.state.set({ data: mappedData, status: 'success' });
+  private loadData() {
+    this.dashboardService.getFactoryStats().subscribe({
+      next: (apiStats) => {
+        this.state.update(s => ({
+          ...s,
+          stats: this.mapStatsToCardData(apiStats),
+          status: 'success'
+        }));
       },
       error: (err) => {
-        console.error(
-          'Błąd podczas pobierania danych dla strony głównej:',
-          err
-        );
-        this.state.set({ data: null, status: 'error', error: err });
-      },
+        console.error('Błąd pobierania danych:', err);
+        this.state.update(s => ({ ...s, status: 'error', error: err }));
+      }
     });
   }
 
-  private mapStatsToCardData(apiStats: BreakdownStatsDTO): StatCardData[] {
-    const roundIfNumber = (value: number | null | undefined): number | 'B/D' => {
-      return typeof value === 'number' ? Math.round(value) : 'B/D';
-    };
-
-    return [
-      {
-        icon: 'heroCalendar',
-        value: roundIfNumber(apiStats.daysSinceLastBreakdown),
-        label: 'Dni od ostatniej awarii',
-        color: 'text-cyan-400',
+  private loadLastBreakdown() {
+    this.breakdownService.getLatestBreakdown().subscribe({
+      next: (breakdown) => {
+        this.state.update(s => ({ ...s, lastBreakdown: breakdown }));
       },
-      {
-        icon: 'heroExclamationTriangle',
-        value: roundIfNumber(apiStats.breakdownsLastWeek),
-        label: 'Awarie w ostatnim tygodniu',
-        color: 'text-amber-400',
-      },
-      {
-        icon: 'heroExclamationTriangle',
-        value: roundIfNumber(apiStats.breakdownsLastMonth),
-        label: 'Awarie w ostatnim miesiącu',
-        color: 'text-orange-400',
-      },
-      {
-        icon: 'heroExclamationTriangle',
-        value: roundIfNumber(apiStats.breakdownsCurrentYear),
-        label: 'Awarie w tym roku',
-        color: 'text-red-400',
-      },
-      {
-        icon: 'heroClock',
-        value:
-          typeof apiStats.averageBreakdownDurationMinutes === 'number'
-            ? `${Math.round(apiStats.averageBreakdownDurationMinutes)} min`
-            : 'B/D',
-        label: 'Średni czas awarii',
-        color: 'text-teal-400',
-      },
-    ];
+      error: (err) => {
+        console.error('Błąd pobierania ostatniej awarii:', err);
+      }
+    });
   }
 
-  private mapLatestBreakdownToData(
-    latest: BreakdownResponseDTO | null | undefined
-  ): LastFailureData {
-    if (!latest) {
-      return {
-        title: 'Brak zarejestrowanych awarii',
-        description: 'System nie odnotował jeszcze żadnych awarii.',
-        imageUrl:
-          'https://cdn.pixabay.com/photo/2017/02/19/15/28/checklist-2080034_1280.jpg',
-      };
-    }
+  private mapStatsToCardData(apiStats: DashboardFactoryStatsDTO) {
+    const round = (v: number | null | undefined) => (typeof v === 'number' ? Math.round(v) : 'B/D');
 
-    return {
-      title: `Awaria: ${latest.machine?.fullName ?? 'Nieznana maszyna'}`,
-      description: latest.description ?? 'Brak szczegółowego opisu.',
-      imageUrl:
-        'https://cdn.pixabay.com/photo/2016/02/02/07/24/towing-service-1174901_1280.jpg',
-    };
+    return [
+      { icon: 'heroCalendar', value: round(apiStats.daysSinceLastBreakdown), label: 'Dni od ostatniej awarii', color: 'text-cyan-400' },
+      { icon: 'heroExclamationTriangle', value: round(apiStats.breakdownsLastWeek), label: 'Awarie w ostatnim tygodniu', color: 'text-amber-400' },
+      { icon: 'heroExclamationTriangle', value: round(apiStats.breakdownsLastMonth), label: 'Awarie w ostatnim miesiącu', color: 'text-orange-400' },
+      { icon: 'heroExclamationTriangle', value: round(apiStats.breakdownsCurrentYear), label: 'Awarie w tym roku', color: 'text-red-400' },
+      { icon: 'heroClock', value: typeof apiStats.averageBreakdownDurationMinutes === 'number' ? `${Math.round(apiStats.averageBreakdownDurationMinutes)} min` : 'B/D', label: 'Średni czas awarii', color: 'text-teal-400' },
+      { icon: 'heroChartBar', value: typeof apiStats.averageEfficiencyPercentage === 'number' ? `${Math.round(apiStats.averageEfficiencyPercentage)}%` : 'B/D', label: 'Średnia wydajność (7 dni)', color: 'text-indigo-400' },
+    ];
   }
 }

@@ -13,16 +13,16 @@ import { EmployeeResponseDTO } from './employeeResponseDTO';
 
 
 export interface PageEmployeeResponseDTO { 
-    totalPages?: number;
     totalElements?: number;
-    first?: boolean;
-    last?: boolean;
+    totalPages?: number;
     size?: number;
     content?: Array<EmployeeResponseDTO>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 }
 

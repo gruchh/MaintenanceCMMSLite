@@ -10,9 +10,9 @@
 
 
 /**
- * Statystyki związane z awariami
+ * Podstawowe informacje o liczbie awarii w ostatnim czasie
  */
-export interface BreakdownStatsDTO { 
+export interface DashboardFactoryStatsDTO { 
     /**
      * Number of days since the last breakdown
      */
@@ -33,5 +33,9 @@ export interface BreakdownStatsDTO {
      * Average breakdown duration in minutes
      */
     averageBreakdownDurationMinutes?: number;
+    /**
+     * Average efficiency over 7 days
+     */
+    averageEfficiencyPercentage?: number;
 }
 

@@ -24,6 +24,10 @@ export interface BreakdownResponseDTO {
      */
     description?: string;
     /**
+     * Image URL of the breakdown, if available
+     */
+    imageUrl?: string;
+    /**
      * When the breakdown was reported
      */
     reportedAt?: string;
