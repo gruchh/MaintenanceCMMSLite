@@ -86,6 +86,10 @@ export interface EmployeeResponseDTO {
      */
     educationLevel?: EmployeeResponseDTO.EducationLevelEnum;
     /**
+     * Brigade
+     */
+    brigade?: EmployeeResponseDTO.BrigadeEnum;
+    /**
      * Field of study
      */
     fieldOfStudy?: string;
@@ -115,6 +119,15 @@ export namespace EmployeeResponseDTO {
         DOCTORATE: 'DOCTORATE'
     } as const;
     export type EducationLevelEnum = typeof EducationLevelEnum[keyof typeof EducationLevelEnum];
+    export const BrigadeEnum = {
+        A: 'A',
+        B: 'B',
+        C: 'C',
+        D: 'D',
+        K: 'K',
+        S: 'S'
+    } as const;
+    export type BrigadeEnum = typeof BrigadeEnum[keyof typeof BrigadeEnum];
 }
 
 

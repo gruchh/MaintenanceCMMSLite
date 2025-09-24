@@ -13,16 +13,16 @@ import { MachineResponseDTO } from './machineResponseDTO';
 
 
 export interface PageMachineResponseDTO { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<MachineResponseDTO>;
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
     pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 }
 

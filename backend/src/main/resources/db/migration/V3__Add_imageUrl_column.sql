@@ -1,0 +1,2 @@
+ALTER TABLE breakdowns
+ADD COLUMN image_url VARCHAR(1000);

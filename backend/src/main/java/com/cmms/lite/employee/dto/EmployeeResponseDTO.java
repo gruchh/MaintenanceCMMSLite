@@ -1,9 +1,15 @@
 package com.cmms.lite.employee.dto;
 
+import com.cmms.lite.employee.entity.Brigade;
 import com.cmms.lite.employee.entity.EducationLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.time.LocalDate;
 
 @Schema(name = "EmployeeResponseDTO", description = "Szczegółowe dane pracownika")
@@ -61,6 +67,9 @@ public record EmployeeResponseDTO(
 
         @Schema(description = "Education level", example = "MASTER")
         EducationLevel educationLevel,
+
+        @Schema(description = "Brigade", example = "A")
+        Brigade brigade,
 
         @Schema(description = "Field of study", example = "Informatyka")
         String fieldOfStudy,

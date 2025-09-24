@@ -68,7 +68,7 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public Page<EmployeeResponseDTO> getAllEmployees(Pageable pageable) {
+    public Page<EmployeeResponseDTO> findAllWithDetails(Pageable pageable) {
         return employeeRepository.findAllWithSummary(pageable)
                 .map(employeeMapper::toResponse);
     }
@@ -76,7 +76,7 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public Page<EmployeeResponseDTO> searchEmployees(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return getAllEmployees(pageable);
+            return findAllWithDetails(pageable);
         }
         return employeeRepository.searchByKeyword(keyword, pageable)
                 .map(employeeMapper::toResponse);
@@ -128,6 +128,7 @@ public class EmployeeService {
             Optional.ofNullable(request.getContractEndDate()).ifPresent(details::setContractEndDate);
             Optional.ofNullable(request.getSalary()).ifPresent(details::setSalary);
             Optional.ofNullable(request.getEducationLevel()).ifPresent(details::setEducationLevel);
+            Optional.ofNullable(request.getBrigade()).ifPresent(details::setBrigade);
             Optional.ofNullable(request.getFieldOfStudy()).ifPresent(details::setFieldOfStudy);
             Optional.ofNullable(request.getEmergencyContactName()).ifPresent(details::setEmergencyContactName);
             Optional.ofNullable(request.getEmergencyContactPhone()).ifPresent(details::setEmergencyContactPhone);
