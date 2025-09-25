@@ -13,7 +13,7 @@ public record DashboardInfoAboutUser(
         String lastName,
 
         @Schema(description = "Total number of breakdowns assigned to the employee", example = "15")
-        Integer breakdownCount,
+        Long breakdownCount,
 
         @Schema(description = "Avatar URL", example = "https://example.com/avatar.jpg")
         String avatarUrl,

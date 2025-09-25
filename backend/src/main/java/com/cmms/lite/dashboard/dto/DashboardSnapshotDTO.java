@@ -20,15 +20,14 @@ public record DashboardSnapshotDTO(
         DashboardInfoAboutUser userInfo,
 
         @Schema(description = "Ranking pracowników wg liczby obsłużonych awarii")
-        DashboardRatingByBreakdownsDTO employeeBreakdownRanking
+        List<DashboardWorkerBreakdownDTO> workerBreakdownRanking
 ) {
-
     public DashboardSnapshotDTO(
             List<DashboardPerformanceInditatorDTO> weeklyPerformance,
             DashboardOeeStatsOverallDTO oeeStatsOverall,
             DashboardInfoAboutUser userInfo,
-            DashboardRatingByBreakdownsDTO employeeBreakdownRanking
+            List<DashboardWorkerBreakdownDTO> workerBreakdownRanking
     ) {
-        this(LocalDateTime.now(), weeklyPerformance, oeeStatsOverall, userInfo, employeeBreakdownRanking);
+        this(LocalDateTime.now(), weeklyPerformance, oeeStatsOverall, userInfo, workerBreakdownRanking);
     }
 }

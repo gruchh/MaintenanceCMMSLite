@@ -36,8 +36,8 @@ model/dashboardFactoryStatsDTO.ts
 model/dashboardInfoAboutUser.ts
 model/dashboardOeeStatsOverallDTO.ts
 model/dashboardPerformanceInditatorDTO.ts
-model/dashboardRatingByBreakdownsDTO.ts
 model/dashboardSnapshotDTO.ts
+model/dashboardWorkerBreakdownDTO.ts
 model/employeeResponseDTO.ts
 model/generateShiftScheduleDTO.ts
 model/jwtAuthRequest.ts
@@ -64,7 +64,6 @@ model/updateSparePartDTO.ts
 model/usedPartBreakdownDTO.ts
 model/userProfileDto.ts
 model/userProfileResponse.ts
-model/workerBreakdownDTO.ts
 param.ts
 provide-api.ts
 variables.ts

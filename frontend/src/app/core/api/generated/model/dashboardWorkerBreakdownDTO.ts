@@ -12,26 +12,42 @@
 /**
  * Szczegółowe dane pracownika wraz z liczbą awarii
  */
-export interface WorkerBreakdownDTO { 
+export interface DashboardWorkerBreakdownDTO { 
     /**
      * Unique identifier of the employee
      */
     id?: number;
     /**
-     * Full name of the employee
+     * Last name of the employee
      */
-    fullName?: string;
+    lastName?: string;
     /**
-     * Avatar URL
+     * First name of the employee
      */
-    avatarUrl?: string;
+    firstName?: string;
     /**
      * Employee role
      */
     role?: string;
     /**
+     * Brigade
+     */
+    brigade?: DashboardWorkerBreakdownDTO.BrigadeEnum;
+    /**
      * Total number of breakdowns assigned to this worker
      */
     breakdownCount?: number;
 }
+export namespace DashboardWorkerBreakdownDTO {
+    export const BrigadeEnum = {
+        A: 'A',
+        B: 'B',
+        C: 'C',
+        D: 'D',
+        K: 'K',
+        S: 'S'
+    } as const;
+    export type BrigadeEnum = typeof BrigadeEnum[keyof typeof BrigadeEnum];
+}
+
 

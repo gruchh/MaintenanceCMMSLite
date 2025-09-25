@@ -1,4 +1,11 @@
-import { Component, OnInit, signal, computed, inject, DestroyRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  computed,
+  inject,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
@@ -21,6 +28,9 @@ import {
   DashboardService,
   DashboardSnapshotDTO,
   DashboardPerformanceInditatorDTO,
+  DashboardInfoAboutUser,
+  // ZMIANA: Zaimportowano DTO dla rankingu pracowników
+  DashboardWorkerBreakdownDTO,
 } from '../../../core/api/generated';
 
 @Component({
@@ -53,6 +63,7 @@ export class OverviewComponent implements OnInit {
   isLoading = signal(true);
   error = signal<string | null>(null);
 
+  // --- Sygnały dla wykresu wydajności (bez zmian) ---
   performanceData = signal<number[]>([]);
   days = signal<string[]>([]);
   performanceSpotlightDate = signal('');
@@ -60,31 +71,18 @@ export class OverviewComponent implements OnInit {
   performancePath = signal('');
   performanceDotCoords = signal<{ x: number; y: number; value: number }[]>([]);
 
+  // --- Sygnały dla statystyk OEE (bez zmian) ---
   oeePercentage = signal<number | null>(null);
   mtbfYear = signal<number | null>(null);
   mtbfMonth = signal<number | null>(null);
   mttrYear = signal<number | null>(null);
   mttrMonth = signal<number | null>(null);
 
-  employeesByFailures = signal<
-    { name: string; avatar?: string; failures: number; area?: string; role?: string }[]
-  >([]);
+  // ZMIANA: Typ sygnału zmieniony na tablicę DTO. Nazwa również zmieniona dla spójności.
+  workerBreakdownRanking = signal<DashboardWorkerBreakdownDTO[]>([]);
 
-  employeeProfile = signal<{
-    name: string;
-    avatar: string;
-    position: string;
-    remainingLeave: number;
-    openWorkOrders: number;
-    nextTraining: string;
-  }>({
-    name: 'Nieznany',
-    avatar: 'https://placehold.co/128x128',
-    position: 'Pracownik',
-    remainingLeave: 0,
-    openWorkOrders: 0,
-    nextTraining: 'Brak danych',
-  });
+  // ZMIANA: Typ sygnału ustawiony na DTO lub null.
+  employeeProfile = signal<DashboardInfoAboutUser | null>(null);
 
   readonly avgPerformance = computed(() => {
     const data = this.performanceData();
@@ -93,8 +91,9 @@ export class OverviewComponent implements OnInit {
     return Math.round(sum / data.length);
   });
 
+  // --- Wartości dla wykresu (bez zmian) ---
   viewBoxWidth = 400;
-  viewBoxHeight = 150; // zmniejszona wysokość wykresu
+  viewBoxHeight = 120;
   paddingX = 40;
   paddingTop = 20;
   paddingBottom = 30;
@@ -119,7 +118,9 @@ export class OverviewComponent implements OnInit {
           this.processApiData(snapshot.weeklyPerformance || []);
 
           if (snapshot.oeeStatsOverall) {
-            this.oeePercentage.set(snapshot.oeeStatsOverall.oeePercentage ?? null);
+            this.oeePercentage.set(
+              snapshot.oeeStatsOverall.oeePercentage ?? null
+            );
             this.mtbfYear.set(snapshot.oeeStatsOverall.mtbfYear ?? null);
             this.mtbfMonth.set(snapshot.oeeStatsOverall.mtbfMonth ?? null);
             this.mttrYear.set(snapshot.oeeStatsOverall.mttrYear ?? null);
@@ -128,30 +129,17 @@ export class OverviewComponent implements OnInit {
             this.setFallbackOee();
           }
 
-          if (snapshot.employeeBreakdownRanking?.workers) {
-            const mapped = snapshot.employeeBreakdownRanking.workers.map((w) => ({
-              name: w.fullName ?? 'Nieznany',
-              avatar: w.avatarUrl ?? 'https://placehold.co/64x64',
-              failures: w.breakdownCount ?? 0,
-              area: snapshot.employeeBreakdownRanking?.associatedArea,
-              role: w.role,
-            }));
-            this.employeesByFailures.set(mapped);
+          // ZMIANA: Usunięto mapowanie. Dane są przypisywane bezpośrednio.
+          // Poprawiono również ścieżkę dostępu do rankingu.
+          if (snapshot.workerBreakdownRanking) {
+            this.workerBreakdownRanking.set(snapshot.workerBreakdownRanking);
           } else {
             this.setFallbackEmployees();
           }
 
+          // ZMIANA: Usunięto mapowanie. Dane są przypisywane bezpośrednio.
           if (snapshot.userInfo) {
-            this.employeeProfile.set({
-              name:
-                `${snapshot.userInfo.firstName || ''} ${snapshot.userInfo.lastName || ''}`.trim() ||
-                'Nieznany',
-              avatar: snapshot.userInfo.avatarUrl ?? 'https://placehold.co/128x128',
-              openWorkOrders: snapshot.userInfo.breakdownCount ?? 0,
-              position: 'Pracownik',
-              remainingLeave: 0,
-              nextTraining: 'Brak danych',
-            });
+            this.employeeProfile.set(snapshot.userInfo);
           } else {
             this.setFallbackEmployeeProfile();
           }
@@ -163,6 +151,7 @@ export class OverviewComponent implements OnInit {
           this.error.set('Nie udało się załadować danych z dashboardu.');
           this.toastr.error('Nie udało się załadować danych.', 'Błąd');
           this.isLoading.set(false);
+          // Ustawienie danych zapasowych
           this.setFallbackData();
           this.setFallbackOee();
           this.setFallbackEmployees();
@@ -171,40 +160,41 @@ export class OverviewComponent implements OnInit {
       });
   }
 
+  // --- Metody do przetwarzania wykresu (bez zmian) ---
   private processApiData(data: DashboardPerformanceInditatorDTO[]): void {
     if (!data?.length) {
       this.setFallbackData();
       return;
     }
-
     const sortedData = [...data].sort(
-      (a, b) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime()
+      (a, b) =>
+        new Date(a.date || '').getTime() - new Date(b.date || '').getTime()
     );
-
-    this.days.set(sortedData.map((item) => this.formatDateShort(item.date || '')));
+    this.days.set(
+      sortedData.map((item) => this.formatDateShort(item.date || ''))
+    );
     this.performanceData.set(sortedData.map((item) => item.performance || 0));
-
     const maxPerformanceItem = sortedData.reduce((prev, current) =>
       (current.performance || 0) > (prev.performance || 0) ? current : prev
     );
-
     this.performanceSpotlightValue.set(maxPerformanceItem.performance || 0);
-    this.performanceSpotlightDate.set(this.formatSpotlightDate(maxPerformanceItem.date || ''));
-
+    this.performanceSpotlightDate.set(
+      this.formatSpotlightDate(maxPerformanceItem.date || '')
+    );
     this.rebuildChart();
   }
+
+  // --- Metody zapasowe (fallback) ---
 
   private setFallbackData(): void {
     const today = new Date();
     const fallbackDays: string[] = [];
     const fallbackData = [85, 90, 78, 88, 92, 95, 80];
-
     for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
       fallbackDays.push(this.formatDateShort(date.toISOString()));
     }
-
     this.days.set(fallbackDays);
     this.performanceData.set(fallbackData);
     this.performanceSpotlightDate.set('18 Gru, 2024');
@@ -220,25 +210,48 @@ export class OverviewComponent implements OnInit {
     this.mttrMonth.set(0.9);
   }
 
+  // ZMIANA: Dane zapasowe teraz pasują do struktury DashboardWorkerBreakdownDTO
   private setFallbackEmployees(): void {
-    this.employeesByFailures.set([
-      { name: 'Jan Kowalski', failures: 10, area: 'Linia A', avatar: 'https://placehold.co/64x64' },
-      { name: 'Anna Nowak', failures: 8, area: 'Magazyn', avatar: 'https://placehold.co/64x64' },
-      { name: 'Piotr Zieliński', failures: 6, area: 'Spawalnia', avatar: 'https://placehold.co/64x64' },
+    this.workerBreakdownRanking.set([
+      {
+        id: 1,
+        firstName: 'Jan',
+        lastName: 'Kowalski',
+        role: 'Technik',
+        brigade: 'A',
+        breakdownCount: 10,
+      },
+      {
+        id: 2,
+        firstName: 'Anna',
+        lastName: 'Nowak',
+        role: 'Inżynier Procesu',
+        brigade: 'B',
+        breakdownCount: 8,
+      },
+      {
+        id: 3,
+        firstName: 'Piotr',
+        lastName: 'Zieliński',
+        role: 'Automatyk',
+        brigade: 'A',
+        breakdownCount: 6,
+      },
     ]);
   }
 
+  // ZMIANA: Dane zapasowe teraz pasują do struktury DashboardInfoAboutUser
   private setFallbackEmployeeProfile(): void {
     this.employeeProfile.set({
-      name: 'Nieznany',
-      avatar: 'https://placehold.co/128x128',
-      position: 'Pracownik',
-      remainingLeave: 0,
-      openWorkOrders: 0,
-      nextTraining: 'Brak danych',
+      firstName: 'Zalogowany',
+      lastName: 'Użytkownik',
+      breakdownCount: 5,
+      avatarUrl: 'https://placehold.co/128x128',
+      retirementDate: '2045-10-20',
     });
   }
 
+  // --- Metody pomocnicze (bez zmian) ---
   private rebuildChart(): void {
     const data = this.performanceData();
     if (!data?.length) {
@@ -246,29 +259,31 @@ export class OverviewComponent implements OnInit {
       this.performanceDotCoords.set([]);
       return;
     }
-
     const n = data.length;
     const minVal = 0;
     const maxVal = 100;
     const innerWidth = this.viewBoxWidth - this.paddingX * 2;
-    const innerHeight = this.viewBoxHeight - this.paddingTop - this.paddingBottom;
-
+    const innerHeight =
+      this.viewBoxHeight - this.paddingTop - this.paddingBottom;
     const toY = (v: number) =>
       this.paddingTop + (1 - (v - minVal) / (maxVal - minVal)) * innerHeight;
     const toX = (i: number) => this.paddingX + i * (innerWidth / (n - 1 || 1));
-
     const points = data.map((v, i) => [toX(i), toY(v)] as [number, number]);
-
-    const path = points.map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `L${x} ${y}`)).join(' ');
-
+    const path = points
+      .map(([x, y], i) => (i === 0 ? `M${x} ${y}` : `L${x} ${y}`))
+      .join(' ');
     this.performancePath.set(path);
-    this.performanceDotCoords.set(points.map(([x, y], i) => ({ x, y, value: data[i] })));
+    this.performanceDotCoords.set(
+      points.map(([x, y], i) => ({ x, y, value: data[i] }))
+    );
   }
 
   private formatDateShort(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1)
+    return `${date.getDate().toString().padStart(2, '0')}.${(
+      date.getMonth() + 1
+    )
       .toString()
       .padStart(2, '0')}`;
   }
@@ -276,7 +291,22 @@ export class OverviewComponent implements OnInit {
   private formatSpotlightDate(dateString: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    const monthNames = ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'];
-    return `${date.getDate()} ${monthNames[date.getMonth()]}, ${date.getFullYear()}`;
+    const monthNames = [
+      'Sty',
+      'Lut',
+      'Mar',
+      'Kwi',
+      'Maj',
+      'Cze',
+      'Lip',
+      'Sie',
+      'Wrz',
+      'Paź',
+      'Lis',
+      'Gru',
+    ];
+    return `${date.getDate()} ${
+      monthNames[date.getMonth()]
+    }, ${date.getFullYear()}`;
   }
 }

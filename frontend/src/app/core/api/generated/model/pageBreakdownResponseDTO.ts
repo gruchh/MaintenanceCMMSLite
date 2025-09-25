@@ -13,8 +13,8 @@ import { BreakdownResponseDTO } from './breakdownResponseDTO';
 
 
 export interface PageBreakdownResponseDTO { 
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     first?: boolean;
     last?: boolean;
     size?: number;

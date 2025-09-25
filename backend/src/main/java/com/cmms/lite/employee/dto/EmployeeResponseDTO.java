@@ -20,11 +20,12 @@ public record EmployeeResponseDTO(
         @Schema(description = "Username of the employee", example = "jkowalski")
         String username,
 
-        @Schema(description = "Last name of the employee", example = "Kowalski")
-        String lastName,
-
         @Schema(description = "First name of the employee", example = "Jan")
         String firstName,
+
+
+        @Schema(description = "Last name of the employee", example = "Kowalski")
+        String lastName,
 
         @Schema(description = "Full name of the employee", example = "Jan Kowalski")
         String fullName,

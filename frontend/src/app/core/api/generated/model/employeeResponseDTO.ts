@@ -22,13 +22,13 @@ export interface EmployeeResponseDTO {
      */
     username?: string;
     /**
-     * Last name of the employee
-     */
-    lastName?: string;
-    /**
      * First name of the employee
      */
     firstName?: string;
+    /**
+     * Last name of the employee
+     */
+    lastName?: string;
     /**
      * Full name of the employee
      */

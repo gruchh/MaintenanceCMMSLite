@@ -2,15 +2,28 @@ package com.cmms.lite.dashboard.service;
 
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
 import com.cmms.lite.dashboard.dto.*;
+import com.cmms.lite.employee.entity.Employee;
+import com.cmms.lite.employee.repository.EmployeeRepository;
 import com.cmms.lite.machine.repository.MachineRepository;
+import com.cmms.lite.security.entity.User;
+import com.cmms.lite.security.repository.UserRepository;
+import com.cmms.lite.security.service.JwtService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +34,8 @@ public class DashboardService {
 
     private final MachineRepository machineRepository;
     private final BreakdownRepository breakdownRepository;
+    private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
     private final OeeCalculator oeeCalculator;
 
     private static final int MINUTES_IN_DAY = 24 * 60;
@@ -30,7 +45,7 @@ public class DashboardService {
         List<DashboardPerformanceInditatorDTO> weeklyPerformance = getWeeklyPerformance();
         DashboardOeeStatsOverallDTO oeeStats = getOeeStatsOverall();
         DashboardInfoAboutUser userInfo = getDashboardInfoAboutUser();
-        DashboardRatingByBreakdownsDTO ranking = getEmployeeBreakdownRanking();
+        List<DashboardWorkerBreakdownDTO> ranking = getEmployeeBreakdownRanking();
 
         return new DashboardSnapshotDTO(
                 weeklyPerformance,
@@ -111,19 +126,34 @@ public class DashboardService {
         );
     }
 
-    private DashboardInfoAboutUser getDashboardInfoAboutUser() {
-        // TODO: Implementacja pobierania danych o zalogowanym użytkowniku
-        log.info("Fetching user info...");
-        return new DashboardInfoAboutUser("Jan", "Kowalski", 15, "https://i.pravatar.cc/150?u=a042581f4e29026704d", LocalDate.of(2055, 5, 15));
+    public DashboardInfoAboutUser getDashboardInfoAboutUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetails userDetails)) {
+            throw new IllegalStateException("Brak uwierzytelnionego użytkownika");
+        }
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Employee employee = employeeRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        Long breakdownCount = breakdownRepository.countByAssignedEmployees_Id(employee.getId());
+
+
+        return new DashboardInfoAboutUser(
+                employee.getFirstName(),
+                employee.getLastName(),
+                breakdownCount,
+                employee.getAvatarUrl(),
+                employee.getRetirementDate()
+        );
     }
 
-    private DashboardRatingByBreakdownsDTO getEmployeeBreakdownRanking() {
-        // TODO: Implementacja rankingu pracowników
-        log.info("Generating employee breakdown ranking...");
-        List<DashboardRatingByBreakdownsDTO.WorkerBreakdownDTO> workers = List.of(
-                new DashboardRatingByBreakdownsDTO.WorkerBreakdownDTO(1L, "Robert Malinowski", "https://i.pravatar.cc/150?u=a042581f4e29026704e", "Technik", 21),
-                new DashboardRatingByBreakdownsDTO.WorkerBreakdownDTO(2L, "Ewa Nowak", "https://i.pravatar.cc/150?u=a042581f4e29026704f", "Inżynier Procesu", 18)
-        );
-        return new DashboardRatingByBreakdownsDTO(workers, "Linia Montażowa A");
+    private List<DashboardWorkerBreakdownDTO> getEmployeeBreakdownRanking() {
+        log.info("Generating top 3 employee breakdown ranking...");
+
+        Pageable topThree = PageRequest.of(0, 3);
+        return breakdownRepository.findTopEmployeesByBreakdownCount(topThree);
     }
 }

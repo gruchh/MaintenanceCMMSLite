@@ -8,8 +8,8 @@
  * Do not edit the class manually.
  */
 import { DashboardInfoAboutUser } from './dashboardInfoAboutUser';
+import { DashboardWorkerBreakdownDTO } from './dashboardWorkerBreakdownDTO';
 import { DashboardPerformanceInditatorDTO } from './dashboardPerformanceInditatorDTO';
-import { DashboardRatingByBreakdownsDTO } from './dashboardRatingByBreakdownsDTO';
 import { DashboardOeeStatsOverallDTO } from './dashboardOeeStatsOverallDTO';
 
 
@@ -36,6 +36,6 @@ export interface DashboardSnapshotDTO {
     /**
      * Ranking pracowników wg liczby obsłużonych awarii
      */
-    employeeBreakdownRanking?: DashboardRatingByBreakdownsDTO;
+    workerBreakdownRanking?: Array<DashboardWorkerBreakdownDTO>;
 }
 
