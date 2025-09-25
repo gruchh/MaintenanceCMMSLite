@@ -18,13 +18,17 @@ export interface DashboardWorkerBreakdownDTO {
      */
     id?: number;
     /**
+     * First name of the employee
+     */
+    firstName?: string;
+    /**
      * Last name of the employee
      */
     lastName?: string;
     /**
-     * First name of the employee
+     * Avatar URL
      */
-    firstName?: string;
+    avatarUrl?: string;
     /**
      * Employee role
      */

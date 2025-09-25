@@ -6,20 +6,56 @@
     (click)="createSchedule()"
     [disabled]="isLoading()"
   >
-    {{ isLoading() ? "Generating..." : "Generate Schedule" }}
+    {{ isLoading() ? 'Generating...' : 'Generate Schedule' }}
   </button>
 
   @if (schedule(); as s) {
-  <div class="bg-white rounded-lg shadow p-4">
-    <h3 class="mb-4 text-lg font-semibold text-gray-700">
-      Calendar View - Schedule ID: {{ s.id }} ({{ s.startDate }} →
-      {{ s.endDate }})
-    </h3>
-    <full-calendar [options]="calendarOptions()"></full-calendar>
-  </div>
-  } @if (error()) {
-  <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-    Error: {{ error() }}
-  </div>
+    <!-- Calendar View -->
+    <div class="bg-white rounded-lg shadow p-4">
+      <h3 class="mb-4 text-lg font-semibold text-gray-700">
+        Calendar View - Schedule ID: {{ s.id }} ({{ s.startDate }} → {{ s.endDate }})
+      </h3>
+      <full-calendar [options]="calendarOptions()"></full-calendar>
+    </div>
+
+    <!-- Table View -->
+    <div class="overflow-x-auto">
+      <h3 class="mt-6 text-lg font-semibold text-gray-700">
+        Table View
+      </h3>
+
+      <table class="w-full mt-4 border border-gray-200 rounded-lg overflow-hidden">
+        <thead class="bg-gray-100 text-left text-sm font-medium text-gray-700">
+          <tr>
+            <th class="px-4 py-2 border-b">Date</th>
+            <th class="px-4 py-2 border-b">Brigade</th>
+            <th class="px-4 py-2 border-b">Shift</th>
+            <th class="px-4 py-2 border-b">Start</th>
+            <th class="px-4 py-2 border-b">End</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm text-gray-600">
+          @for (entry of s.entries; track entry.id) {
+            <tr class="hover:bg-gray-50 transition">
+              <td class="px-4 py-2 border-b">{{ entry.date }}</td>
+              <td class="px-4 py-2 border-b">{{ entry.brigade }}</td>
+              <td class="px-4 py-2 border-b">{{ entry.shift }}</td>
+              <td class="px-4 py-2 border-b">
+                {{ getShiftStartTime(entry.shift) }}
+              </td>
+              <td class="px-4 py-2 border-b">
+                {{ getShiftEndTime(entry.shift) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+      Error: {{ error() }}
+    </div>
   }
 </div>

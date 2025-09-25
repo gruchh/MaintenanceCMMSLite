@@ -158,9 +158,17 @@
           @for (employee of workerBreakdownRanking(); track employee.id) {
           <tr class="bg-white border-b hover:bg-gray-50">
             <td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap flex items-center">
-              <div class="h-8 w-8 rounded-full mr-3 bg-gray-200 flex items-center justify-center">
-                  <ng-icon name="heroUserCircle" class="w-5 h-5 text-gray-500"></ng-icon>
-              </div>
+              @if (employee.avatarUrl) {
+                <img
+                  class="h-8 w-8 rounded-full mr-3 object-cover"
+                  [src]="employee.avatarUrl"
+                  alt="Avatar of {{ employee.firstName }} {{ employee.lastName }}"
+                />
+              } @else {
+                <div class="h-8 w-8 rounded-full mr-3 bg-gray-200 flex items-center justify-center">
+                    <ng-icon name="heroUserCircle" class="w-5 h-5 text-gray-500"></ng-icon>
+                </div>
+              }
               {{ employee.firstName }} {{ employee.lastName }}
             </td>
             <td class="py-4 px-6">{{ employee.role }}</td>

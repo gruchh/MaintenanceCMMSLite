@@ -41,16 +41,17 @@ public interface BreakdownRepository extends JpaRepository<Breakdown, Long> {
 
     @Query("SELECT new com.cmms.lite.dashboard.dto.DashboardWorkerBreakdownDTO(" +
             "  e.id, " +
-            "  e.lastName, " +
             "  e.firstName, " +
-            "  er.name, " + // Pobieranie nazwy roli
-            "  ed.brigade, " + // Pobieranie brygady
-            "  CAST(COUNT(b) AS int)) " + // Rzutowanie wyniku COUNT na int
+            "  e.lastName, " +
+            "  e.avatarUrl, " +
+            "  er.name, " +
+            "  ed.brigade, " +
+            "  CAST(COUNT(b) AS int)) " +
             "FROM Breakdown b " +
             "JOIN b.assignedEmployees e " +
             "JOIN e.employeeRole er " +
-            "JOIN e.employeeDetails ed " + // DODANO JOIN na EmployeeDetails
-            "GROUP BY e.id, e.lastName, e.firstName, er.name, ed.brigade " +
+            "JOIN e.employeeDetails ed " +
+            "GROUP BY e.id, e.firstName, e.lastName, e.avatarUrl, er.name, ed.brigade " +
             "ORDER BY COUNT(b) DESC")
     List<DashboardWorkerBreakdownDTO> findTopEmployeesByBreakdownCount(Pageable pageable);
 }

@@ -13,8 +13,9 @@ import { EmployeeResponseDTO } from './employeeResponseDTO';
 
 
 export interface PageEmployeeResponseDTO { 
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     size?: number;
@@ -22,7 +23,6 @@ export interface PageEmployeeResponseDTO {
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 
