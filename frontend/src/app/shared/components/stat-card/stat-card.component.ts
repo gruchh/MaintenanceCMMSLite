@@ -4,6 +4,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { heroCalendar } from '@ng-icons/heroicons/outline';
 import { heroExclamationTriangle } from '@ng-icons/heroicons/outline';
 import { heroClock } from '@ng-icons/heroicons/outline';
+import { heroChartBar } from '@ng-icons/heroicons/outline';
 
 @Component({
   selector: 'app-stat-card',
@@ -14,12 +15,13 @@ import { heroClock } from '@ng-icons/heroicons/outline';
     provideIcons({
       heroCalendar,
       heroExclamationTriangle,
-      heroClock
+      heroClock,
+      heroChartBar
     })
   ]
 })
 export class StatCardComponent {
-  @Input() icon: 'heroCalendar' | 'heroExclamationTriangle' | 'heroClock' = 'heroCalendar';
+  @Input() icon: 'heroCalendar' | 'heroChartBar' | 'heroExclamationTriangle' | 'heroClock' = 'heroCalendar';
   @Input() value: string | number = '0';
   @Input() label: string = 'Etykieta';
   @Input() colorClass: string = 'text-gray-400';

@@ -12,12 +12,12 @@ import {
 } from '../../../core/api/generated';
 
 import { EmployeeEditModalComponent } from '../../../shared/components/employee-edit-modal/employee-edit-modal.component';
-import { FormsModule } from '@angular/forms'; // Dodano import dla ngModel
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, EmployeeEditModalComponent, FormsModule], // Dodano FormsModule
+  imports: [CommonModule, EmployeeEditModalComponent, FormsModule],
   templateUrl: './employee.component.html',
 })
 export class EmployeesComponent implements OnInit, OnDestroy {

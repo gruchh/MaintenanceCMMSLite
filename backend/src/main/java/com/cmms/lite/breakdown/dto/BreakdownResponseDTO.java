@@ -16,6 +16,9 @@ public record BreakdownResponseDTO(
         @Schema(description = "Description of the breakdown", example = "Pump failure in production line")
         String description,
 
+        @Schema(description = "Image URL of the breakdown, if available", example = "https://example.com/images/failure1.jpg")
+        String imageUrl,
+
         @Schema(description = "When the breakdown was reported", example = "2025-09-10T10:30:00")
         LocalDateTime reportedAt,
 

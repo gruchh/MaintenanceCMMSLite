@@ -15,6 +15,7 @@ import { MachineResponseDTO } from './machineResponseDTO';
 export interface PageMachineResponseDTO { 
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     size?: number;
@@ -22,7 +23,6 @@ export interface PageMachineResponseDTO {
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

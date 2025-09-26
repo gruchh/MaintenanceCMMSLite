@@ -5,10 +5,7 @@ import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
 import com.cmms.lite.breakdown.repository.BreakdownUsedPartsRepository;
 import com.cmms.lite.breakdownType.entity.BreakdownType;
-import com.cmms.lite.employee.entity.Address;
-import com.cmms.lite.employee.entity.EducationLevel;
-import com.cmms.lite.employee.entity.Employee;
-import com.cmms.lite.employee.entity.EmployeeDetails;
+import com.cmms.lite.employee.entity.*;
 import com.cmms.lite.employee.repository.EmployeeDetailsRepository;
 import com.cmms.lite.employee.repository.EmployeeRepository;
 import com.cmms.lite.employee.repository.EmployeeRoleRepository;
@@ -64,6 +61,7 @@ public class DataInitializer {
     private static final List<String> COMPONENTS = List.of("napędem osi Z", "systemem smarowania", "układem chłodzenia", "panelem sterowania HMI", "głównym wrzecionem", "magazynem narzędzi", "pompy hydraulicznej", "falownikiem");
     private static final List<String> SPECIALIST_ACTIONS = List.of("Wymieniono", "Naprawiono", "Wyczyszczono i skalibrowano", "Dokręcono połączenia i sprawdzono", "Zaktualizowano oprogramowanie", "Uzupełniono stan");
     private static final List<String> REPAIRED_COMPONENTS = List.of("uszkodzony przekaźnik", "zapchany filtr", "przewód sygnałowy", "czujnik ciśnienia", "oprogramowanie sterownika", "oleju hydraulicznego");
+    private static final List<Brigade> BRIGADES = List.of(Brigade.A, Brigade.B, Brigade.C, Brigade.D, Brigade.K, Brigade.S);
 
 
     @EventListener(ApplicationReadyEvent.class)
@@ -167,6 +165,7 @@ public class DataInitializer {
                     .fieldOfStudy(RANDOM.nextBoolean() ? FAKER.educator().course() : null)
                     .emergencyContactName(FAKER.name().fullName())
                     .emergencyContactPhone(FAKER.phoneNumber().cellPhone())
+                    .brigade(getRandomElement(BRIGADES))
                     .build();
             detailsToSave.add(details);
         }
@@ -254,6 +253,7 @@ public class DataInitializer {
 
             Breakdown breakdown = Breakdown.builder()
                     .description(generateRandomDescription())
+                    .imageUrl(RANDOM.nextBoolean() ? "https://picsum.photos/seed/" + UUID.randomUUID() + "/800/600" : null)
                     .reportedAt(reportedAt)
                     .startedAt(startedAt)
                     .finishedAt(finishedAt)

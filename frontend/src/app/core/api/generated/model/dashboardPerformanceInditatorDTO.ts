@@ -12,7 +12,7 @@
 /**
  * Statystyki związane z wydajnością w kontekście awarii
  */
-export interface BreakdownPerformanceIndicatorDTO { 
+export interface DashboardPerformanceInditatorDTO { 
     /**
      * Data, której dotyczą statystyki wydajności
      */

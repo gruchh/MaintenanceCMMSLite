@@ -3,8 +3,10 @@ package com.cmms.lite.employee.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -48,6 +50,11 @@ public class EmployeeDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "education_level")
     private EducationLevel educationLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "brigade", length = 1)
+    @JdbcTypeCode(Types.CHAR)
+    private Brigade brigade;
 
     @Column(name = "field_of_study")
     private String fieldOfStudy;

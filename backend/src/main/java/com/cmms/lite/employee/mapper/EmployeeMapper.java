@@ -17,12 +17,13 @@ public interface EmployeeMapper {
     @Mapping(source = "user.email", target = "email")
     @Mapping(source = "avatarUrl", target = "avatarUrl")
     @Mapping(source = "employeeRole.name", target = "role")
-    @Mapping(source = "retirementDate", target = "retirementDate")
+    @Mapping(source = "employeeDetails.retirementDate", target = "retirementDate") // POPRAWIONE
     @Mapping(source = "employeeDetails.hireDate", target = "hireDate")
     @Mapping(source = "employeeDetails.phoneNumber", target = "phoneNumber")
     @Mapping(source = "employeeDetails.age", target = "age")
     @Mapping(source = "employeeDetails.salary", target = "salary")
     @Mapping(source = "employeeDetails.educationLevel", target = "educationLevel")
+    @Mapping(source = "employeeDetails.brigade", target = "brigade") // DODANE
     @Mapping(source = "employeeDetails.fieldOfStudy", target = "fieldOfStudy")
     @Mapping(source = "employeeDetails.dateOfBirth", target = "dateOfBirth")
     @Mapping(source = "employeeDetails.contractEndDate", target = "contractEndDate")

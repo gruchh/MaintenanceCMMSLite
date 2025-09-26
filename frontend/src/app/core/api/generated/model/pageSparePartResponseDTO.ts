@@ -15,6 +15,7 @@ import { SortObject } from './sortObject';
 export interface PageSparePartResponseDTO { 
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     size?: number;
@@ -22,7 +23,6 @@ export interface PageSparePartResponseDTO {
     number?: number;
     sort?: SortObject;
     numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 }
 

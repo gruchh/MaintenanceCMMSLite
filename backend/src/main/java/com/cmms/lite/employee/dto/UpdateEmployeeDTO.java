@@ -1,5 +1,6 @@
 package com.cmms.lite.employee.dto;
 
+import com.cmms.lite.employee.entity.Brigade;
 import com.cmms.lite.employee.entity.EducationLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -57,6 +58,9 @@ public class UpdateEmployeeDTO {
 
     @Schema(description = "Poziom wykształcenia.", example = "MASTER")
     private EducationLevel educationLevel;
+
+    @Schema(description = "Poziom wykształcenia.", example = "MASTER")
+    private Brigade brigade;
 
     @Schema(description = "Kierunek studiów.", example = "Informatyka")
     private String fieldOfStudy;
