@@ -3,7 +3,7 @@
     class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden"
   >
     <div
-      class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
+      class="flex flex-col md:flex-row items-center justify-end space-y-3 md:space-y-0 md:space-x-4 p-4"
     >
       <div class="w-full md:w-1/2">
         <form class="flex items-center">
@@ -31,33 +31,29 @@
               id="simple-search"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Szukaj pracownika..."
-              [(ngModel)]="searchTerm"
-              (ngModelChange)="onSearchChange()"
-              [ngModelOptions]="{ standalone: true }"
+              [formControl]="searchControl"
             />
-            <!-- <<--- DODANA LINIA -->
           </div>
         </form>
       </div>
     </div>
-
     @if (isLoading()) {
     <div class="flex justify-center items-center p-8">
       <div class="text-lg text-gray-500 dark:text-gray-400">
         Ładowanie pracowników...
       </div>
     </div>
-    } @if (errorMessage()) {
+    } @else if (errorMessage()) {
     <div class="p-8 text-center text-red-600 dark:text-red-500">
       <p>{{ errorMessage() }}</p>
       <button
-        (click)="loadEmployees()"
+        (click)="fetchEmployees(searchControl.value || '')"
         class="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
       >
         Spróbuj ponownie
       </button>
     </div>
-    } @if (!isLoading() && !errorMessage()) {
+    } @else { @if (!isMobile()) {
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead
@@ -83,11 +79,11 @@
               <img
                 class="w-10 h-10 rounded-full object-cover"
                 [src]="employee.avatarUrl || 'assets/images/default-avatar.png'"
-                [alt]="employee.fullName + ' profile image'"
+                [alt]="employee.firstName + ' profile image'"
               />
               <div class="pl-3">
                 <div class="text-base font-semibold">
-                  {{ employee.fullName }}
+                  {{ employee.firstName }}
                 </div>
                 <div class="font-normal text-gray-500">
                   {{ employee.username }}
@@ -100,9 +96,8 @@
               <a
                 (click)="openEditModal(employee)"
                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
+                >Edytuj pracownika</a
               >
-                Edytuj pracownika
-              </a>
             </td>
             }
           </tr>
@@ -119,7 +114,51 @@
         </tbody>
       </table>
     </div>
-
+    } @else {
+    <div class="p-4 grid gap-4">
+      @for (employee of employees(); track employee.id) {
+      <div
+        class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-md p-4 flex flex-col space-y-3"
+      >
+        <div class="flex items-center space-x-4">
+          <img
+            class="w-16 h-16 rounded-full object-cover"
+            [src]="employee.avatarUrl || 'assets/images/default-avatar.png'"
+            [alt]="employee.lastName"
+          />
+          <div class="flex-grow">
+            <div class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ employee.firstName }} {{ employee.lastName }}
+            </div>
+            <div class="font-normal text-gray-500">{{ employee.username }}</div>
+          </div>
+        </div>
+        <div>
+          <span class="text-sm font-medium text-gray-600 dark:text-gray-400"
+            >Stanowisko:</span
+          >
+          <p class="text-base text-gray-800 dark:text-gray-200">
+            {{ employee.role }}
+          </p>
+        </div>
+        @if (isAdmin) {
+        <div class="border-t dark:border-gray-700 pt-3 mt-auto">
+          <a
+            (click)="openEditModal(employee)"
+            class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer w-full text-center block"
+          >
+            Edytuj pracownika
+          </a>
+        </div>
+        }
+      </div>
+      } @empty {
+      <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+        Nie znaleziono pracowników spełniających kryteria.
+      </div>
+      }
+    </div>
+    }
     <nav
       class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
       aria-label="Table navigation"
@@ -142,7 +181,6 @@
           }
         </select>
       </div>
-
       <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
         Wyświetlanie
         <span class="font-semibold text-gray-900 dark:text-white">
@@ -157,7 +195,6 @@
           totalElements()
         }}</span>
       </span>
-
       <div class="inline-flex items-center -space-x-px">
         <button
           (click)="previousPage()"
@@ -178,7 +215,6 @@
     }
   </div>
 </div>
-
 <app-employee-edit-modal
   [isOpen]="isModalOpen()"
   [employeeId]="selectedEmployeeId()"

@@ -1,22 +1,25 @@
-import { Component, inject, model, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import {
   Pageable,
   SparePartResponseDTO,
   SparePartService,
 } from '../../../core/api/generated';
-import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { BreakpointService } from '../../../core/services/breakout.service';
+import { PageableRequest } from '../../../core/models/pageableRequest ';
 
 @Component({
   selector: 'app-spare-parts',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './spare-parts.component.html',
 })
-export class SparePartsComponent implements OnInit {
+export class SparePartsComponent implements OnInit, OnDestroy {
   private sparePartService = inject(SparePartService);
+  private breakpointService = inject(BreakpointService);
 
   spareParts = signal<SparePartResponseDTO[]>([]);
   isLoading = signal(true);
@@ -30,21 +33,29 @@ export class SparePartsComponent implements OnInit {
 
   isAdmin = true;
 
-  searchTerm = model('');
-  private searchSubject = new Subject<string>();
+  searchControl = new FormControl('');
+  private searchSubscription!: Subscription;
+
+  isMobile = this.breakpointService.isMobile;
 
   ngOnInit(): void {
-    this.fetchSpareParts();
-
-    this.searchSubject
-      .pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe((searchValue) => {
-        this.currentPage.set(0);
-        this.fetchSpareParts(searchValue);
-      });
+    this.searchSubscription = this.searchControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(searchValue => {
+      this.currentPage.set(0);
+      this.fetchSpareParts(searchValue || '');
+    });
   }
 
-  fetchSpareParts(search: string = ''): void {
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+  }
+
+  fetchSpareParts(search: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
@@ -73,28 +84,24 @@ export class SparePartsComponent implements OnInit {
       });
   }
 
-  onSearchChange(): void {
-    this.searchSubject.next(this.searchTerm());
-  }
-
   onPageSizeChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.pageSize.set(+target.value);
     this.currentPage.set(0);
-    this.fetchSpareParts(this.searchTerm());
+    this.fetchSpareParts(this.searchControl.value || '');
   }
 
   previousPage(): void {
     if (this.currentPage() > 0) {
       this.currentPage.update((page) => page - 1);
-      this.fetchSpareParts(this.searchTerm());
+      this.fetchSpareParts(this.searchControl.value || '');
     }
   }
 
   nextPage(): void {
     if (this.currentPage() < this.totalPages() - 1) {
       this.currentPage.update((page) => page + 1);
-      this.fetchSpareParts(this.searchTerm());
+      this.fetchSpareParts(this.searchControl.value || '');
     }
   }
 }

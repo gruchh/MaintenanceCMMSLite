@@ -29,7 +29,6 @@ import {
   DashboardSnapshotDTO,
   DashboardPerformanceInditatorDTO,
   DashboardInfoAboutUser,
-  // ZMIANA: Zaimportowano DTO dla rankingu pracowników
   DashboardWorkerBreakdownDTO,
 } from '../../../core/api/generated';
 
@@ -63,7 +62,6 @@ export class OverviewComponent implements OnInit {
   isLoading = signal(true);
   error = signal<string | null>(null);
 
-  // --- Sygnały dla wykresu wydajności (bez zmian) ---
   performanceData = signal<number[]>([]);
   days = signal<string[]>([]);
   performanceSpotlightDate = signal('');
@@ -71,17 +69,14 @@ export class OverviewComponent implements OnInit {
   performancePath = signal('');
   performanceDotCoords = signal<{ x: number; y: number; value: number }[]>([]);
 
-  // --- Sygnały dla statystyk OEE (bez zmian) ---
   oeePercentage = signal<number | null>(null);
   mtbfYear = signal<number | null>(null);
   mtbfMonth = signal<number | null>(null);
   mttrYear = signal<number | null>(null);
   mttrMonth = signal<number | null>(null);
 
-  // ZMIANA: Typ sygnału zmieniony na tablicę DTO. Nazwa również zmieniona dla spójności.
   workerBreakdownRanking = signal<DashboardWorkerBreakdownDTO[]>([]);
 
-  // ZMIANA: Typ sygnału ustawiony na DTO lub null.
   employeeProfile = signal<DashboardInfoAboutUser | null>(null);
 
   readonly avgPerformance = computed(() => {
@@ -91,7 +86,6 @@ export class OverviewComponent implements OnInit {
     return Math.round(sum / data.length);
   });
 
-  // --- Wartości dla wykresu (bez zmian) ---
   viewBoxWidth = 400;
   viewBoxHeight = 120;
   paddingX = 40;
@@ -129,15 +123,12 @@ export class OverviewComponent implements OnInit {
             this.setFallbackOee();
           }
 
-          // ZMIANA: Usunięto mapowanie. Dane są przypisywane bezpośrednio.
-          // Poprawiono również ścieżkę dostępu do rankingu.
           if (snapshot.workerBreakdownRanking) {
             this.workerBreakdownRanking.set(snapshot.workerBreakdownRanking);
           } else {
             this.setFallbackEmployees();
           }
 
-          // ZMIANA: Usunięto mapowanie. Dane są przypisywane bezpośrednio.
           if (snapshot.userInfo) {
             this.employeeProfile.set(snapshot.userInfo);
           } else {
@@ -151,7 +142,6 @@ export class OverviewComponent implements OnInit {
           this.error.set('Nie udało się załadować danych z dashboardu.');
           this.toastr.error('Nie udało się załadować danych.', 'Błąd');
           this.isLoading.set(false);
-          // Ustawienie danych zapasowych
           this.setFallbackData();
           this.setFallbackOee();
           this.setFallbackEmployees();
@@ -160,7 +150,6 @@ export class OverviewComponent implements OnInit {
       });
   }
 
-  // --- Metody do przetwarzania wykresu (bez zmian) ---
   private processApiData(data: DashboardPerformanceInditatorDTO[]): void {
     if (!data?.length) {
       this.setFallbackData();
@@ -183,8 +172,6 @@ export class OverviewComponent implements OnInit {
     );
     this.rebuildChart();
   }
-
-  // --- Metody zapasowe (fallback) ---
 
   private setFallbackData(): void {
     const today = new Date();
@@ -210,7 +197,6 @@ export class OverviewComponent implements OnInit {
     this.mttrMonth.set(0.9);
   }
 
-  // ZMIANA: Dane zapasowe teraz pasują do struktury DashboardWorkerBreakdownDTO
   private setFallbackEmployees(): void {
     this.workerBreakdownRanking.set([
       {
@@ -240,7 +226,6 @@ export class OverviewComponent implements OnInit {
     ]);
   }
 
-  // ZMIANA: Dane zapasowe teraz pasują do struktury DashboardInfoAboutUser
   private setFallbackEmployeeProfile(): void {
     this.employeeProfile.set({
       firstName: 'Zalogowany',
@@ -251,7 +236,6 @@ export class OverviewComponent implements OnInit {
     });
   }
 
-  // --- Metody pomocnicze (bez zmian) ---
   private rebuildChart(): void {
     const data = this.performanceData();
     if (!data?.length) {

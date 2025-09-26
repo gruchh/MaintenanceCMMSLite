@@ -14,18 +14,15 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 export class WorkScheduleComponent {
   private shiftScheduleService = inject(ShiftScheduleService);
 
-  // State signals
   schedule = signal<ShiftScheduleResponseDTO | null>(null);
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  // Computed calendar events
   private calendarEvents = computed(() => {
     const scheduleData = this.schedule();
     return scheduleData ? this.mapShiftsToEvents(scheduleData.entries ?? []) : [];
   });
 
-  // Calendar configuration
   calendarOptions = computed<CalendarOptions>(() => ({
     plugins: [dayGridPlugin],
     initialView: 'dayGridMonth',

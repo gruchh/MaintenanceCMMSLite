@@ -30,10 +30,6 @@ export interface EmployeeResponseDTO {
      */
     lastName?: string;
     /**
-     * Full name of the employee
-     */
-    fullName?: string;
-    /**
      * Email address
      */
     email?: string;

@@ -1,28 +1,29 @@
-import { Component, OnDestroy, OnInit, inject, signal, model } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import {
   EmployeeResponseDTO,
   EmployeesService,
   Pageable,
   PageEmployeeResponseDTO
 } from '../../../core/api/generated';
-
 import { EmployeeEditModalComponent } from '../../../shared/components/employee-edit-modal/employee-edit-modal.component';
-import { FormsModule } from '@angular/forms';
+import { BreakpointService } from '../../../core/services/breakout.service';
+import { PageableRequest } from '../../../core/models/pageableRequest ';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, EmployeeEditModalComponent, FormsModule],
+  imports: [CommonModule, EmployeeEditModalComponent, ReactiveFormsModule],
   templateUrl: './employee.component.html',
 })
 export class EmployeesComponent implements OnInit, OnDestroy {
   private employeeService = inject(EmployeesService);
   private toastr = inject(ToastrService);
+  private breakpointService = inject(BreakpointService);
 
   employees = signal<EmployeeResponseDTO[]>([]);
   isLoading = signal(true);
@@ -37,21 +38,20 @@ export class EmployeesComponent implements OnInit, OnDestroy {
   isModalOpen = signal(false);
   selectedEmployeeId = signal<number | null>(null);
 
-  searchTerm = model('');
-  private searchSubject = new Subject<string>();
+  searchControl = new FormControl('');
   private searchSubscription!: Subscription;
 
+  isMobile = this.breakpointService.isMobile;
   isAdmin: boolean = true;
 
   ngOnInit(): void {
-    this.loadEmployees();
-
-    this.searchSubscription = this.searchSubject.pipe(
+    this.searchSubscription = this.searchControl.valueChanges.pipe(
+      startWith(''),
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(term => {
       this.currentPage.set(0);
-      this.loadEmployees(term);
+      this.fetchEmployees(term || '');
     });
   }
 
@@ -61,17 +61,17 @@ export class EmployeesComponent implements OnInit, OnDestroy {
     }
   }
 
-  // 8. Metody publiczne i obsługa zdarzeń
-  loadEmployees(search: string = this.searchTerm()): void {
+  fetchEmployees(search: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const pageable: Pageable = {
+    const pageable: PageableRequest = {
       page: this.currentPage(),
       size: this.pageSize(),
+      sort: 'lastName,asc',
     };
 
-    this.employeeService.getAllEmployees(pageable, search).subscribe({
+    this.employeeService.getAllEmployees(pageable as unknown as Pageable, search).subscribe({
       next: (page: PageEmployeeResponseDTO) => {
         this.employees.set(page.content ?? []);
         this.totalElements.set(page.totalElements ?? 0);
@@ -83,28 +83,22 @@ export class EmployeesComponent implements OnInit, OnDestroy {
         this.errorMessage.set('Nie udało się załadować danych o pracownikach.');
         this.toastr.error('Nie udało się załadować pracowników.', 'Błąd');
         this.employees.set([]);
-        this.totalElements.set(0);
-        this.totalPages.set(0);
         this.isLoading.set(false);
       }
     });
   }
 
-  onSearchChange(): void {
-    this.searchSubject.next(this.searchTerm());
-  }
-
   nextPage(): void {
     if (this.currentPage() < this.totalPages() - 1) {
       this.currentPage.update(page => page + 1);
-      this.loadEmployees();
+      this.fetchEmployees(this.searchControl.value || '');
     }
   }
 
   previousPage(): void {
     if (this.currentPage() > 0) {
       this.currentPage.update(page => page - 1);
-      this.loadEmployees();
+      this.fetchEmployees(this.searchControl.value || '');
     }
   }
 
@@ -112,7 +106,7 @@ export class EmployeesComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLSelectElement;
     this.pageSize.set(+target.value);
     this.currentPage.set(0);
-    this.loadEmployees();
+    this.fetchEmployees(this.searchControl.value || '');
   }
 
   openEditModal(employee: EmployeeResponseDTO): void {
@@ -129,6 +123,6 @@ export class EmployeesComponent implements OnInit, OnDestroy {
 
   handleEmployeeUpdate(): void {
     this.closeEditModal();
-    this.loadEmployees();
+    this.fetchEmployees(this.searchControl.value || '');
   }
 }

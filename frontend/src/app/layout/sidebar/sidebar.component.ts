@@ -18,7 +18,7 @@ import {
   heroCake,
 } from '@ng-icons/heroicons/outline';
 import { CommonModule, NgClass } from '@angular/common';
-import { AuthService } from '../../core/api/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ActionItem, MENU_ITEMS, MenuItem, SIDEBAR_ICONS } from './sidebar.constants';
 
 @Component({

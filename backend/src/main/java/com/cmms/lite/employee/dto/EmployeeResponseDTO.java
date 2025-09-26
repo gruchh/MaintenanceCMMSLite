@@ -26,9 +26,6 @@ public record EmployeeResponseDTO(
         @Schema(description = "Last name of the employee", example = "Kowalski")
         String lastName,
 
-        @Schema(description = "Full name of the employee", example = "Jan Kowalski")
-        String fullName,
-
         @Schema(description = "Email address", example = "jan.kowalski@company.com")
         String email,
 

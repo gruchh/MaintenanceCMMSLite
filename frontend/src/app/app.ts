@@ -3,8 +3,8 @@ import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { LoginModalComponent } from './shared/components/login-modal/login-modal.component';
 import { RegisterModalComponent } from './shared/components/register-modal/register-modal.component';
-import { ModalService, ModalType } from './core/api/services/modal.service';
-import { AuthService } from './core/api/services/auth.service';
+import { ModalService, ModalType } from './core/services/modal.service';
+import { AuthService } from './core/services/auth.service';
 import localePl from '@angular/common/locales/pl';
 
 registerLocaleData(localePl, 'pl-PL');

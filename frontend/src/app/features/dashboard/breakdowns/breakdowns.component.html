@@ -2,12 +2,7 @@
   <div
     class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden"
   >
-    <div
-      class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
-    >
-      <div
-        class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0"
-      ></div>
+    <div class="flex items-center justify-end p-4">
       <div class="w-full md:w-1/2">
         <form class="flex items-center">
           <label for="simple-search" class="sr-only">Szukaj</label>
@@ -34,14 +29,30 @@
               id="simple-search"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Szukaj awarii..."
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()"
-              name="searchTerm"
+              [formControl]="searchControl"
             />
           </div>
         </form>
       </div>
     </div>
+    @if (isLoading()) {
+    <div class="flex justify-center items-center p-8">
+      <div class="text-lg text-gray-500 dark:text-gray-400">
+        Ładowanie awarii...
+      </div>
+    </div>
+    } @else if (errorMessage()) {
+    <div class="p-8 text-center text-red-600 dark:text-red-500">
+      <p>{{ errorMessage() }}</p>
+      <button
+        (click)="fetchBreakdowns(searchControl.value || '')"
+        class="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+      >
+        Spróbuj ponownie
+      </button>
+    </div>
+    } @else {
+    @if (!isMobile()) {
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead
@@ -88,29 +99,80 @@
               <a
                 (click)="openCloseModal(breakdown)"
                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer"
+                >Zamknij awarię</a
               >
-                Zamknij awarię
-              </a>
               }
             </td>
             }
           </tr>
-          } @empty { @if (!isLoading()) {
+          } @empty {
           <tr>
             <td
               [attr.colspan]="isAdmin ? 5 : 4"
-              class="px-6 py-4 text-center text-gray-500"
+              class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
             >
               Nie znaleziono awarii.
             </td>
           </tr>
-          } }
+          }
         </tbody>
       </table>
-      @if (isLoading()) {
-      <div class="p-6 text-center text-gray-500">Ładowanie danych...</div>
+    </div>
+    } @else {
+    <div class="p-4 grid gap-4">
+      @for (breakdown of breakdowns(); track breakdown.id) {
+      <div
+        class="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-md p-4 flex flex-col space-y-3"
+      >
+        <div class="flex justify-between items-start">
+          <div class="font-bold text-gray-900 dark:text-white">
+            ID: #{{ breakdown.id }}
+          </div>
+          <span
+            class="px-2 py-1 text-xs font-medium rounded-full"
+            [ngClass]="{
+              'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300':
+                !breakdown.opened,
+              'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300':
+                breakdown.opened
+            }"
+          >
+            {{ breakdown.opened ? "ZGŁOSZONA" : "ZAMKNIĘTA" }}
+          </span>
+        </div>
+        <div class="space-y-1">
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            Maszyna/Zasób
+          </div>
+          <div class="text-base font-medium text-gray-900 dark:text-white">
+            {{ breakdown.machine?.fullName }}
+          </div>
+        </div>
+        <div class="space-y-1">
+          <div class="text-sm text-gray-500 dark:text-gray-400">
+            Data zgłoszenia
+          </div>
+          <div class="text-base font-medium text-gray-900 dark:text-white">
+            {{ breakdown.reportedAt | date : "yyyy-MM-dd HH:mm" }}
+          </div>
+        </div>
+        @if (isAdmin && breakdown.opened) {
+        <div class="border-t dark:border-gray-700 pt-3 mt-auto">
+          <a
+            (click)="openCloseModal(breakdown)"
+            class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer w-full text-center block"
+            >Zamknij awarię</a
+          >
+        </div>
+        }
+      </div>
+      } @empty {
+      <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+        Nie znaleziono awarii.
+      </div>
       }
     </div>
+    }
     <nav
       class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
       aria-label="Table navigation"
@@ -133,22 +195,20 @@
           }
         </select>
       </div>
-
       <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
         Wyświetlanie
-        <span class="font-semibold text-gray-900 dark:text-white">
-          {{ totalElements() > 0 ? currentPage() * pageSize() + 1 : 0 }}-{{
+        <span class="font-semibold text-gray-900 dark:text-white"
+          >{{ totalElements() > 0 ? currentPage() * pageSize() + 1 : 0 }}-{{
             (currentPage() + 1) * pageSize() > totalElements()
               ? totalElements()
               : (currentPage() + 1) * pageSize()
-          }}
-        </span>
+          }}</span
+        >
         z
         <span class="font-semibold text-gray-900 dark:text-white">{{
           totalElements()
         }}</span>
       </span>
-
       <div class="inline-flex items-center -space-x-px">
         <button
           (click)="previousPage()"
@@ -166,13 +226,12 @@
         </button>
       </div>
     </nav>
+    }
   </div>
 </div>
-
 <app-breakdown-close-modal
   [isOpen]="isModalOpen()"
   [breakdownId]="selectedBreakdownId()"
   (closeModal)="closeCloseModal()"
   (breakdownClosed)="handleBreakdownClosed()"
->
-</app-breakdown-close-modal>
+></app-breakdown-close-modal>
