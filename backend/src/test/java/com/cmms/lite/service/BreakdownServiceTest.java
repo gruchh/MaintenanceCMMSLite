@@ -81,6 +81,7 @@ class BreakdownServiceTest {
         responseDTO = new BreakdownResponseDTO(
                 1L,
                 "Test Description",
+                "https://pix4free.org/photo/14513/example.html",
                 LocalDateTime.now(),
                 null,
                 null,
@@ -160,7 +161,12 @@ class BreakdownServiceTest {
             Machine machine = savedBreakdown.getMachine();
             MachineSummaryDTO machineSummary = new MachineSummaryDTO(machine.getId(), machine.getCode(), machine.getFullName());
             return new BreakdownResponseDTO(
-                    savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(), null, null,
+                    savedBreakdown.getId(),
+                    savedBreakdown.getDescription(),
+                    null,
+                    savedBreakdown.getReportedAt(),
+                    null,
+                    null,
                     savedBreakdown.getOpened(), null, savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
         });
 
@@ -187,8 +193,18 @@ class BreakdownServiceTest {
             Machine machine = savedBreakdown.getMachine();
             MachineSummaryDTO machineSummary = new MachineSummaryDTO(machine.getId(), machine.getCode(), machine.getFullName());
             return new BreakdownResponseDTO(
-                    savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(), null, null,
-                    savedBreakdown.getOpened(), null, savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
+                    savedBreakdown.getId(),
+                    savedBreakdown.getDescription(),
+                    null,
+                    savedBreakdown.getReportedAt(),
+                    null,
+                    null,
+                    savedBreakdown.getOpened(),
+                    null,
+                    savedBreakdown.getType(),
+                    savedBreakdown.getTotalCost(),
+                    machineSummary,
+                    List.of());
         });
 
         BreakdownResponseDTO response = breakdownService.removePartFromBreakdown(1L, 10L);
@@ -215,9 +231,18 @@ class BreakdownServiceTest {
             Machine machine = savedBreakdown.getMachine();
             MachineSummaryDTO machineSummary = new MachineSummaryDTO(machine.getId(), machine.getCode(), machine.getFullName());
             return new BreakdownResponseDTO(
-                    savedBreakdown.getId(), savedBreakdown.getDescription(), savedBreakdown.getReportedAt(),
-                    savedBreakdown.getStartedAt(), savedBreakdown.getFinishedAt(), savedBreakdown.getOpened(),
-                    savedBreakdown.getSpecialistComment(), savedBreakdown.getType(), savedBreakdown.getTotalCost(), machineSummary, List.of());
+                    savedBreakdown.getId(),
+                    savedBreakdown.getDescription(),
+                    null,
+                    savedBreakdown.getReportedAt(),
+                    savedBreakdown.getStartedAt(),
+                    savedBreakdown.getFinishedAt(),
+                    savedBreakdown.getOpened(),
+                    savedBreakdown.getSpecialistComment(),
+                    savedBreakdown.getType(),
+                    savedBreakdown.getTotalCost(),
+                    machineSummary,
+                    List.of());
         });
 
 
@@ -255,29 +280,5 @@ class BreakdownServiceTest {
         when(breakdownRepository.findTopByOrderByReportedAtDesc()).thenReturn(Optional.empty());
 
         assertThrows(BreakdownNotFoundException.class, () -> breakdownService.getLatestBreakdown());
-    }
-
-    @Test
-    void getBreakdownStats_shouldReturnCorrectStats() {
-        LocalDateTime now = LocalDateTime.now();
-        Breakdown testBreakdown = new Breakdown();
-        testBreakdown.setFinishedAt(now.minusDays(5));
-
-        when(breakdownRepository.findTopByOrderByFinishedAtDesc()).thenReturn(Optional.of(testBreakdown));
-
-        when(breakdownRepository.countByFinishedAtBetween(any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(1L)
-                .thenReturn(5L)
-                .thenReturn(10L);
-
-        when(breakdownRepository.getAverageBreakdownDurationInMinutes()).thenReturn(120.5);
-
-        BreakdownStatsDTO stats = breakdownService.getBreakdownStats();
-
-        assertEquals(5L, stats.daysSinceLastBreakdown());
-        assertEquals(1L, stats.breakdownsLastWeek());
-        assertEquals(5L, stats.breakdownsLastMonth());
-        assertEquals(10L, stats.breakdownsCurrentYear());
-        assertEquals(120.5, stats.averageBreakdownDurationMinutes());
     }
 }

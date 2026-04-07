@@ -74,8 +74,36 @@ class EmployeeServiceTest {
         testEmployee.setEmployeeDetails(details);
 
 
-        createRequest = new CreateEmployeeDTO(1L, "Jan", "Kowalski", "https://example.com/avatar.jpg", 1L);
-        responseDTO = new EmployeeResponseDTO(1L, "testuser", null, null, null, null, null, "Mechanic", null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null);
+        createRequest = new CreateEmployeeDTO(
+                1L,
+                "Jan",
+                "Kowalski",
+                "https://example.com/avatar.jpg",
+                1L);
+        responseDTO = new EmployeeResponseDTO(
+                1L,
+                "testuser",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "Mechanic",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                null);
     }
 
     @Test
@@ -138,7 +166,23 @@ class EmployeeServiceTest {
     @Test
     void updateEmployee_shouldUpdateDetailsSuccessfully() {
         UpdateEmployeeAddressDTO addressRequest = new UpdateEmployeeAddressDTO("Street", "City", "00-000", "Country");
-        updateRequest = new UpdateEmployeeDTO( null,null,null, null, "123456789",null,null, addressRequest, null,null,null,null, null,null);
+        updateRequest = new UpdateEmployeeDTO(
+                null,
+                null,
+                null,
+                null,
+                "123456789",
+                null,
+                null,
+                addressRequest,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
         when(employeeRepository.findByIdWithDetails(1L)).thenReturn(Optional.of(testEmployee));
         when(employeeRepository.save(any(Employee.class))).thenReturn(testEmployee);
@@ -155,7 +199,23 @@ class EmployeeServiceTest {
 
     @Test
     void updateEmployee_shouldThrowEmployeeNotFoundException_whenEmployeeDoesNotExist() {
-        updateRequest = new UpdateEmployeeDTO( null,null,null, null, "123456789",null,null, null, null,null,null,null, null,null);
+        updateRequest = new UpdateEmployeeDTO(
+                null,
+                null,
+                null,
+                null,
+                "123456789",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
         when(employeeRepository.findByIdWithDetails(1L)).thenReturn(Optional.empty());
 
