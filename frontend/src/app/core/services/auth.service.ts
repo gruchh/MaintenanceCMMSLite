@@ -24,12 +24,14 @@ export class AuthService {
       map(response => {
         if (response?.status === 'success' && response.data) {
           this.currentUser.set(response.data);
+          console.log('Dane użytkownika pobrane:', response.data);
           return response.data;
         }
         this.logout();
         return null;
       }),
-      catchError(() => {
+      catchError((error) => {
+        console.log('Błąd podczas pobierania danych użytkownika:', error);
         this.logout();
         return of(null);
       })
@@ -52,6 +54,7 @@ export class AuthService {
         switchMap((loginResponse) => {
           if (loginResponse?.accessToken && loginResponse.refreshToken) {
             this.tokenStorage.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+            console.log('Tokeny JWT zapisane:', { accessToken: loginResponse.accessToken.substring(0, 20) + '...', refreshToken: loginResponse.refreshToken.substring(0, 20) + '...' });
             return this.fetchAndStoreUser();
           }
           this.logout();

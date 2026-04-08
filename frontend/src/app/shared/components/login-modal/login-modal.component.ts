@@ -56,7 +56,7 @@ export class LoginModalComponent {
     this.errorMessage.set(null);
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        console.log('Logowanie udane!');
+        console.log('Logowanie udane dla użytkownika:', this.loginForm.value.username);
         this.closeModal(true);
       },
       error: (err: HttpErrorResponse) => {
