@@ -1,7 +1,7 @@
-package com.cmms.lite.breakdownType.service;
+package com.cmms.lite.breakdown.service;
 
-import com.cmms.lite.breakdownType.dto.BreakdownTypeResponseDTO;
-import com.cmms.lite.breakdownType.entity.BreakdownType;
+import com.cmms.lite.breakdown.dto.BreakdownTypeResponseDTO;
+import com.cmms.lite.breakdown.entity.BreakdownType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

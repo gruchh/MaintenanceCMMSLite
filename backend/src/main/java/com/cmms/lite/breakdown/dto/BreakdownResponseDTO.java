@@ -1,6 +1,6 @@
 package com.cmms.lite.breakdown.dto;
 
-import com.cmms.lite.breakdownType.entity.BreakdownType;
+import com.cmms.lite.breakdown.entity.BreakdownType;
 import com.cmms.lite.machine.dto.MachineSummaryDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 

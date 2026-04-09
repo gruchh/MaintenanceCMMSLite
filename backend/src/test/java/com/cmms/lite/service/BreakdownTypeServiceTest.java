@@ -1,8 +1,8 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.breakdownType.dto.BreakdownTypeResponseDTO;
-import com.cmms.lite.breakdownType.entity.BreakdownType;
-import com.cmms.lite.breakdownType.service.BreakdownTypeService;
+import com.cmms.lite.breakdown.dto.BreakdownTypeResponseDTO;
+import com.cmms.lite.breakdown.entity.BreakdownType;
+import com.cmms.lite.breakdown.service.BreakdownTypeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

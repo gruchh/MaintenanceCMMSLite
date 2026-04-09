@@ -7,7 +7,7 @@ import com.cmms.lite.breakdown.exception.BreakdownNotFoundException;
 import com.cmms.lite.breakdown.mapper.BreakdownMapper;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
 import com.cmms.lite.breakdown.service.BreakdownService;
-import com.cmms.lite.breakdownType.entity.BreakdownType;
+import com.cmms.lite.breakdown.entity.BreakdownType;
 import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.machine.dto.MachineSummaryDTO;
 import com.cmms.lite.machine.entity.Machine;

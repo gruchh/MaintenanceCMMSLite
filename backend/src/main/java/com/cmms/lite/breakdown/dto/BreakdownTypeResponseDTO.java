@@ -1,4 +1,4 @@
-package com.cmms.lite.breakdownType.dto;
+package com.cmms.lite.breakdown.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

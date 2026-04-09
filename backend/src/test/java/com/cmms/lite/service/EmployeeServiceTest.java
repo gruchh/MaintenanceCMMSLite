@@ -13,7 +13,7 @@ import com.cmms.lite.employee.mapper.EmployeeMapper;
 import com.cmms.lite.employee.repository.EmployeeRepository;
 import com.cmms.lite.employee.repository.EmployeeRoleRepository;
 import com.cmms.lite.employee.service.EmployeeService;
-import com.cmms.lite.employeeRole.entity.EmployeeRole;
+import com.cmms.lite.employee.entity.EmployeeRole;
 import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.exception.UserNotFoundException;

@@ -1,6 +1,6 @@
 package com.cmms.lite.employee.repository;
 
-import com.cmms.lite.employeeRole.entity.EmployeeRole;
+import com.cmms.lite.employee.entity.EmployeeRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,7 +1,6 @@
 package com.cmms.lite.employee.entity;
 
 import com.cmms.lite.breakdown.entity.Breakdown;
-import com.cmms.lite.employeeRole.entity.EmployeeRole;
 import com.cmms.lite.security.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

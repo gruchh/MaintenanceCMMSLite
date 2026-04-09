@@ -1,4 +1,4 @@
-package com.cmms.lite.employeeRole.dto;
+package com.cmms.lite.employee.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

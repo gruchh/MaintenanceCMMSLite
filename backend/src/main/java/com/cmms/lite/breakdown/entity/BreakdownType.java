@@ -1,4 +1,4 @@
-package com.cmms.lite.breakdownType.entity;
+package com.cmms.lite.breakdown.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

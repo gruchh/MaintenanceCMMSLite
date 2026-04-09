@@ -1,9 +1,9 @@
-package com.cmms.lite.employeeRole.mapper;
+package com.cmms.lite.employee.mapper;
 
-import com.cmms.lite.employeeRole.dto.CreateEmployeeRoleDTO;
-import com.cmms.lite.employeeRole.dto.EmployeeRoleResponseDTO;
-import com.cmms.lite.employeeRole.dto.UpdateEmployeeRoleDTO;
-import com.cmms.lite.employeeRole.entity.EmployeeRole;
+import com.cmms.lite.employee.dto.CreateEmployeeRoleDTO;
+import com.cmms.lite.employee.dto.EmployeeRoleResponseDTO;
+import com.cmms.lite.employee.dto.UpdateEmployeeRoleDTO;
+import com.cmms.lite.employee.entity.EmployeeRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
