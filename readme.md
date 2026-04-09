@@ -1,176 +1,231 @@
-# CMMS Lite 🚧
+# CMMS Lite — Lightweight Maintenance Management System
 
-A lightweight Computerized Maintenance Management System (CMMS) designed to streamline maintenance operations. The backend is built with Spring Boot, utilizing Spring Data JPA, Spring Security, and JWT for authentication. The frontend is developed using Angular with Tailwind CSS for styling. The application is containerized and orchestrated using Docker for easy deployment and scalability.
+> A full-stack web application for managing maintenance operations in industrial facilities. Designed to streamline breakdown reporting, spare parts inventory, workforce management, and shift scheduling — all in one place.
 
-## ✨ Features
+---
 
--   🛠️ **Comprehensive Maintenance Management**:
-    -   **Work Orders**: Report, track, and manage the entire lifecycle of machinery breakdowns, from initial report to resolution.
-    -   **Asset Management**: Full CRUD (Create, Read, Update, Delete) for machines and equipment.
-    -   **Personnel Management**: Manage detailed employee profiles, roles (e.g., *Mechanic, Manager*), contact information, and professional details.
-    -   **Inventory Control**: Full CRUD for spare parts. Automatically logs parts used for repairs and calculates total breakdown cost.
-    -   **Shift Scheduling**: Generate and manage multi-brigade work schedules for maintenance teams.
--   📊 **Performance Analytics**: API endpoints for key performance indicators, including breakdown statistics and weekly performance reports.
--   📖 **API Documentation**: Automatically generated and interactive API documentation with SpringDoc OpenAPI.
--   🔒 **Secure Authentication & Authorization**:
-    -   Implements JWT-based authentication with Spring Security.
-    -   Features Role-Based Access Control (RBAC) with distinct roles (`ADMIN`, `TECHNICAN`, `SUBCONTRACTOR`) protecting API endpoints.
--   📱 **Responsive UI**: Built with Angular and styled using Tailwind CSS for a modern, responsive interface.
--   🗄️ **Database Support**: Supports both H2 (for development) and PostgreSQL (for production), with database migrations managed by Flyway.
--   🌱 **Sample Data Seeding**: Includes a `DataInitializer` for the `dev` profile that uses JavaFaker to populate the database with realistic sample data for a rich development experience.
--   ⚙️ **Robust Error Handling**: Centralized exception handling provides consistent and meaningful API error responses.
--   🐳 **Containerized Deployment**: Uses Docker and Docker Compose for simplified setup and deployment.
+## Overview
 
-## 🏛️ Architecture Overview
+**CMMS Lite** is a portfolio project that simulates a real-world Computerized Maintenance Management System used in manufacturing environments. The system supports the full lifecycle of a breakdown event — from anonymous reporting on the shop floor, through assignment and resolution by a technician, to historical analysis and KPI reporting for management.
 
-### Backend Architecture
+---
 
-The backend follows a modular, feature-oriented architecture. Each core domain has its own dedicated package containing its entities, repositories, services, and controllers.
+## Screenshots
+
+### Public Home — Live KPIs & Quick Breakdown Reporting
+![Home Page](docs/screenshots/home.png)
+
+> The public-facing home page displays real-time factory statistics (downtime days, weekly/monthly breakdowns, average repair time, efficiency) and highlights the most recent incident. No login required to report a breakdown.
+
+---
+
+### Breakdown Reporting Form
+![Report Breakdown](docs/screenshots/breakdown_report.png)
+
+> Any operator on the floor can report a new breakdown by selecting the machine, choosing the fault type (Mechanical / Automatic / Parametric), and providing a detailed description. The form is intentionally simple and accessible without authentication.
+
+---
+
+### Authentication
+![Login Panel](docs/screenshots/login_panel.png)
+
+> JWT-based authentication with role-based access control. Three distinct roles are supported: `ADMIN`, `TECHNICIAN`, and `SUBCONTRACTOR`, each with a different scope of permissions across the system.
+
+---
+
+### Dashboard — Performance Analytics
+![Dashboard](docs/screenshots/dashboard.png)
+
+> The authenticated dashboard provides a comprehensive overview of factory performance. Key metrics include a 7-day efficiency trend chart, OEE indicator, MTBF and MTTR values, the current user's assigned breakdowns, and a ranking of technicians by incident count.
+
+---
+
+### Breakdown Management
+![Breakdown List](docs/screenshots/breakdowns.png)
+
+> A paginated, searchable list of all reported breakdowns. Each entry shows the machine, current status (`REPORTED` / `CLOSED`), and reporting date. Technicians can close open breakdowns directly from this view.
+
+---
+
+### Spare Parts Inventory
+![Spare Parts](docs/screenshots/spare_parts.png)
+
+> A searchable catalogue of spare parts with pricing and manufacturer information. Inventory is automatically updated when parts are assigned to breakdown work orders, and total repair costs are calculated accordingly.
+
+---
+
+### Employee Management
+![Edit Employee](docs/screenshots/employee_edit.png)
+
+> Full employee profile management including personal data, contact details, employment contract dates, salary, education level, and address. Profiles are linked to breakdown assignments and shift schedules.
+
+---
+
+### Shift Schedule — Brigade Calendar
+![Shift Schedule](docs/screenshots/shift_schedule.png)
+
+> Automated generation of multi-brigade shift schedules (A/B/C/D brigades, DAY / NIGHT / OFF rotations) visualized on a full monthly calendar powered by FullCalendar. Schedules can be generated and viewed for any time period.
+
+### Mobile View
+![Mobile View](docs/screenshots/mobile.png)
+
+> The interface is fully responsive. On smaller screens the sidebar collapses to an icon-only rail, tables reflow to accommodate narrower viewports, and all interactions remain accessible on touch devices.
+
+---
+
+## Tech Stack
+
+### Backend
+| Technology | Version | Purpose |
+|---|---|---|
+| Java | 17 | Core language |
+| Spring Boot | 3.5.4 | Application framework |
+| Spring Security + JWT | 6.5 / 0.12.6 | Authentication & authorization |
+| Spring Data JPA + Hibernate | 3.5 / 6.6 | ORM & data persistence |
+| PostgreSQL | — | Production database |
+| H2 | — | In-memory database (dev profile) |
+| Flyway | 11.x | Database migrations |
+| MapStruct | 1.6.3 | DTO ↔ Entity mapping |
+| Lombok | 1.18.38 | Boilerplate reduction |
+| SpringDoc OpenAPI | 2.8.9 | Interactive API documentation |
+| JavaFaker | 1.0.2 | Sample data seeding (dev) |
+
+### Frontend
+| Technology | Version | Purpose |
+|---|---|---|
+| Angular | ~20.2.1 | SPA framework |
+| Tailwind CSS | ~4.1.11 | Utility-first styling |
+| FullCalendar | ~6.1.19 | Shift schedule calendar |
+| ngx-toastr | ~19.0.0 | Notifications |
+| ng-icons | ~32.1.0 | Icon library |
+| OpenAPI Generator CLI | ~2.21.4 | Type-safe API client generation |
+
+### Infrastructure
+- **Docker & Docker Compose** — containerized deployment
+- **Maven** — backend build tool
+
+---
+
+## Architecture
+
+### Backend — Feature-Slice / Domain-Driven
+
+Each domain module contains its own `controller`, `dto`, `entity`, `mapper`, `repository`, `service`, and `exception` packages:
 
 ```
 com.cmms.lite
-├── CmmsLiteApplication.java
-├── breakdown         # Core logic for breakdowns; links machines, employees, and parts.
-├── breakdownType     # Defines breakdown categories (e.g., MECHANICAL, AUTOMATICAL).
-├── config            # Application configuration, including the dev data initializer.
-├── employee          # Manages employee data, details, and profiles.
-├── employeeRole      # Defines employee roles (e.g., Mechanic, Automation Engineer).
-├── exception         # Global exception handling and custom exceptions.
-├── machine           # Manages machine and equipment data.
-├── security          # Handles JWT authentication, user management, and authorization.
-├── shiftSchedule     # Logic for generating and managing team work schedules.
-└── sparePart         # Manages the spare parts inventory.
+├── breakdown         # Full breakdown lifecycle: report → assign → close → cost
+├── breakdownType     # Fault categories: MECHANICAL, AUTOMATIC, PARAMETRIC
+├── config            # App config, dev data seeding (JavaFaker)
+├── employee          # Employee profiles, roles, brigade assignment
+├── exception         # Global exception handler, custom exceptions
+├── machine           # Machine/equipment CRUD
+├── security          # JWT filter, UserDetailsService, RBAC config
+├── shiftSchedule     # Brigade rotation generation & calendar API
+└── sparePart         # Spare parts inventory & usage tracking
 ```
 
-### Frontend Architecture
-
-The frontend is built using Angular and follows a scalable, modular architecture that separates concerns into four main categories: `core`, `features`, `layout`, and `shared`.
+### Frontend — Modular Angular
 
 ```
-/src/app
-├── core/           # Core services, guards, and interceptors. Singleton logic.
-│   ├── api/        # Generated API client and related models.
-│   ├── guards/     # Route guards for authentication and authorization.
-│   └── interceptors/ # HTTP interceptors (e.g., for adding JWT tokens).
-│
-├── features/       # Individual application features or business modules.
-│   ├── dashboard/  # Main dashboard with sub-modules (overview, employees, etc.).
-│   └── home/       # The public-facing home page.
-│
-├── layout/         # Reusable layout components (e.g., navbars, sidebars).
-│   ├── dashboard-layout/ # Layout for the authenticated user area.
-│   └── default-layout/   # Layout for public pages.
-│
-└── shared/         # Reusable components, pipes, and directives.
-    └── components/ # Shared UI components (modals, buttons, etc.).
+src/app
+├── core/             # Guards, interceptors, generated API client
+├── features/         # Business modules (dashboard, home)
+├── layout/           # Structural components (nav, sidebar)
+└── shared/           # Reusable UI components (modals, tables)
 ```
 
--   **Core**: Contains singleton services, interceptors, and guards that are loaded once at the application's root. The `api` sub-directory holds the TypeScript client generated by `openapi-generator-cli`, ensuring type safety when communicating with the backend.
--   **Features**: Represents the different "pages" or business domains of the application. Each feature is a self-contained module, making the application easier to maintain and scale.
--   **Layout**: Defines the main structural components of the application's UI, such as headers, footers, and sidebars. This allows for consistent layouts across different feature modules.
--   **Shared**: A collection of reusable "dumb" components, pipes, and directives that are used across multiple feature modules. This promotes code reuse and a consistent look and feel.
+---
 
-## 🔗 API Endpoints Overview
+## API Overview
 
-The backend exposes a comprehensive RESTful API for interacting with the system.
+| Endpoint | Method | Description | Auth |
+|---|---|---|---|
+| `/api/auth/login` | POST | Authenticate, receive JWT | Public |
+| `/api/auth/register` | POST | Register new user | Public |
+| `/api/breakdowns/report` | POST | Report a new breakdown | Public |
+| `/api/breakdowns` | GET | Paginated breakdown list | Authenticated |
+| `/api/breakdowns/{id}/close` | PATCH | Close a breakdown | `TECHNICIAN` |
+| `/api/breakdowns/{id}/parts` | POST | Assign spare part to breakdown | `SUBCONTRACTOR` |
+| `/api/machines` | GET/POST | List / create machines | Authenticated / `ADMIN` |
+| `/api/machines/{id}` | PUT/DELETE | Update / delete machine | `ADMIN` |
+| `/api/employees` | GET/POST/PATCH | Manage employees | Authenticated |
+| `/api/spare-parts` | GET/POST | List / create spare parts | Authenticated / `ADMIN` |
+| `/api/spare-parts/{id}` | PUT/DELETE | Update / delete spare part | `ADMIN` |
+| `/api/schedules/generate` | POST | Generate shift schedule | Authenticated |
+| `/api/dashboard` | GET | KPIs, OEE, MTBF, MTTR | Authenticated |
 
-| Endpoint | Method | Description | Authorization |
-| :--- | :--- | :--- | :--- |
-| `/api/auth/register` | `POST` | Registers a new user. | Permit All |
-| `/api/auth/login` | `POST` | Authenticates a user and returns a JWT. | Permit All |
-| `/api/breakdowns` | `GET` | Retrieves a paginated list of breakdowns. | Authenticated |
-| `/api/breakdowns/report` | `POST` | Reports a new breakdown. | Permit All |
-| `/api/breakdowns/{id}` | `GET` | Gets details of a specific breakdown. | Authenticated |
-| `/api/breakdowns/{id}/close` | `PATCH` | Closes an open breakdown. | `TECHNICAN` |
-| `/api/breakdowns/{id}/parts`| `POST` | Adds a spare part to a breakdown. | `SUBCONTRACTOR` |
-| `/api/machines` | `GET` | Retrieves a paginated list of machines. | Authenticated |
-| `/api/machines` | `POST` | Creates a new machine. | `ADMIN` |
-| `/api/machines/{id}` | `PUT`/`DELETE` | Updates or deletes a machine. | `ADMIN` |
-| `/api/employees` | `GET` | Retrieves a paginated list of employees. | Authenticated |
-| `/api/employees` | `POST`/`PATCH` | Creates or updates an employee. | Authenticated |
-| `/api/spare-parts` | `GET` | Retrieves a paginated list of spare parts. | Authenticated |
-| `/api/spare-parts` | `POST` | Creates a new spare part. | `ADMIN` |
-| `/api/spare-parts/{id}` | `PUT`/`DELETE` | Updates or deletes a spare part. | `ADMIN` |
-| `/api/schedules/generate` | `POST` | Generates a new shift schedule. | Authenticated |
+Full interactive documentation available at `/swagger-ui-custom.html` when the application is running.
 
-## 🚀 Getting Started
+---
 
-### 🛠 Prerequisites
+## Getting Started
 
--   ☕ **Java 17** or later
--   🌐 **Node.js 18.x** or later
--   🐳 **Docker** and **Docker Compose**
--   🛠 **Maven**
--   📂 **Git**
+### Prerequisites
 
-### 📥 Clone the Repository
+- Java 17+
+- Node.js 18+
+- Docker & Docker Compose
+- Maven
+
+### Run with Docker
 
 ```bash
-git clone https://github.com/your-username/cmms-lite.git
-cd cmms-lite
-```
-
-### 🐳 Running with Docker
-
-1. Ensure Docker and Docker Compose are installed.
-2. Build and run the application using Docker Compose:
-
-```bash
+git clone https://github.com/gruchh/MaintenanceCMMSLite.git
+cd MaintenanceCMMSLite
 docker-compose up --build
 ```
 
-3. Access the application:
-   - 🌐 **Frontend**: http://localhost:4200
-   - 🔗 **Backend API**: http://localhost:8080
-   - 📄 **API Documentation**: http://localhost:8080/swagger-ui-custom.html
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:4200 |
+| Backend API | http://localhost:8080 |
+| API Documentation | http://localhost:8080/swagger-ui-custom.html |
 
-### 🖥 Running Without Docker
+### Run Locally (without Docker)
 
-#### Backend
+**Backend:**
+```bash
+cd backend
+./mvnw spring-boot:run -Dspring.profiles.active=dev
+```
 
-1. Navigate to the backend directory: `cd backend`
-2. Run the application: `./mvnw spring-boot:run`
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm start
+```
 
-#### Frontend
+> The `dev` profile uses an H2 in-memory database and automatically seeds realistic sample data via `DataInitializer` + JavaFaker on every startup.
 
-1. Navigate to the frontend directory: `cd frontend`
-2. Install dependencies: `npm install`
-3. Start the development server: `npm start`
-4. Access at http://localhost:4200
+### Generate API Client (after backend changes)
 
-### Frontend Scripts
+```bash
+# From local backend
+npm run api:generate:dev
 
-- `npm start`: Runs the app in development mode.
-- `npm run build`: Builds the app for production.
-- `npm test`: Runs unit tests.
-- `npm run api:generate:dev`: Generates the Angular API client from the local backend.
-- `npm run api:generate:docker`: Generates the API client from the backend running in Docker.
+# From Docker
+npm run api:generate:docker
+```
 
-## 📦 Dependencies
+---
 
-### Backend
+## Key Features
 
-- ☕ Spring Boot 3.5.4
-- 🗄️ Spring Data JPA & Spring Security
-- 🗄️ PostgreSQL & H2
-- 🔑 JWT (io.jsonwebtoken) v0.12.6
-- 🛠️ Lombok & MapStruct
-- 📖 SpringDoc OpenAPI 2.8.9
-- 🗃️ Flyway Core & 🎭 JavaFaker
+- **Breakdown lifecycle management** — from anonymous field report to full resolution with cost tracking
+- **Role-Based Access Control** — three roles (`ADMIN`, `TECHNICIAN`, `SUBCONTRACTOR`) with granular endpoint permissions
+- **Performance analytics** — OEE, MTBF, MTTR, weekly efficiency trends
+- **Automated shift scheduling** — multi-brigade (A/B/C/D) rotation calendar
+- **Spare parts inventory** — searchable catalogue with automatic usage logging and cost calculation
+- **Type-safe API client** — Angular client auto-generated from OpenAPI spec
+- **Dual database support** — H2 for development, PostgreSQL for production
+- **Database migrations** — managed by Flyway for safe, versioned schema evolution
+- **Responsive UI** — fully functional on mobile and tablet with collapsible sidebar navigation
+- **Containerized** — full Docker Compose setup for one-command deployment
 
-### Frontend
+---
 
-- 🌐 Angular: ~20.2.1
-- 🎨 Tailwind CSS: ~4.1.11
-- 🍞 ngx-toastr: ~19.0.0
-- 🗓️ FullCalendar: ~6.1.19
-- 🖼️ ng-icons: ~32.1.0
-- 🛠️ OpenAPI Generator CLI: ~2.21.4
+## License
 
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repository and create a pull request.
-
-## 📜 License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
