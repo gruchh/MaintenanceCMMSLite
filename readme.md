@@ -137,28 +137,6 @@ src/app
 
 ---
 
-## API Overview
-
-| Endpoint | Method | Description | Auth |
-|---|---|---|---|
-| `/api/auth/login` | POST | Authenticate, receive JWT | Public |
-| `/api/auth/register` | POST | Register new user | Public |
-| `/api/breakdowns/report` | POST | Report a new breakdown | Public |
-| `/api/breakdowns` | GET | Paginated breakdown list | Authenticated |
-| `/api/breakdowns/{id}/close` | PATCH | Close a breakdown | `TECHNICIAN` |
-| `/api/breakdowns/{id}/parts` | POST | Assign spare part to breakdown | `SUBCONTRACTOR` |
-| `/api/machines` | GET/POST | List / create machines | Authenticated / `ADMIN` |
-| `/api/machines/{id}` | PUT/DELETE | Update / delete machine | `ADMIN` |
-| `/api/employees` | GET/POST/PATCH | Manage employees | Authenticated |
-| `/api/spare-parts` | GET/POST | List / create spare parts | Authenticated / `ADMIN` |
-| `/api/spare-parts/{id}` | PUT/DELETE | Update / delete spare part | `ADMIN` |
-| `/api/schedules/generate` | POST | Generate shift schedule | Authenticated |
-| `/api/dashboard` | GET | KPIs, OEE, MTBF, MTTR | Authenticated |
-
-Full interactive documentation available at `/swagger-ui-custom.html` when the application is running.
-
----
-
 ## Getting Started
 
 ### Prerequisites
