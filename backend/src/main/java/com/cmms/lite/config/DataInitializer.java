@@ -1,15 +1,14 @@
 package com.cmms.lite.config;
 
 import com.cmms.lite.breakdown.entity.Breakdown;
+import com.cmms.lite.breakdown.entity.BreakdownType;
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
 import com.cmms.lite.breakdown.repository.BreakdownUsedPartsRepository;
-import com.cmms.lite.breakdown.entity.BreakdownType;
 import com.cmms.lite.employee.entity.*;
 import com.cmms.lite.employee.repository.EmployeeDetailsRepository;
 import com.cmms.lite.employee.repository.EmployeeRepository;
 import com.cmms.lite.employee.repository.EmployeeRoleRepository;
-import com.cmms.lite.employee.entity.EmployeeRole;
 import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.repository.MachineRepository;
 import com.cmms.lite.security.entity.Role;

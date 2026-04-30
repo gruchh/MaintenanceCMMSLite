@@ -7,9 +7,6 @@ import com.cmms.lite.employee.repository.EmployeeRepository;
 import com.cmms.lite.machine.repository.MachineRepository;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.repository.UserRepository;
-import com.cmms.lite.security.service.JwtService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
