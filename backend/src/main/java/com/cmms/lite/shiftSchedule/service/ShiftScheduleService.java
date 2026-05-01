@@ -5,13 +5,14 @@ import com.cmms.lite.shiftSchedule.dto.ShiftScheduleResponseDTO;
 import com.cmms.lite.shiftSchedule.entity.BrigadeType;
 import com.cmms.lite.shiftSchedule.entity.ShiftEntry;
 import com.cmms.lite.shiftSchedule.entity.ShiftSchedule;
+import com.cmms.lite.shiftSchedule.exception.ShiftScheduleNotFoundException;
 import com.cmms.lite.shiftSchedule.factory.ShiftEntryFactory;
 import com.cmms.lite.shiftSchedule.mapper.ShiftScheduleMapper;
 import com.cmms.lite.shiftSchedule.repository.ShiftEntryRepository;
 import com.cmms.lite.shiftSchedule.repository.ShiftScheduleRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class ShiftScheduleService {
         for (int i = 0; i < days; i++) {
             LocalDate date = start.plusDays(i);
             for (BrigadeType brigade : BrigadeType.values()) {
-                batch.add(shiftEntryFactory.create(schedule, date, brigade, i)); // ← fabryka
+                batch.add(shiftEntryFactory.create(schedule, date, brigade, i));
             }
         }
 
@@ -53,11 +54,11 @@ public class ShiftScheduleService {
         return shiftScheduleMapper.toResponse(schedule);
     }
 
-    @Transactional()
+    @Transactional(readOnly = true)
     public ShiftScheduleResponseDTO getShiftScheduleById(Long id) {
         return scheduleRepository.findById(id)
                 .map(shiftScheduleMapper::toResponse)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Harmonogram o ID %d nie istnieje.".formatted(id)));
+                .orElseThrow(() -> new ShiftScheduleNotFoundException(
+                        "Schedule with ID %d does not exist.".formatted(id)));
     }
 }

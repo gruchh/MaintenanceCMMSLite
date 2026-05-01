@@ -35,10 +35,10 @@ public class ShiftEntryFactory {
                              BrigadeType brigade, int dayIndex) {
 
         int week = (dayIndex / 7) % 4;
-        int day  =  dayIndex % 7;
+        int day = dayIndex % 7;
 
-        char       symbol = BRIGADE_PATTERNS.get(brigade)[week].charAt(day);
-        ShiftState state  = stateRegistry.resolve(symbol);
+        char symbol = BRIGADE_PATTERNS.get(brigade)[week].charAt(day);
+        ShiftState state = stateRegistry.resolve(symbol);
 
         return ShiftEntry.builder()
                 .schedule(schedule)

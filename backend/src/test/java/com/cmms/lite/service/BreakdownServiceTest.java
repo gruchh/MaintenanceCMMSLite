@@ -1,13 +1,16 @@
 package com.cmms.lite.service;
 
-import com.cmms.lite.breakdown.dto.*;
+import com.cmms.lite.breakdown.dto.AddPartBreakdownDTO;
+import com.cmms.lite.breakdown.dto.BreakdownResponseDTO;
+import com.cmms.lite.breakdown.dto.CloseBreakdownDTO;
+import com.cmms.lite.breakdown.dto.CreateBreakdownDTO;
 import com.cmms.lite.breakdown.entity.Breakdown;
+import com.cmms.lite.breakdown.entity.BreakdownType;
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
 import com.cmms.lite.breakdown.exception.BreakdownNotFoundException;
 import com.cmms.lite.breakdown.mapper.BreakdownMapper;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
 import com.cmms.lite.breakdown.service.BreakdownService;
-import com.cmms.lite.breakdown.entity.BreakdownType;
 import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.machine.dto.MachineSummaryDTO;
 import com.cmms.lite.machine.entity.Machine;
