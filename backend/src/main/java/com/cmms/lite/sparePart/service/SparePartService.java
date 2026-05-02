@@ -20,8 +20,6 @@ public class SparePartService {
     private final SparePartRepository sparePartRepository;
     private final SparePartMapper sparePartMapper;
 
-    private static final String NOT_FOUND = "Część zamienna o ID %d nie została znaleziona.";
-
     @Transactional(readOnly = true)
     public Page<SparePartResponseDTO> getAllSpareParts(String keyword, Pageable pageable) {
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -56,13 +54,13 @@ public class SparePartService {
     @Transactional
     public void deleteSparePart(Long id) {
         if (!sparePartRepository.existsById(id)) {
-            throw new SparePartNotFoundException(String.format(NOT_FOUND, id));
+            throw new SparePartNotFoundException(String.format("Part with id %d not found", id));
         }
         sparePartRepository.deleteById(id);
     }
 
     private SparePart getSparePartByIdOrThrow(Long id) {
         return sparePartRepository.findById(id)
-                .orElseThrow(() -> new SparePartNotFoundException(String.format(NOT_FOUND, id)));
+                .orElseThrow(() -> new SparePartNotFoundException(String.format("Part with id %d not found", id)));
     }
 }
