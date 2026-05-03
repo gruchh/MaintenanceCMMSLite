@@ -216,6 +216,7 @@ public class DataInitializer {
                         .name(partNames[i % partNames.length] + " typ " + i)
                         .price(new BigDecimal(15 + i * 12).setScale(2, RoundingMode.HALF_UP))
                         .producer(i % 2 == 0 ? "Siemens" : "Festo")
+                        .stockQuantity(RANDOM.nextInt(46) + 5) // ← 5–50 sztuk
                         .build())
                 .collect(Collectors.toList());
 
@@ -223,7 +224,6 @@ public class DataInitializer {
         log.info("Utworzono {} części zamiennych.", spareParts.size());
         return spareParts;
     }
-
 
     private void createBreakdowns(List<Machine> machines, List<SparePart> spareParts, List<Employee> employees) {
         log.info("Tworzenie awarii...");

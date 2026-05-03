@@ -70,6 +70,7 @@ class BreakdownServiceTest {
         testSparePart.setId(1L);
         testSparePart.setName("Test Spare Part");
         testSparePart.setPrice(BigDecimal.TEN);
+        testSparePart.setStockQuantity(12);
 
         testBreakdown = new Breakdown();
         testBreakdown.setId(1L);

@@ -2,10 +2,7 @@ package com.cmms.lite.sparePart.entity;
 
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -40,4 +37,12 @@ public class SparePart {
 
     @OneToMany(mappedBy = "sparePart")
     private List<BreakdownUsedParts> breakdownUsedPartsList;
+
+    @NotNull(message = "Stock quantity cannot be null.")
+    @Min(value = 0, message = "Stock quantity cannot be negative.")
+    @Column(name = "stock_quantity", nullable = false)
+    private Integer stockQuantity;
+
+    @Version
+    private Long version;
 }

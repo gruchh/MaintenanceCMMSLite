@@ -14,6 +14,7 @@ import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.exception.MachineNotFoundException;
 import com.cmms.lite.machine.repository.MachineRepository;
 import com.cmms.lite.sparePart.entity.SparePart;
+import com.cmms.lite.sparePart.exception.InsufficientStockException;
 import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
 import com.cmms.lite.sparePart.exception.UsedPartNotFoundException;
 import com.cmms.lite.sparePart.repository.SparePartRepository;
@@ -82,7 +83,17 @@ public class BreakdownService {
     public BreakdownResponseDTO addPartToBreakdown(Long breakdownId, AddPartBreakdownDTO request) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
         SparePart sparePart = sparePartRepository.findById(request.getSparePartId())
-                .orElseThrow(() -> new SparePartNotFoundException(String.format(PART_NOT_FOUND, request.getSparePartId())));
+                .orElseThrow(() -> new SparePartNotFoundException(
+                        String.format(PART_NOT_FOUND, request.getSparePartId())));
+
+        if (sparePart.getStockQuantity() < request.getQuantity()) {
+            throw new InsufficientStockException(
+                    "Insufficient part number %s. Available: %d, requested: %d."
+                            .formatted(sparePart.getName(), sparePart.getStockQuantity(), request.getQuantity()));
+        }
+
+        sparePart.setStockQuantity(sparePart.getStockQuantity() - request.getQuantity());
+        sparePartRepository.save(sparePart);
 
         BreakdownUsedParts usedPart = new BreakdownUsedParts();
         usedPart.setBreakdown(breakdown);
@@ -98,13 +109,20 @@ public class BreakdownService {
     @Transactional
     public BreakdownResponseDTO removePartFromBreakdown(Long breakdownId, Long usedPartId) {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
-        boolean removed = breakdown.getUsedPartsList().removeIf(part -> part.getId().equals(usedPartId));
 
-        if (!removed) {
-            throw new UsedPartNotFoundException("Użyta część o ID " + usedPartId + " nie została znaleziona w awarii o ID " + breakdownId);
-        }
+        BreakdownUsedParts partToRemove = breakdown.getUsedPartsList().stream()
+                .filter(part -> part.getId().equals(usedPartId))
+                .findFirst()
+                .orElseThrow(() -> new UsedPartNotFoundException(
+                        "Used part with ID " + usedPartId + " not found in breakdown ID " + breakdownId));
 
+        SparePart sparePart = partToRemove.getSparePart();
+        sparePart.setStockQuantity(sparePart.getStockQuantity() + partToRemove.getQuantity());
+        sparePartRepository.save(sparePart);
+
+        breakdown.getUsedPartsList().remove(partToRemove);
         recalculateTotalCost(breakdown);
+
         return breakdownMapper.toResponse(breakdownRepository.save(breakdown));
     }
 

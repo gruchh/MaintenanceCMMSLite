@@ -9,6 +9,7 @@ public record SparePartResponseDTO(
         Long id,
         String name,
         BigDecimal price,
-        String producer
+        String producer,
+        Integer stockQuantity
 ) {
 }
