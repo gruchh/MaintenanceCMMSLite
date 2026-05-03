@@ -6,15 +6,15 @@ import com.cmms.lite.breakdown.dto.CloseBreakdownDTO;
 import com.cmms.lite.breakdown.dto.CreateBreakdownDTO;
 import com.cmms.lite.breakdown.entity.Breakdown;
 import com.cmms.lite.breakdown.entity.BreakdownUsedParts;
+import com.cmms.lite.breakdown.exception.BreakdownAlreadyClosedException;
 import com.cmms.lite.breakdown.exception.BreakdownNotFoundException;
 import com.cmms.lite.breakdown.mapper.BreakdownMapper;
 import com.cmms.lite.breakdown.repository.BreakdownRepository;
-import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.machine.entity.Machine;
 import com.cmms.lite.machine.exception.MachineNotFoundException;
 import com.cmms.lite.machine.repository.MachineRepository;
 import com.cmms.lite.sparePart.entity.SparePart;
-import com.cmms.lite.sparePart.exception.InsufficientStockException;
+import com.cmms.lite.sparePart.exception.PartUnavailableException;
 import com.cmms.lite.sparePart.exception.SparePartNotFoundException;
 import com.cmms.lite.sparePart.exception.UsedPartNotFoundException;
 import com.cmms.lite.sparePart.repository.SparePartRepository;
@@ -38,10 +38,11 @@ public class BreakdownService {
     private final MachineRepository machineRepository;
     private final BreakdownMapper breakdownMapper;
 
-    private static final String BREAKDOWN_NOT_FOUND = "Awaria o ID %d nie została znaleziona.";
-    private static final String LATEST_BREAKDOWN_NOT_FOUND = "Nie znaleziono żadnych awarii.";
-    private static final String MACHINE_NOT_FOUND = "Maszyna o ID %d nie została znaleziona.";
-    private static final String PART_NOT_FOUND = "Część zamienna o ID %d nie została znaleziona.";
+    private static final String BREAKDOWN_NOT_FOUND = "Breakdown with ID %d was not found.";
+    private static final String LATEST_BREAKDOWN_NOT_FOUND = "No breakdowns found in the system.";
+    private static final String MACHINE_NOT_FOUND = "Machine with ID %d was not found.";
+    private static final String PART_NOT_FOUND = "Spare part with ID %d was not found.";
+    private static final String BREAKDOWN_ALREADY_CLOSED = "Operation failed: Breakdown with ID %d is already closed.";
 
     @Transactional
     public BreakdownResponseDTO createBreakdown(CreateBreakdownDTO request) {
@@ -87,7 +88,7 @@ public class BreakdownService {
                         String.format(PART_NOT_FOUND, request.getSparePartId())));
 
         if (sparePart.getStockQuantity() < request.getQuantity()) {
-            throw new InsufficientStockException(
+            throw new PartUnavailableException(
                     "Insufficient part number %s. Available: %d, requested: %d."
                             .formatted(sparePart.getName(), sparePart.getStockQuantity(), request.getQuantity()));
         }
@@ -131,7 +132,7 @@ public class BreakdownService {
         Breakdown breakdown = getBreakdownByIdOrThrow(breakdownId);
 
         if (!breakdown.getOpened()) {
-            throw new IllegalOperationException("Awaria jest już zamknięta.");
+            throw new BreakdownAlreadyClosedException(BREAKDOWN_ALREADY_CLOSED);
         }
 
         breakdown.setOpened(false);

@@ -7,12 +7,12 @@ import com.cmms.lite.employee.entity.Address;
 import com.cmms.lite.employee.entity.Employee;
 import com.cmms.lite.employee.entity.EmployeeDetails;
 import com.cmms.lite.employee.entity.EmployeeRole;
+import com.cmms.lite.employee.exception.EmployeeAlreadyExistsException;
 import com.cmms.lite.employee.exception.EmployeeNotFoundException;
 import com.cmms.lite.employee.exception.EmployeeRoleNotFoundException;
 import com.cmms.lite.employee.mapper.EmployeeMapper;
 import com.cmms.lite.employee.repository.EmployeeRepository;
 import com.cmms.lite.employee.repository.EmployeeRoleRepository;
-import com.cmms.lite.exception.IllegalOperationException;
 import com.cmms.lite.security.entity.User;
 import com.cmms.lite.security.exception.UserNotFoundException;
 import com.cmms.lite.security.repository.UserRepository;
@@ -43,7 +43,9 @@ public class EmployeeService {
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND, request.getUserId())));
 
         if (employeeRepository.existsById(user.getId())) {
-            throw new IllegalOperationException("Użytkownik o ID " + user.getId() + " jest już zarejestrowany jako pracownik.");
+            throw new EmployeeAlreadyExistsException(
+                    String.format("Employee for user with id %d already exists", request.getUserId())
+            );
         }
 
         EmployeeRole role = employeeRoleRepository.findById(request.getRoleId())
